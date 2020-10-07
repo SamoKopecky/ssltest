@@ -1,4 +1,6 @@
-import ssl, socket
+import ssl
+import re
+from socket import socket
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -14,17 +16,18 @@ def get_website_info():
     print(get_cert_auth_algorithm(cert.public_key()))
     print("Certificate valid until : " + str(cert.not_valid_after.date()))
     print('subject: ')
-    # TODO: nice printing
     for attribute in cert.subject:
-        print(attribute.oid, end="")
-        print(' = ' + attribute.value)
+        print(get_oid_name(str(attribute.oid)) + ' = ' + attribute.value)
     print('issuer:')
     for attribute in cert.issuer:
-        print(attribute.oid, end="")
-        print(' = ' + attribute.value)
-    print(cert.signature_algorithm_oid)
+        print(get_oid_name(str(attribute.oid)) + ' = ' + attribute.value)
     print("Cipher suite : " + cipher_suite[0])
     print("TLS/SSL version : " + cipher_suite[1])
+    get_oid_name('<ObjectIdentifier(oid=2.5.4.8, name=stateOrProvinceName)')
+
+
+def get_oid_name(oid):
+    return re.findall('name=[a-z, A-Z]+', oid)[0][5:]
 
 
 def get_cert_auth_algorithm(public_key):
@@ -36,7 +39,7 @@ def get_cert_auth_algorithm(public_key):
 def get_session_info(hostname):
     hostname = hostname
     ctx = ssl.create_default_context()
-    with ctx.wrap_socket(socket.socket(), server_hostname=hostname) as sslsock:
+    with ctx.wrap_socket(socket(), server_hostname=hostname) as sslsock:
         sslsock.connect((hostname, 443))
         cert = sslsock.cipher()
 
