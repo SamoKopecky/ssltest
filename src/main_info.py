@@ -3,39 +3,38 @@ from src.utils import *
 from socket import socket
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
 
 
 def get_website_info(hostname):
-    cipher_suite = create_and_get_session_info(hostname)
-    print("Info for " + hostname + ": ")
+    get_certificate_info(hostname)
+    get_session_info(hostname)
+
+
+def get_certificate_info(hostname):
     cert_pem = bytes(ssl.get_server_certificate((hostname, 443)), 'utf-8')
     cert = x509.load_pem_x509_certificate(cert_pem, default_backend())
-    print("Certificate Hash algorith : " + cert.signature_hash_algorithm.name)
-    print(get_cert_auth_algorithm(cert.public_key()))
-    print("Certificate valid until : " + str(cert.not_valid_after.date()))
+    print("Certificate version: " + str(cert.version.value))
+    print("Serial Number: " + str(cert.serial_number))
+    print("Signature Algorithm: " + str(cert.signature_algorithm_oid._name))
+    print("Asymmetric cryptography key length : " + str(cert.public_key().key_size) + " bits")
+    print("Validity interval: " + str(cert.not_valid_before.date()) + " to " + str(cert.not_valid_after.date()))
     print('subject: ')
     for attribute in cert.subject:
-        print(get_oid_name(str(attribute.oid)) + ' = ' + attribute.value)
+        print(attribute.oid._name + ' = ' + attribute.value)
     print('issuer:')
     for attribute in cert.issuer:
-        print(get_oid_name(str(attribute.oid)) + ' = ' + attribute.value)
+        print(attribute.oid._name + ' = ' + attribute.value)
+
+
+def get_session_info(hostname):
+    session = create_session(hostname)
+    cipher_suite = session.cipher()
     print("Cipher suite : " + cipher_suite[0])
     print("TLS/SSL version : " + cipher_suite[1])
-    get_oid_name('<ObjectIdentifier(oid=2.5.4.8, name=stateOrProvinceName)')
 
 
-def get_cert_auth_algorithm(public_key):
-    if isinstance(public_key, rsa.RSAPublicKey):
-        return "RSA key size: " + str(public_key.key_size)
-    # TODO: implement more algorithms
-
-
-def create_and_get_session_info(hostname):
-    hostname = hostname
+def create_session(hostname):
     ctx = ssl.create_default_context()
-    with ctx.wrap_socket(socket(), server_hostname=hostname) as sslsock:
-        sslsock.connect((hostname, 443))
-        cert = sslsock.cipher()
-
-    return cert
+    ssl_socket = ctx.wrap_socket(socket(), server_hostname=hostname)
+    ssl_socket.connect((hostname, 443))
+    return ssl_socket
