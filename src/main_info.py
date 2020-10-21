@@ -41,5 +41,4 @@ def create_session(hostname):
     ctx = ssl.create_default_context()
     ssl_socket = ctx.wrap_socket(socket(), server_hostname=hostname)
     ssl_socket.connect((hostname, 443))
-    ssl_socket.getpeercert()
     return ssl_socket
