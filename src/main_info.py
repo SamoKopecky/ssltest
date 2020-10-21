@@ -28,9 +28,12 @@ def get_certificate_info(ssl_socket):
 
 
 def get_session_info(ssl_socket):
-    cipher_suite = ssl_socket.cipher()
-    print("Cipher suite : " + cipher_suite[0])
-    print("TLS/SSL version : " + cipher_suite[1])
+    cipher = ssl_socket.cipher()
+    cipher_suite = cipher[0]
+    if '-' in cipher_suite:
+        cipher_suite = convert_openssh_to_iana(cipher_suite)
+    print("Cipher suite : " + cipher_suite)
+    print("TLS/SSL version : " + cipher[1])
     return ssl_socket
 
 
