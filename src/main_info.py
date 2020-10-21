@@ -6,13 +6,14 @@ from cryptography.hazmat.backends import default_backend
 
 
 def get_website_info(hostname):
-    get_certificate_info(hostname)
-    get_session_info(hostname)
+    ssl_socket = create_session(hostname)
+    get_session_info(ssl_socket)
+    get_certificate_info(ssl_socket)
 
 
-def get_certificate_info(hostname):
-    cert_pem = bytes(ssl.get_server_certificate((hostname, 443)), 'utf-8')
-    cert = x509.load_pem_x509_certificate(cert_pem, default_backend())
+def get_certificate_info(ssl_socket):
+    cert_pem = bytes(ssl_socket.getpeercert(binary_form=True))
+    cert = x509.load_der_x509_certificate(cert_pem, default_backend())
     print("Certificate version: " + str(cert.version.value))
     print("Serial Number: " + str(cert.serial_number))
     print("Signature Algorithm: " + str(cert.signature_algorithm_oid._name))
@@ -26,15 +27,16 @@ def get_certificate_info(hostname):
         print(attribute.oid._name + ' = ' + attribute.value)
 
 
-def get_session_info(hostname):
-    session = create_session(hostname)
-    cipher_suite = session.cipher()
+def get_session_info(ssl_socket):
+    cipher_suite = ssl_socket.cipher()
     print("Cipher suite : " + cipher_suite[0])
     print("TLS/SSL version : " + cipher_suite[1])
+    return ssl_socket
 
 
 def create_session(hostname):
     ctx = ssl.create_default_context()
     ssl_socket = ctx.wrap_socket(socket(), server_hostname=hostname)
     ssl_socket.connect((hostname, 443))
+    ssl_socket.getpeercert()
     return ssl_socket
