@@ -1,0 +1,42 @@
+3 urovne
+1. bezpecne
+2. nedoporucane
+3. legacy use/slabe
+4. zakazane
+
+
+suites:
+1. ephemeral keys over static keys (DHE over DH)
+2. GCM or CCM over CBC
+3. CCM over CCM_8
+
+1:
+TLS verzia: 1.3, 1.2
+Asymetric encryption mode: GCM, CCM
+Asymetric encryption: AES(>=128)
+Hash: SHA223, SHA256, SHA384, SHA512, SHA512-224, SHA512-256, SHA3-224, SHA3-256, SHA3-384, SHA3-512
+key-exchange: ECDHE, DHE,
+certificate signature: ECDSA(>=224), RSA(>=2048), DSS(2048, 224)
+Ak nani key-exchange ani certificate musi byt GCM alebo CCM
+
+2:
+TLS verzia: 1.2, 1.1, 1.0
+Asymetric encryption mode: GCM_8, CBC
+Asymetric encryption: AES(>=128)
+Hash: SHA(SHA-1)
+key-exchange: ECDH, DH
+certificate signature: ECDSA(>=224), RSA(>=2048), DSS(2048, 224)
+ak neni certificte signauter: RSA
+
+3:
+TLS verzia: 1.1, 1.0
+Asymetric encryption: TDEA, 2DES, 3DES
+certificate signature: ECDSA(>=160), RSA(>=1024), DSS(512, 160)
+
+4:
+TLS verzia: 3.0, 2.0
+Asymetric encryption mode: ECB, CTR
+Asymetric encryption: AES(<=128), skipjack
+Hash: SHA
+key-exchange: ECDH, DH, PSK
+certificate signature: ECDSA(>=160), RSA(>=1024), DSS(512, 160), PSK
