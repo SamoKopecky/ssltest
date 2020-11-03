@@ -1,0 +1,6 @@
+RSA
+DSS
+anon
+KRB5
+PSK
+ECDSA

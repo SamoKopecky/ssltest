@@ -7,8 +7,9 @@ from cryptography.hazmat.backends import default_backend
 
 def get_website_info(hostname):
     ssl_socket = create_session(hostname)
-    get_session_info(ssl_socket)
+    cipher_suite = get_session_info(ssl_socket)
     get_certificate_info(ssl_socket)
+    return cipher_suite
 
 
 def get_certificate_info(ssl_socket):
@@ -34,7 +35,7 @@ def get_session_info(ssl_socket):
         cipher_suite = convert_openssh_to_iana(cipher_suite)
     print("Cipher suite : " + cipher_suite)
     print("TLS/SSL version : " + cipher[1])
-    return ssl_socket
+    return cipher_suite
 
 
 def create_session(hostname):
