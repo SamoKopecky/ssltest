@@ -21,7 +21,7 @@ Ak nani key-exchange ani certificate musi byt GCM alebo CCM
 
 2:
 TLS verzia: 1.2, 1.1, 1.0
-Asymetric encryption mode: GCM_8, CBC
+Asymetric encryption mode: CCM, CBC
 Asymetric encryption: AES(>=128)
 Hash: SHA(SHA-1)
 key-exchange: ECDH, DH
