@@ -1,0 +1,75 @@
+{
+  "KEY_EXCHANGE_ALG": {
+    "1": "ECDHE,DHE",
+    "2": "ECDH,DH",
+    "3": "NONE",
+    "4": "NULL"
+  },
+  "CERT_SIG_ALG": {
+    "1": "ECDSA,RSA,DSS",
+    "2": "",
+    "3": "",
+    "4": ""
+  },
+  "SYM_ENCRYPT_ALG": {
+    "1": "AES",
+    "2": "",
+    "3": "TDEA,2DES,3DES",
+    "4": "SKIPJACK"
+  },
+  "SYM_ENCRYPT_ALG_KEY_LEN": {
+    "1": "AES128",
+    "2": "",
+    "3": "",
+    "4": "AES64"
+  },
+  "SYM_ENCRYPT_ALG_BLOCK_MODE": {
+    "1": "GCM,CCM",
+    "2": "",
+    "3": "",
+    "4": ""
+  },
+  "SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER": {
+    "1": "",
+    "2": "CCM8",
+    "3": "",
+    "4": ""
+  },
+  "HASH_FUN": {
+    "1": "SHA223,SHA256,SHA384",
+    "2": "SHA",
+    "3": "",
+    "4": "MD5"
+  },
+  "HMAC": {
+    "1": "NONE",
+    "2": "NONE",
+    "3": "NONE",
+    "4": "NULL"
+  },
+  "PROTOCOL": {
+    "1": "TLS",
+    "2": "",
+    "3": "",
+    "4": "SSL"
+  },
+  "PROTOCOL_VERSION": {
+    "1": "1.3,1.2",
+    "2": "1.1,1.0",
+    "3": "",
+    "4": "3,2"
+  },
+  "CERT_SIG_ALG_HASH_FUN": {
+    "1": "SHA223,SHA256,SHA384",
+    "2": "SHA",
+    "3": "",
+    "4": "MD5"
+  },
+  "CERT_SIG_ALG_KEY_LEN": {
+    "1": "RSA2048,ECDSA224",
+    "2": "",
+    "3": "ECDSA160,RSA1024",
+    "4": ""
+  }
+}
+
