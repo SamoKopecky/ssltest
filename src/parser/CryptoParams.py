@@ -29,7 +29,7 @@ class CryptoParams:
                               range(CPEnum.KEY_EXCHANGE_ALG.value, CPEnum.HMAC.value + 1)]
         for param in raw_params:
             for enum in cipher_suite_enums:
-                file_params = jdata[enum.name]['PARAMETERS'].split(',')
+                file_params = jdata[enum.name].split(',')
                 if param in file_params:
                     cipher_suite_enums.remove(enum)
                     self.params[enum] = [param, 0]
