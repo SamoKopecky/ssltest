@@ -1,19 +1,9 @@
 import os
 import json
 from src.parser.CryptoParamsEnum import CryptoParamsEnum as CPEnum
+from src.utils import read_json
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-FILE_NAMES = [
-    'key_exchange_algorithm.txt',
-    'certificate_signature_algorithm.txt',
-    'symetric_encryption_algorithm.txt',
-    'symetric_encryption_algorithm_key_length.txt',
-    'symetric_encryption_algorithm_block_mode.txt',
-    'symetric_encryption_algorithm_block_mode_number.txt',
-    'cipher_suite_hash_function.txt',
-    'hmac.txt'
-]
 
 
 class CryptoParams:
@@ -36,19 +26,18 @@ class CryptoParams:
         self.rating = 0
 
     def parse_cipher_suite(self, cipher_suite: str):
+        jdata = read_json('cipher_parameters.json')
         raw_params = cipher_suite.split('_')
         raw_params.remove('TLS')
-        file_names_cpy = FILE_NAMES.copy()
+        cipher_suite_enums = [CPEnum(enum_val) for enum_val in
+                              range(CPEnum.KEY_EXCHANGE_ALG.value, CPEnum.HMAC.value + 1)]
         for param in raw_params:
-            file = ''
-            for idx, file_name in enumerate(file_names_cpy):
-                file = open(ROOT_DIR + '/../../resources/cipher_parameters/' + file_name, 'r')
-                file_params = file.readline().split(',')
+            for enum in cipher_suite_enums:
+                file_params = jdata[enum.name]['PARAMETERS'].split(',')
                 if param in file_params:
-                    file_names_cpy.pop(idx)
-                    self.params[CPEnum(FILE_NAMES.index(file_name))] = [param, 0]
+                    cipher_suite_enums.remove(enum)
+                    self.params[enum] = [param, 0]
                     break
-            file.close()
         if self.params[CPEnum.CERT_SIG_ALG][0] == 'N/A' and self.params[CPEnum.KEY_EXCHANGE_ALG][0] == 'RSA':
             self.params[CPEnum.CERT_SIG_ALG][0] = 'RSA'
 
@@ -61,9 +50,7 @@ class CryptoParams:
         # self.params[CPEnum.SYM_ENCRYPT_ALG_KEY_LEN][0] = '64'
         # self.params[CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER][0] = '8'
         # self.params[CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE][0] = 'CCM'
-
-        jfile = open(ROOT_DIR + '/../../resources/security_levels.json', 'r')
-        jdata = json.loads(jfile.read())
+        jdata = read_json('security_levels.json')
 
         for enum in CPEnum:
             param = self.params[enum].copy()
@@ -78,4 +65,3 @@ class CryptoParams:
                     self.params[enum][1] = idx
                     break
         self.rating = max([solo_rating[1] for solo_rating in self.params.values()])
-        jfile.close()
