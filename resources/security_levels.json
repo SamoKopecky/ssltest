@@ -18,10 +18,10 @@
     "4": "SKIPJACK"
   },
   "SYM_ENCRYPT_ALG_KEY_LEN": {
-    "1": "AES128",
+    "1": "AES,>=128",
     "2": "",
     "3": "",
-    "4": "AES64"
+    "4": "AES,<<128"
   },
   "SYM_ENCRYPT_ALG_BLOCK_MODE": {
     "1": "GCM,CCM",
@@ -31,7 +31,7 @@
   },
   "SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER": {
     "1": "",
-    "2": "CCM8",
+    "2": "CCM,==8",
     "3": "",
     "4": ""
   },
@@ -66,10 +66,10 @@
     "4": "MD5"
   },
   "CERT_SIG_ALG_KEY_LEN": {
-    "1": "RSA2048,ECDSA224",
+    "1": "RSA,>=2048,ECDSA,>=224",
     "2": "",
-    "3": "ECDSA160,RSA1024",
-    "4": ""
+    "3": "ECDSA,>=160,RSA,>=1024",
+    "4": "ECDSA,<<160,RSA,<<1024"
   }
 }
 

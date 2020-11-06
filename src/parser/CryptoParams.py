@@ -1,9 +1,5 @@
-import os
-import json
 from src.parser.CryptoParamsEnum import CryptoParamsEnum as CPEnum
-from src.utils import read_json
-
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+from src.utils import read_json, compare_key_length
 
 
 class CryptoParams:
@@ -50,18 +46,18 @@ class CryptoParams:
         # self.params[CPEnum.SYM_ENCRYPT_ALG_KEY_LEN][0] = '64'
         # self.params[CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER][0] = '8'
         # self.params[CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE][0] = 'CCM'
+        # self.params[CPEnum.CERT_SIG_ALG_KEY_LEN][0] = '1500'
         jdata = read_json('security_levels.json')
 
         for enum in CPEnum:
             param = self.params[enum].copy()
-            if enum == CPEnum.SYM_ENCRYPT_ALG_KEY_LEN:
-                param[0] = self.params[CPEnum.SYM_ENCRYPT_ALG][0] + self.params[enum][0]
-            elif enum == CPEnum.CERT_SIG_ALG_KEY_LEN:
-                param[0] = self.params[CPEnum.CERT_SIG_ALG][0] + self.params[enum][0]
-            elif enum == CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER:
-                param[0] = self.params[CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE][0] + self.params[enum][0]
+            if enum == CPEnum.SYM_ENCRYPT_ALG_KEY_LEN or \
+                    enum == CPEnum.CERT_SIG_ALG_KEY_LEN or \
+                    enum == CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER:
+                self.params[enum][1] = compare_key_length(self.params[CPEnum.get_key_pair(enum)][0], param[0],
+                                                          jdata[enum.name])
             for idx in range(1, 5):
-                if param[0] in jdata[enum.name][str(idx)].split(","):
+                if param[0] in jdata[enum.name][str(idx)].split(','):
                     self.params[enum][1] = idx
                     break
         self.rating = max([solo_rating[1] for solo_rating in self.params.values()])
