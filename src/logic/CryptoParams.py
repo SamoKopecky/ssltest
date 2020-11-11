@@ -15,8 +15,9 @@ class CryptoParams:
         self.cert_subject = self.cert.subject
         self.cert_issuer = self.cert.issuer
         self.cipher_suite = cipher_suite
-        self.params[CPEnum.CERT_PUB_KEY_LEN] = [str(self.cert.public_key().key_size), 0]
-        self.params[CPEnum.CERT_SIG_ALG_HASH_FUN] = [str(self.cert.signature_hash_algorithm.name).upper(), 0]
+        self.params[CPEnum.CERT_SIG_ALG][0] = get_sig_alg_from_oid(self.cert.signature_algorithm_oid)
+        self.params[CPEnum.CERT_SIG_ALG_HASH_FUN][0] = str(self.cert.signature_hash_algorithm.name).upper()
+        self.params[CPEnum.CERT_PUB_KEY_LEN][0] = str(self.cert.public_key().key_size)
         self.rating = 0
 
     def parse_cipher_suite(self):
@@ -34,15 +35,8 @@ class CryptoParams:
                     cipher_suite_enums.remove(enum)
                     self.params[enum] = [param, 0]
                     break
-        if self.params[CPEnum.PROTOCOL_VERSION][0] == '1.3':
-            self.params[CPEnum.KEY_EXCHANGE_ALG][0] = 'ECDHE'
         if self.params[CPEnum.CERT_PUB_KEY_ALG][0] == 'N/A':
             self.params[CPEnum.CERT_PUB_KEY_ALG][0] = pub_key_alg_from_cert(self.cert.public_key())
-        self.params[CPEnum.CERT_SIG_ALG][0] = get_sig_alg_from_oid(self.cert.signature_algorithm_oid)
-
-    def parse_protocol_version(self):
-        self.params[CPEnum.PROTOCOL] = [self.protocol[:3], 0]
-        self.params[CPEnum.PROTOCOL_VERSION] = [self.protocol[4:], 0]
 
     def rate_parameters(self):
         jdata = read_json('security_levels.json')
@@ -50,10 +44,16 @@ class CryptoParams:
             if enum == CPEnum.SYM_ENCRYPT_ALG_KEY_LEN or \
                     enum == CPEnum.CERT_PUB_KEY_LEN or \
                     enum == CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER:
-                self.params[enum][1] = compare_key_length(self.params[CPEnum.get_key_pair(enum)][0],
+                self.params[enum][1] = compare_key_length(self.params[enum.key_pair][0],
                                                           self.params[enum][0], jdata[enum.name])
             for idx in range(1, 5):
                 if self.params[enum][0] in jdata[enum.name][str(idx)].split(','):
                     self.params[enum][1] = idx
                     break
         self.rating = max([solo_rating[1] for solo_rating in self.params.values()])
+
+    def parse_protocol_version(self):
+        self.params[CPEnum.PROTOCOL] = [self.protocol[:3], 0]
+        self.params[CPEnum.PROTOCOL_VERSION] = [self.protocol[4:], 0]
+        if self.params[CPEnum.PROTOCOL_VERSION][0] == '1.3':
+            self.params[CPEnum.KEY_EXCHANGE_ALG][0] = 'ECDHE'

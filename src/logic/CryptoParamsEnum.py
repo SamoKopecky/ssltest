@@ -16,7 +16,8 @@ class CryptoParamsEnum(Enum):
     CERT_SIG_ALG_HASH_FUN = auto()
     HMAC = auto()
 
-    def get_key_pair(self):
+    @property
+    def key_pair(self):
         pairs = {
             self.SYM_ENCRYPT_ALG_KEY_LEN: self.SYM_ENCRYPT_ALG,
             self.CERT_PUB_KEY_LEN: self.CERT_PUB_KEY_ALG,
