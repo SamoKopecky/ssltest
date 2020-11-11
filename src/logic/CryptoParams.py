@@ -1,4 +1,4 @@
-from src.parser.CryptoParamsEnum import CryptoParamsEnum as CPEnum
+from src.logic.CryptoParamsEnum import CryptoParamsEnum as CPEnum
 from src.utils import read_json, compare_key_length, pub_key_alg_from_cert, get_sig_alg_from_oid
 
 
@@ -15,7 +15,7 @@ class CryptoParams:
         self.cert_subject = self.cert.subject
         self.cert_issuer = self.cert.issuer
         self.cipher_suite = cipher_suite
-        self.params[CPEnum.CERT_PUB_KEY_ALG_KEY_LEN] = [str(self.cert.public_key().key_size), 0]
+        self.params[CPEnum.CERT_PUB_KEY_LEN] = [str(self.cert.public_key().key_size), 0]
         self.params[CPEnum.CERT_SIG_ALG_HASH_FUN] = [str(self.cert.signature_hash_algorithm.name).upper(), 0]
         self.rating = 0
 
@@ -23,8 +23,10 @@ class CryptoParams:
         jdata = read_json('cipher_parameters.json')
         raw_params = self.cipher_suite.split('_')
         raw_params.remove('TLS')
-        cipher_suite_enums = [CPEnum(enum_val) for enum_val in
-                              range(CPEnum.KEY_EXCHANGE_ALG.value, CPEnum.HMAC.value + 1)]
+        cipher_suite_enums = []
+        for enum in CPEnum:
+            if enum.is_parsable():
+                cipher_suite_enums.append(enum)
         for param in raw_params:
             for enum in cipher_suite_enums:
                 file_params = jdata[enum.name].split(',')
@@ -34,8 +36,8 @@ class CryptoParams:
                     break
         if self.params[CPEnum.PROTOCOL_VERSION][0] == '1.3':
             self.params[CPEnum.KEY_EXCHANGE_ALG][0] = 'ECDHE'
-        if self.params[CPEnum.CERT_PUB_KEY_ALG_KEY_ALG][0] == 'N/A':
-            self.params[CPEnum.CERT_PUB_KEY_ALG_KEY_ALG][0] = pub_key_alg_from_cert(self.cert.public_key())
+        if self.params[CPEnum.CERT_PUB_KEY_ALG][0] == 'N/A':
+            self.params[CPEnum.CERT_PUB_KEY_ALG][0] = pub_key_alg_from_cert(self.cert.public_key())
         self.params[CPEnum.CERT_SIG_ALG][0] = get_sig_alg_from_oid(self.cert.signature_algorithm_oid)
 
     def parse_protocol_version(self):
@@ -46,7 +48,7 @@ class CryptoParams:
         jdata = read_json('security_levels.json')
         for enum in CPEnum:
             if enum == CPEnum.SYM_ENCRYPT_ALG_KEY_LEN or \
-                    enum == CPEnum.CERT_PUB_KEY_ALG_KEY_LEN or \
+                    enum == CPEnum.CERT_PUB_KEY_LEN or \
                     enum == CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER:
                 self.params[enum][1] = compare_key_length(self.params[CPEnum.get_key_pair(enum)][0],
                                                           self.params[enum][0], jdata[enum.name])

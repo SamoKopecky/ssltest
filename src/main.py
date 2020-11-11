@@ -1,9 +1,6 @@
-from src.text_output.console_output import output
-from src.parser.session_info import get_website_info
-from src.parser.CryptoParams import CryptoParams
-from src.parser.CryptoParamsEnum import CryptoParamsEnum
-import json
-import os
+from src.console_output.console_output import output
+from src.logic.session_info import get_website_info
+from src.logic.CryptoParams import CryptoParams
 
 if __name__ == '__main__':
     cert, cipher, protocol = get_website_info(str(input("Domain name: ") or 'stackoverflow.com'))

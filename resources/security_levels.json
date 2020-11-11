@@ -65,13 +65,13 @@
     "3": "",
     "4": "MD5"
   },
-  "CERT_PUB_KEY_ALG_KEY_LEN": {
+  "CERT_PUB_KEY_LEN": {
     "1": "RSA,>=2048,ECDSA,>=224,EC,>=224",
     "2": "",
     "3": "ECDSA,>=160,RSA,>=1024,EC,>=160",
     "4": "ECDSA,<<160,RSA,<<1024,EC,<<160"
   },
-  "CERT_PUB_KEY_ALG_KEY_ALG": {
+  "CERT_PUB_KEY_ALG": {
     "1": "EC,RSA,ECDSA",
     "2": "DSA",
     "3": "",
