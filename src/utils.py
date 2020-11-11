@@ -1,5 +1,11 @@
 import json
 import os
+from cryptography import x509
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric import dsa
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.hazmat.primitives.asymmetric import ed448
 
 
 def convert_openssh_to_iana(search_term):
@@ -41,3 +47,20 @@ def return_function_from_operation(operation):
         return lambda a, b: a < b
     elif operation == "==":
         return lambda a, b: a == b
+
+
+def pub_key_alg_from_cert(public_key):
+    if isinstance(public_key, ec.EllipticCurvePublicKey):
+        return 'EC'
+    elif isinstance(public_key, rsa.RSAPublicKey):
+        return 'RSA'
+    elif isinstance(public_key, dsa.DSAPublicKey):
+        return 'DSA'
+    elif isinstance(public_key, ed25519.Ed25519PublicKey) or isinstance(public_key, ed448.Ed448PublicKey):
+        return 'ECDSA'
+
+
+def get_sig_alg_from_oid(oid):
+    values = list(x509.SignatureAlgorithmOID.__dict__.values())
+    keys = list(x509.SignatureAlgorithmOID.__dict__.keys())
+    return keys[values.index(oid)].split('_')[0]
