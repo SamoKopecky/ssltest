@@ -1,6 +1,6 @@
 {
   "KEY_EXCHANGE_ALG": {
-    "1": "ECDHE,DHE",
+    "1": "ECDHE,DHE,RSA",
     "2": "ECDH,DH",
     "3": "NONE",
     "4": "NULL"
@@ -25,7 +25,7 @@
   },
   "SYM_ENCRYPT_ALG_BLOCK_MODE": {
     "1": "GCM,CCM",
-    "2": "",
+    "2": "CBC",
     "3": "",
     "4": ""
   },

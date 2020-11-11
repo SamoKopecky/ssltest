@@ -7,6 +7,7 @@ class CryptoParams:
     def __init__(self, cert, cipher_suite, protocol):
         self.params = {enum: ['N/A', 0] for enum in CPEnum}
         self.cert = cert
+        self.protocol = protocol
         self.cert_version = str(self.cert.version.value)
         self.cert_serial_number = str(self.cert.serial_number)
         self.cert_not_valid_before = str(self.cert.not_valid_before.date())
@@ -14,15 +15,13 @@ class CryptoParams:
         self.cert_subject = self.cert.subject
         self.cert_issuer = self.cert.issuer
         self.cipher_suite = cipher_suite
-        self.parse_protocol_version(protocol)
-        self.parse_cipher_suite(self.cipher_suite)
         self.params[CPEnum.CERT_PUB_KEY_ALG_KEY_LEN] = [str(self.cert.public_key().key_size), 0]
         self.params[CPEnum.CERT_SIG_ALG_HASH_FUN] = [str(self.cert.signature_hash_algorithm.name).upper(), 0]
         self.rating = 0
 
-    def parse_cipher_suite(self, cipher_suite: str):
+    def parse_cipher_suite(self):
         jdata = read_json('cipher_parameters.json')
-        raw_params = cipher_suite.split('_')
+        raw_params = self.cipher_suite.split('_')
         raw_params.remove('TLS')
         cipher_suite_enums = [CPEnum(enum_val) for enum_val in
                               range(CPEnum.KEY_EXCHANGE_ALG.value, CPEnum.HMAC.value + 1)]
@@ -39,18 +38,12 @@ class CryptoParams:
             self.params[CPEnum.CERT_PUB_KEY_ALG_KEY_ALG][0] = pub_key_alg_from_cert(self.cert.public_key())
         self.params[CPEnum.CERT_SIG_ALG][0] = get_sig_alg_from_oid(self.cert.signature_algorithm_oid)
 
-    def parse_protocol_version(self, protocol):
-        self.params[CPEnum.PROTOCOL] = [protocol[:3], 0]
-        self.params[CPEnum.PROTOCOL_VERSION] = [protocol[4:], 0]
+    def parse_protocol_version(self):
+        self.params[CPEnum.PROTOCOL] = [self.protocol[:3], 0]
+        self.params[CPEnum.PROTOCOL_VERSION] = [self.protocol[4:], 0]
 
     def rate_parameters(self):
-        # self.params[CPEnum.HASH_FUN][0] = 'SHA'
-        # self.params[CPEnum.SYM_ENCRYPT_ALG_KEY_LEN][0] = '64'
-        # self.params[CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER][0] = '8'
-        # self.params[CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE][0] = 'CCM'
-        # self.params[CPEnum.CERT_PUB_KEY_ALG_KEY_LEN][0] = '1500'
         jdata = read_json('security_levels.json')
-
         for enum in CPEnum:
             if enum == CPEnum.SYM_ENCRYPT_ALG_KEY_LEN or \
                     enum == CPEnum.CERT_PUB_KEY_ALG_KEY_LEN or \
