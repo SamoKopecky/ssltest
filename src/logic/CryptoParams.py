@@ -25,7 +25,7 @@ class CryptoParams:
         raw_params.remove('TLS')
         cipher_suite_enums = []
         for enum in CPEnum:
-            if enum.is_parsable():
+            if enum.is_parsable:
                 cipher_suite_enums.append(enum)
         for param in raw_params:
             for enum in cipher_suite_enums:
