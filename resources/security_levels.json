@@ -2,12 +2,12 @@
   "KEY_EXCHANGE_ALG": {
     "1": "ECDHE,DHE,RSA",
     "2": "ECDH,DH",
-    "3": "NONE",
-    "4": "NULL"
+    "3": "",
+    "4": ""
   },
   "CERT_SIG_ALG": {
-    "1": "ECDSA,RSA,DSS",
-    "2": "",
+    "1": "EC,RSA,ECDSA",
+    "2": "DSA,DSS",
     "3": "",
     "4": ""
   },
@@ -42,10 +42,10 @@
     "4": "MD5"
   },
   "HMAC": {
-    "1": "NONE",
-    "2": "NONE",
-    "3": "NONE",
-    "4": "NULL"
+    "1": "",
+    "2": "",
+    "3": "",
+    "4": ""
   },
   "PROTOCOL": {
     "1": "TLS",
@@ -73,7 +73,7 @@
   },
   "CERT_PUB_KEY_ALG": {
     "1": "EC,RSA,ECDSA",
-    "2": "DSA",
+    "2": "DSA,DSS",
     "3": "",
     "4": ""
   }

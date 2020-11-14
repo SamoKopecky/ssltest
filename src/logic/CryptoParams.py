@@ -24,10 +24,7 @@ class CryptoParams:
         jdata = read_json('cipher_parameters.json')
         raw_params = self.cipher_suite.split('_')
         raw_params.remove('TLS')
-        cipher_suite_enums = []
-        for enum in CPEnum:
-            if enum.is_parsable:
-                cipher_suite_enums.append(enum)
+        cipher_suite_enums = [enum for enum in CPEnum if enum.is_parsable]
         for param in raw_params:
             for enum in cipher_suite_enums:
                 file_params = jdata[enum.name].split(',')
@@ -44,8 +41,10 @@ class CryptoParams:
             if enum == CPEnum.SYM_ENCRYPT_ALG_KEY_LEN or \
                     enum == CPEnum.CERT_PUB_KEY_LEN or \
                     enum == CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER:
-                self.params[enum][1] = compare_key_length(self.params[enum.key_pair][0],
-                                                          self.params[enum][0], jdata[enum.name])
+                self.params[enum][1] = compare_key_length(
+                    self.params[enum.key_pair][0],
+                    self.params[enum][0], jdata[enum.name]
+                )
             for idx in range(1, 5):
                 if self.params[enum][0] in jdata[enum.name][str(idx)].split(','):
                     self.params[enum][1] = idx

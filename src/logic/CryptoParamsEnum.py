@@ -26,7 +26,7 @@ class CryptoParamsEnum(Enum):
         return pairs[self]
 
     @property
-    def alias(self):
+    def string_alias(self):
         aliases = {
             self.PROTOCOL: 'Typ protokolu',
             self.PROTOCOL_VERSION: 'Verzia protokolu',
