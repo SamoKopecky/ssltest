@@ -1,13 +1,13 @@
 {
   "KEY_EXCHANGE_ALG": {
-    "1": "ECDHE,DHE,RSA",
-    "2": "ECDH,DH",
+    "1": "ECDHE,DHE",
+    "2": "ECDH,DH,RSA",
     "3": "",
     "4": ""
   },
   "CERT_SIG_ALG": {
-    "1": "EC,RSA,ECDSA",
-    "2": "DSA,DSS",
+    "1": "EC,RSA,ECDSA,DSA,DSS,EdDSA",
+    "2": "",
     "3": "",
     "4": ""
   },
