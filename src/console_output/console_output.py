@@ -13,8 +13,9 @@ def get_string_rating(rating: int):
     return ratings[rating]
 
 
-def output(params: CryptoParams):
-    print('Cipher suite: ' + params.cipher_suite)
+def console_output(params: CryptoParams):
+    print('Kryptografická sada: \n\t{}'.format(params.cipher_suite))
+    print('Kryptografické parametre:')
     for enum in CPEnum:
         print('\t{}: {}->{}({})'.format(
             enum.string_alias,
@@ -22,13 +23,14 @@ def output(params: CryptoParams):
             get_string_rating(params.params[enum][1]),
             params.params[enum][1])
         )
-    print('Certificate version: {}'.format(params.cert_version))
-    print('Serial Number: {}'.format(params.cert_serial_number))
-    print('Validity interval: {} to {}'.format(params.cert_not_valid_before, params.cert_not_valid_after))
-    print('subject: ')
+    print('Ostatné informácie o certifikáte:')
+    print('\tCelková bezpečnosť kryptografickej sady: {}({})'.format(get_string_rating(params.rating), params.rating))
+    print('\tVerzia certifikátu: {}'.format(params.cert_version))
+    print('\tSériové číslo: {}'.format(params.cert_serial_number))
+    print('\tInterval platnosti: {} do {}'.format(params.cert_not_valid_before, params.cert_not_valid_after))
+    print('\tpredmet: ')
     for attribute in params.cert_subject:
-        print('\t' + attribute.oid._name + ' = ' + attribute.value)
-    print('issuer:')
+        print('\t\t' + attribute.oid._name + ' = ' + attribute.value)
+    print('\tvydavateľ:')
     for attribute in params.cert_issuer:
-        print('\t' + attribute.oid._name + ' = ' + attribute.value)
-    print('rating: {}'.format(get_string_rating(params.rating)))
+        print('\t\t' + attribute.oid._name + ' = ' + attribute.value)

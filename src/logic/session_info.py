@@ -7,7 +7,7 @@ from cryptography.hazmat.backends import default_backend
 
 def get_website_info(hostname):
     ssl_socket = create_session(hostname)
-    cipher_suite, protocol = get_session_suite_and_protocol(ssl_socket)
+    cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     cert = get_certificate(ssl_socket)
     ssl_socket.close()
     return cert, cipher_suite, protocol
@@ -19,7 +19,7 @@ def get_certificate(ssl_socket):
     return cert
 
 
-def get_session_suite_and_protocol(ssl_socket):
+def get_cipher_suite_and_protocol(ssl_socket):
     cipher = ssl_socket.cipher()
     cipher_suite = cipher[0]
     if '-' in cipher_suite:

@@ -34,12 +34,12 @@ class CryptoParamsEnum(Enum):
             self.CERT_PUB_KEY_ALG: 'Algoritmus verejného kľúča',
             self.CERT_PUB_KEY_LEN: 'Veľkosť verejného kľúča',
             self.SYM_ENCRYPT_ALG: 'Algoritmus symetrickej šifry',
-            self.SYM_ENCRYPT_ALG_KEY_LEN: 'Veľkosť kĺúča symetrickej šifry',
+            self.SYM_ENCRYPT_ALG_KEY_LEN: 'Veľkosť kľúča symetrickej šifry',
             self.SYM_ENCRYPT_ALG_BLOCK_MODE: 'Blokový mód symetrickej šifry',
             self.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER: 'TODO',
             self.HASH_FUN: 'Hash funkcia',
             self.CERT_SIG_ALG: 'Algoritmus podpisu certifikátu',
-            self.CERT_SIG_ALG_HASH_FUN: 'Hash funkcia pre popdis certifikátu',
+            self.CERT_SIG_ALG_HASH_FUN: 'Hash funkcia pre podpis certifikátu',
             self.HMAC: 'TODO',
         }
         return aliases[self]
