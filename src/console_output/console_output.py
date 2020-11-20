@@ -7,7 +7,7 @@ def get_string_rating(rating: int):
         0: 'nezistené/chyba',
         1: 'bezpečné',
         2: 'nedoporúčané',
-        3: 'legacy use/slabé',
+        3: 'zastarané',
         4: 'zakázané'
     }
     return ratings[rating]
