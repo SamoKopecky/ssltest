@@ -17,14 +17,16 @@ def console_output(params: CryptoParams):
     print('Kryptografická sada: \n\t{}'.format(params.cipher_suite))
     print('Kryptografické parametre:')
     for enum in CPEnum:
+        if params.params[enum][1] == 0:
+            continue
         print('\t{}: {}->{}({})'.format(
             enum.string_alias,
             params.params[enum][0],
             get_string_rating(params.params[enum][1]),
             params.params[enum][1])
         )
-    print('Ostatné informácie o certifikáte:')
     print('\tCelková bezpečnosť kryptografickej sady: {}({})'.format(get_string_rating(params.rating), params.rating))
+    print('Ostatné informácie o certifikáte:')
     print('\tVerzia certifikátu: {}'.format(params.cert_version))
     print('\tSériové číslo: {}'.format(params.cert_serial_number))
     print('\tInterval platnosti: {} do {}'.format(params.cert_not_valid_before, params.cert_not_valid_after))

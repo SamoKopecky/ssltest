@@ -36,11 +36,11 @@ class CryptoParamsEnum(Enum):
             self.SYM_ENCRYPT_ALG: 'Algoritmus symetrickej šifry',
             self.SYM_ENCRYPT_ALG_KEY_LEN: 'Veľkosť kľúča symetrickej šifry',
             self.SYM_ENCRYPT_ALG_BLOCK_MODE: 'Blokový mód symetrickej šifry',
-            self.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER: 'TODO',
+            self.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER: 'Dodatočná inoformácia k blokovému módu',
             self.HASH_FUN: 'Hash funkcia',
             self.CERT_SIG_ALG: 'Algoritmus podpisu certifikátu',
             self.CERT_SIG_ALG_HASH_FUN: 'Hash funkcia pre podpis certifikátu',
-            self.HMAC: 'TODO',
+            self.HMAC: 'Hmac funkcia',
         }
         return aliases[self]
 
