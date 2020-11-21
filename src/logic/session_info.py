@@ -1,8 +1,12 @@
+import sys
 import ssl
-from src.utils import *
 from socket import socket
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+
+sys.path.append('../../')
+
+from src.utils import convert_openssh_to_iana
 
 
 def get_website_info(hostname):

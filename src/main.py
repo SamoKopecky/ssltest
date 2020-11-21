@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append('../')
+
 from src.console_output.console_output import console_output
 from src.logic.session_info import get_website_info
 from src.logic.CryptoParams import CryptoParams

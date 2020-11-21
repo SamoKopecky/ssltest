@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append('../../')
+
 from src.logic.CryptoParamsEnum import CryptoParamsEnum as CPEnum
 from src.utils import read_json, compare_key_length, pub_key_alg_from_cert, get_sig_alg_from_oid
 
