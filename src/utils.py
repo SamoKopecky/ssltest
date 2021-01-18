@@ -37,16 +37,14 @@ def compare_key_length(algorithm, key_len, levels_str):
 
 
 def return_function_from_operation(operation):
-    if operation == ">=":
-        return lambda a, b: a >= b
-    elif operation == ">>":
-        return lambda a, b: a > b
-    elif operation == "<=":
-        return lambda a, b: a <= b
-    elif operation == "<<":
-        return lambda a, b: a < b
-    elif operation == "==":
-        return lambda a, b: a == b
+    functions = {
+        ">=": lambda a, b: a >= b,
+        ">>": lambda a, b: a > b,
+        "<=": lambda a, b: a <= b,
+        "<<": lambda a, b: a < b,
+        "==": lambda a, b: a == b
+    }
+    return functions[operation]
 
 
 def pub_key_alg_from_cert(public_key):
@@ -58,6 +56,8 @@ def pub_key_alg_from_cert(public_key):
         return 'DSA'
     elif isinstance(public_key, ed25519.Ed25519PublicKey) or isinstance(public_key, ed448.Ed448PublicKey):
         return 'ECDSA'
+    else:
+        return 'N/A'
 
 
 def get_sig_alg_from_oid(oid):
