@@ -10,12 +10,11 @@ from src.utils import convert_openssh_to_iana
 
 
 def get_website_info(hostname):
-    ssl_socket, supported_protocols = test_ssl_versions(hostname)
-    print(supported_protocols)
+    ssl_socket, supported_versions = test_ssl_versions(hostname)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     cert = get_certificate(ssl_socket)
     ssl_socket.close()
-    return cert, cipher_suite, protocol
+    return cert, cipher_suite, protocol, supported_versions
 
 
 def get_certificate(ssl_socket):
@@ -50,7 +49,7 @@ def test_ssl_versions(hostname):
         for version in ssl_versions:
             ctx.options += version
         try:
-            max_version_socket = create_session(hostname, ctx)
+            max_version_socket = create_session(hostname, ctx, 443)
             version = max_version_socket.version()
             if version not in supported_protocols:
                 supported_protocols.append(version)
@@ -59,7 +58,7 @@ def test_ssl_versions(hostname):
     return max_version_socket, supported_protocols
 
 
-def create_session(hostname, ctx):
+def create_session(hostname, ctx, port):
     ssl_socket = ctx.wrap_socket(socket(), server_hostname=hostname)
-    ssl_socket.connect((hostname, 443))
+    ssl_socket.connect((hostname, port))
     return ssl_socket

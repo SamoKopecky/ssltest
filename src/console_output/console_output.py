@@ -18,6 +18,13 @@ def get_string_rating(rating: int):
 
 
 def console_output(params: CryptoParams):
+    print('Podporované verzie protokolov:')
+    for key in params.supported_versions:
+        print('\t{}->{}({})'.format(
+            key,
+            get_string_rating(params.supported_versions[key]),
+            params.supported_versions[key])
+        )
     print('Kryptografická sada: \n\t{}'.format(params.cipher_suite))
     print('Kryptografické parametre:')
     for enum in CPEnum:

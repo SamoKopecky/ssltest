@@ -3,7 +3,6 @@ from enum import Enum, auto
 
 class CryptoParamsEnum(Enum):
     PROTOCOL = auto()
-    PROTOCOL_VERSION = auto()
     KEY_EXCHANGE_ALG = auto()
     CERT_PUB_KEY_ALG = auto()
     CERT_PUB_KEY_LEN = auto()
@@ -28,8 +27,7 @@ class CryptoParamsEnum(Enum):
     @property
     def string_alias(self):
         aliases = {
-            self.PROTOCOL: 'Typ protokolu',
-            self.PROTOCOL_VERSION: 'Verzia protokolu',
+            self.PROTOCOL: 'Typ a verzia protokolu',
             self.KEY_EXCHANGE_ALG: 'Algoritmus výmenu kľúčov',
             self.CERT_PUB_KEY_ALG: 'Algoritmus verejného kľúča',
             self.CERT_PUB_KEY_LEN: 'Veľkosť verejného kľúča',
