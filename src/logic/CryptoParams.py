@@ -11,6 +11,7 @@ class CryptoParams:
     Holds all the information about the security
     of a webserver and functions for rating them.
     """
+
     def __init__(self, cert, cipher_suite, protocol, supported_versions):
         """
         Constructor for CryptoParams class.
@@ -86,10 +87,9 @@ class CryptoParams:
     @staticmethod
     def rate_parameter(enum, param):
         """
-        Helper function for rating a parameter from a json file.
+        Helper function for rating a parameter  from a json file.
 
         :param enum: specifies which parameter category should be used for rating
-        :param jdata: read data form a json file
         :param param: parameter that is going to be rated
         :return: if a rating is found for a parameter returns that rating,
         if not 0 is returned (default value)

@@ -1,7 +1,7 @@
 import sys
 import ssl
 import socket
-import traceback
+import re
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
@@ -21,6 +21,8 @@ def get_website_info(hostname):
         protocol -- protocol name and version
         supported_versions -- SSL/TLS versions that the web server supports
     """
+    if '/' in hostname:
+        hostname = fix_hostname(hostname)
     ssl_socket, supported_versions = test_ssl_versions(hostname)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     cert = get_certificate(ssl_socket)
@@ -89,13 +91,42 @@ def test_ssl_versions(hostname):
 
 def create_session(hostname, ctx, port):
     """
-    Creates a secure connection to any server on any port with a defined context.
+    Creates a secure connection to any server on any port with a defined context
+    on a specific timeout.
 
     :param hostname: hostname of the website
     :param ctx: ssl context
     :param port: port
     :return: created secure socket
     """
-    ssl_socket = ctx.wrap_socket(socket.socket(), server_hostname=hostname)
-    ssl_socket.connect((hostname, port))
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # 5 seconds
+    sock.settimeout(5)
+    ssl_socket = ctx.wrap_socket(sock, server_hostname=hostname)
+    try:
+        ssl_socket.connect((hostname, port))
+    except socket.timeout:
+        print("Server nepodpruje HTTPS protokol alebo server neodpovedá na požiadavky.")
+        exit(1)
+    except socket.gaierror:
+        print("Chyba v DNS službe.")
+        exit(socket.EAI_FAIL)
     return ssl_socket
+
+
+def fix_hostname(hostname):
+    """
+    Extracts the domain name.
+
+    :param hostname: hostname address to be checked
+    :return: fixed hostname address
+    """
+    print('Upravujem webovú adresu...')
+    if hostname[:4] == 'http':
+        # Removes https:// and anything after TLD
+        hostname = re.search('[/]{2}([^/]+)', hostname).group(1)
+    else:
+        # Removes anything after TLD
+        hostname = re.search('^([^/]+)', hostname).group(0)
+    print('Použítá webová adresa: {}'.format(hostname))
+    return hostname
