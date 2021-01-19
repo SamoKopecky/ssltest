@@ -7,6 +7,12 @@ from src.logic.CryptoParams import CryptoParams
 
 
 def get_string_rating(rating: int):
+    """
+    Converts numeric value into a string
+
+    :param rating: rating to be converted
+    :return: converted rating
+    """
     ratings = {
         0: 'nezistené/chyba',
         1: 'bezpečné',
@@ -18,6 +24,11 @@ def get_string_rating(rating: int):
 
 
 def console_output(params: CryptoParams):
+    """
+    Prints the rated parameters in a console.
+
+    :param params: parameters to be printed out
+    """
     print('Podporované verzie protokolov:')
     for key in params.supported_versions:
         print('\t{}->{}({})'.format(

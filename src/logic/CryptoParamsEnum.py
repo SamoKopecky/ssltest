@@ -2,6 +2,9 @@ from enum import Enum, auto
 
 
 class CryptoParamsEnum(Enum):
+    """
+    Enum type class that defines parameter types for cipher suite and certificate parameters.
+    """
     PROTOCOL = auto()
     KEY_EXCHANGE_ALG = auto()
     CERT_PUB_KEY_ALG = auto()
@@ -17,6 +20,11 @@ class CryptoParamsEnum(Enum):
 
     @property
     def key_pair(self):
+        """
+        Defines the algorithm to which the algorithm length belongs to.
+
+        :return: algorithm type
+        """
         pairs = {
             self.SYM_ENCRYPT_ALG_KEY_LEN: self.SYM_ENCRYPT_ALG,
             self.CERT_PUB_KEY_LEN: self.CERT_PUB_KEY_ALG,
@@ -26,6 +34,11 @@ class CryptoParamsEnum(Enum):
 
     @property
     def string_alias(self):
+        """
+        Defines a string alias of a specific parameter
+
+        :return: string
+        """
         aliases = {
             self.PROTOCOL: 'Typ a verzia protokolu',
             self.KEY_EXCHANGE_ALG: 'Algoritmus výmenu kľúčov',
@@ -44,6 +57,11 @@ class CryptoParamsEnum(Enum):
 
     @property
     def is_parsable(self):
+        """
+        Defines which parameters are parsable from a cipher suite
+
+        :return: true if a parameter is parsable
+        """
         parsable = [self.KEY_EXCHANGE_ALG, self.SYM_ENCRYPT_ALG, self.SYM_ENCRYPT_ALG_KEY_LEN,
                     self.SYM_ENCRYPT_ALG_BLOCK_MODE, self.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER, self.HASH_FUN,
                     self.CERT_PUB_KEY_ALG, self.HMAC]
