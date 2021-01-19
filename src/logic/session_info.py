@@ -109,7 +109,7 @@ def create_session(hostname, ctx, port):
         print("Server nepodpruje HTTPS protokol alebo server neodpovedá na požiadavky.")
         exit(1)
     except socket.gaierror:
-        print("Chyba v DNS službe.")
+        print("Nastala chyba v DNS službe.")
         exit(socket.EAI_FAIL)
     return ssl_socket
 
