@@ -2,6 +2,7 @@ import sys
 import ssl
 import socket
 import re
+import traceback
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
@@ -23,7 +24,8 @@ def get_website_info(hostname):
     """
     if '/' in hostname:
         hostname = fix_hostname(hostname)
-    ssl_socket, supported_versions = test_ssl_versions(hostname)
+    supported_versions = test_ssl_versions(hostname)
+    ssl_socket = create_session(hostname, 443)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     cert = get_certificate(ssl_socket)
     ssl_socket.close()
@@ -49,8 +51,7 @@ def get_cipher_suite_and_protocol(ssl_socket):
     :param ssl_socket: secure socket
     :return: negotiated cipher suite and the protocol
     """
-    cipher = ssl_socket.cipher()
-    cipher_suite = cipher[0]
+    cipher_suite = ssl_socket.cipher()[0]
     if '-' in cipher_suite:
         cipher_suite = convert_openssh_to_iana(cipher_suite)
     return cipher_suite, ssl_socket.version()
@@ -71,38 +72,38 @@ def test_ssl_versions(hostname):
         ssl.Options.OP_NO_SSLv3,
         ssl.Options.OP_NO_SSLv2
     ]
-    max_version_socket = None
     supported_protocols = []
     for i in range(len(ssl_versions)):
         ssl_versions.pop()
-        ctx = ssl.SSLContext()
-        ctx.options -= ssl.Options.OP_NO_SSLv3
+        context = ssl.SSLContext()
+        context.options -= ssl.Options.OP_NO_SSLv3
         for version in ssl_versions:
-            ctx.options += version
+            context.options += version
         try:
-            max_version_socket = create_session(hostname, ctx, 443)
-            version = max_version_socket.version()
+            ssl_socket = create_session(hostname, 443, context)
+            version = ssl_socket.version()
+            ssl_socket.close()
             if version not in supported_protocols:
                 supported_protocols.append(version)
         except ssl.SSLError:
             pass
-    return max_version_socket, supported_protocols
+    return supported_protocols
 
 
-def create_session(hostname, ctx, port):
+def create_session(hostname, port, context=ssl.create_default_context()):
     """
     Creates a secure connection to any server on any port with a defined context
     on a specific timeout.
 
     :param hostname: hostname of the website
-    :param ctx: ssl context
+    :param context: ssl context
     :param port: port
     :return: created secure socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # 5 seconds
     sock.settimeout(5)
-    ssl_socket = ctx.wrap_socket(sock, server_hostname=hostname)
+    ssl_socket = context.wrap_socket(sock, server_hostname=hostname)
     try:
         ssl_socket.connect((hostname, port))
     except socket.timeout:
@@ -123,10 +124,10 @@ def fix_hostname(hostname):
     """
     print('Upravujem webovú adresu...')
     if hostname[:4] == 'http':
-        # Removes https:// and anything after TLD
+        # Removes http(s):// and anything after TLD (*.com)
         hostname = re.search('[/]{2}([^/]+)', hostname).group(1)
     else:
-        # Removes anything after TLD
+        # Removes anything after TLD (*.com)
         hostname = re.search('^([^/]+)', hostname).group(0)
     print('Použítá webová adresa: {}'.format(hostname))
     return hostname

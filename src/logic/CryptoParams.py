@@ -22,6 +22,7 @@ class CryptoParams:
         self.params = {enum: ['N/A', 0] for enum in CPEnum}
         # Create default dictionary for supported SSL/TLS versions
         self.supported_versions = {version: 0 for version in supported_versions}
+        self.security_levels_json = read_json('security_levels.json')
         self.cert = cert
         self.cert_version = str(self.cert.version.value)
         self.cert_serial_number = str(self.cert.serial_number)
@@ -45,14 +46,15 @@ class CryptoParams:
         to categories with the help of a json file. Categories are
         defined in CryptoParamsEnum.py class.
         """
-        jdata = read_json('cipher_parameters.json')
+        json_data = read_json('cipher_parameters.json')
         raw_params = self.cipher_suite.split('_')
         raw_params.remove('TLS')
         # List of all cipher suite enum categories
         cipher_suite_enums = [enum for enum in CPEnum if enum.is_parsable]
+        # For each parameter iterate through each enum value until a match is found
         for param in raw_params:
             for enum in cipher_suite_enums:
-                if param in jdata[enum.name].split(','):
+                if param in json_data[enum.name].split(','):
                     cipher_suite_enums.remove(enum)
                     self.params[enum] = [param, 0]
                     break
@@ -68,7 +70,6 @@ class CryptoParams:
         Second part is used for not length parameters
         After all parameters have been rated the worse rating is recorded
         """
-        jdata = read_json('security_levels.json')
         for enum in CPEnum:
             # 1st part
             if enum == CPEnum.SYM_ENCRYPT_ALG_KEY_LEN or \
@@ -77,15 +78,14 @@ class CryptoParams:
                 self.params[enum][1] = compare_key_length(
                     self.params[enum.key_pair][0],
                     self.params[enum][0],
-                    jdata[enum.name]
+                    self.security_levels_json[enum.name]
                 )
                 continue
             # 2nd part
             self.params[enum][1] = self.rate_parameter(enum, self.params[enum][0])
         self.rating = max([solo_rating[1] for solo_rating in self.params.values()])
 
-    @staticmethod
-    def rate_parameter(enum, param):
+    def rate_parameter(self, enum, param):
         """
         Helper function for rating a parameter  from a json file.
 
@@ -94,15 +94,16 @@ class CryptoParams:
         :return: if a rating is found for a parameter returns that rating,
         if not 0 is returned (default value)
         """
-        jdata = read_json('security_levels.json')
         for idx in range(1, 5):
-            if param in jdata[enum.name][str(idx)].split(','):
+            if param in self.security_levels_json[enum.name][str(idx)].split(','):
                 return idx
         return 0
 
     def parse_protocol_version(self):
         """
         Reads the protocol version and applies special edge cases.
+
+        Might add more
         """
         if self.params[CPEnum.PROTOCOL][0] == 'TLSv1.3':
             self.params[CPEnum.KEY_EXCHANGE_ALG][0] = 'ECDHE'

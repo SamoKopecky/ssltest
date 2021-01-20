@@ -52,7 +52,7 @@ def console_output(params: CryptoParams):
     print('\tVerzia certifikátu: {}'.format(params.cert_version))
     print('\tSériové číslo: {}'.format(params.cert_serial_number))
     print('\tInterval platnosti: {} do {}'.format(params.cert_not_valid_before, params.cert_not_valid_after))
-    print('\tpredmet: ')
+    print('\tpredmet:')
     for attribute in params.cert_subject:
         print('\t\t' + attribute.oid._name + ' = ' + attribute.value)
     print('\tvydavateľ:')
