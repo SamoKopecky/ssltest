@@ -2,7 +2,7 @@ import sys
 
 sys.path.append('../../')
 
-from src.logic.CryptoParamsEnum import CryptoParamsEnum as CPEnum
+from src.parameter_rating.CryptoParamsEnum import CryptoParamsEnum as CPEnum
 from src.utils import read_json, compare_key_length, pub_key_alg_from_cert, get_sig_alg_from_oid
 
 
@@ -68,7 +68,6 @@ class CryptoParams:
 
         First part is used if a length parameter needs to be rated
         Second part is used for not length parameters
-        After all parameters have been rated the worse rating is recorded
         """
         for enum in CPEnum:
             # 1st part
@@ -83,7 +82,13 @@ class CryptoParams:
                 continue
             # 2nd part
             self.params[enum][1] = self.rate_parameter(enum, self.params[enum][0])
-        self.rating = max([solo_rating[1] for solo_rating in self.params.values()])
+
+    def final_rating(self):
+        """
+        After all parameters have been rated the worse rating is recorded.
+        """
+        self.rating = max(
+            [solo_rating[1] for solo_rating in self.params.values()] + list(self.supported_versions.values()))
 
     def rate_parameter(self, enum, param):
         """

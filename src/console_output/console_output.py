@@ -2,8 +2,8 @@ import sys
 
 sys.path.append('../../')
 
-from src.logic.CryptoParamsEnum import CryptoParamsEnum as CPEnum
-from src.logic.CryptoParams import CryptoParams
+from src.parameter_rating.CryptoParamsEnum import CryptoParamsEnum as CPEnum
+from src.parameter_rating.CryptoParams import CryptoParams
 
 
 def get_string_rating(rating: int):
