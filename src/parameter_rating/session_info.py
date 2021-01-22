@@ -1,9 +1,8 @@
 import sys
 import ssl
-from OpenSSL import SSL
 import socket
 import re
-import traceback
+from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
@@ -25,8 +24,8 @@ def get_website_info(hostname):
     """
     if '/' in hostname:
         hostname = fix_hostname(hostname)
-    supported_versions = test_ssl_versions(hostname)
     ssl_socket = create_session(hostname, 443)
+    supported_versions = test_ssl_versions(hostname)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     cert = get_certificate(ssl_socket)
     ssl_socket.close()
@@ -75,46 +74,40 @@ def test_ssl_versions(hostname):
     for version in ssl_versions:
         context = SSL.Context(version)
         try:
-            ssl_socket = create_session_a(hostname, 443, context)
+            ssl_socket = create_session_pyopenssl(hostname, 443, context)
             version = ssl_socket.get_protocol_version_name()
             ssl_socket.close()
             if version not in supported_protocols:
                 supported_protocols.append(version)
-        except Exception:
-            traceback.print_exc()
+        except SSL.Error:
+            continue
     return supported_protocols
 
 
-def create_session_a(hostname, port, context):
+def create_session_pyopenssl(hostname, port, context):
     """
     Creates a secure connection to any server on any port with a defined context
     on a specific timeout.
 
+    This function creates a secure connection with pyopenssl lib. Original ssl lib
+    doesn't work with older TLS versions on some OpenSSL implementations.
     :param hostname: hostname of the website
     :param context: ssl context
     :param port: port
     :return: created secure socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # 5 seconds
     ssl_socket = SSL.Connection(context, sock)
-    try:
-        ssl_socket.connect((hostname, port))
-        ssl_socket.do_handshake()
-    except socket.timeout:
-        print("Server nepodpruje HTTPS protokol alebo server neodpovedá na požiadavky.")
-        exit(1)
-    except socket.gaierror:
-        print("Nastala chyba v DNS službe.")
-        exit(socket.EAI_FAIL)
+    ssl_socket.connect((hostname, port))
+    ssl_socket.do_handshake()
     return ssl_socket
 
 
-# Hacky function remove next !!!
 def create_session(hostname, port, context=ssl.create_default_context()):
     """
     Creates a secure connection to any server on any port with a defined context
     on a specific timeout.
+
     :param hostname: hostname of the website
     :param context: ssl context
     :param port: port
