@@ -5,6 +5,7 @@ sys.path.append('../')
 from src.console_output.console_output import console_output
 from src.parameter_rating.session_info import get_website_info
 from src.parameter_rating.CryptoParams import CryptoParams
+from src.nmap.nmap import scan_versions
 
 
 def main():
@@ -19,4 +20,5 @@ def main():
 
 
 if __name__ == '__main__':
+    scan_versions()
     main()
