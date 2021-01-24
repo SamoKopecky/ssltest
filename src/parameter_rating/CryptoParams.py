@@ -12,7 +12,17 @@ class CryptoParams:
     of a webserver and functions for rating them.
 
     Attributes:
-        TODO: params
+        params -- list of all parameters to be writen out
+        supported_versions -- SSL/TLS protocol versions that are supported by a website
+        security_levels_json -- json data that contains security levels for rating
+        cert -- used certificate in a session
+        cert_version -- certificate version
+        cert_serial_number -- certificate serial number
+        cert_not_valid_before -- starting date of validity period of a certificate
+        cert_not_valid_after -- ending datee of validity period of a certificate
+        cert_subject -- certificate subject
+        cert_issuer -- issuer of a certificate
+        rating -- top level rating of a website
     """
 
     def __init__(self, cert, cipher_suite, protocol, supported_versions):
@@ -33,7 +43,6 @@ class CryptoParams:
         self.params[CPEnum.CERT_SIG_ALG_HASH_FUN][0] = str(self.cert.signature_hash_algorithm.name).upper()
         self.params[CPEnum.CERT_PUB_KEY_LEN][0] = str(self.cert.public_key().key_size)
         self.params[CPEnum.PROTOCOL][0] = protocol
-        # Top level rating of a website
         self.rating = 0
 
     def parse_cipher_suite(self):

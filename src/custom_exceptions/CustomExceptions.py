@@ -1,6 +1,7 @@
 class NoWebServerVersionFoundError(Exception):
     """
-    TODO: Docs
+    Attributes
+        message -- return message after a raised exception
     """
     def __init__(self, message="Nebolo možné nájsť verziu serveru."):
         self.message = message
