@@ -10,14 +10,12 @@ class CryptoParams:
     """
     Holds all the information about the security
     of a webserver and functions for rating them.
+
+    Attributes:
+        TODO: params
     """
 
     def __init__(self, cert, cipher_suite, protocol, supported_versions):
-        """
-        Constructor for CryptoParams class.
-
-        Gathers data from created connections in the session_info.py file
-        """
         # Create default dictionary for cipher suite and certificate parameters
         self.params = {enum: ['N/A', 0] for enum in CPEnum}
         # Create default dictionary for supported SSL/TLS versions

@@ -125,6 +125,9 @@ def create_session(hostname, port, context=ssl.create_default_context()):
     except socket.gaierror:
         print("Nastala chyba v DNS službe.")
         exit(socket.EAI_FAIL)
+    except socket.error:
+        print("Nastala nečakaná chyba.")
+        exit(1)
     return ssl_socket
 
 

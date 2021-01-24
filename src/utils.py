@@ -20,7 +20,7 @@ def convert_openssh_to_iana(search_term):
     for row in json_data:
         if json_data[row] == search_term:
             return row
-    raise IndexError("cipher is not contained in .json file")
+    raise KeyError("cipher is not contained in .json file")
 
 
 def read_json(file_name):

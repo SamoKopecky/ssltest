@@ -23,12 +23,15 @@ def get_string_rating(rating: int):
     return ratings[rating]
 
 
-def console_output(params: CryptoParams):
+def console_output(params: CryptoParams, web_server_versions: list):
     """
     Prints the rated parameters in a console.
 
+    :param web_server_versions: version of the web server SW
     :param params: parameters to be printed out
     """
+    for index in range(len(web_server_versions)):
+        print('Zistené verzia web serveru (metóda {}): {}'.format(index + 1, web_server_versions[index]))
     print('Podporované verzie protokolov:')
     for key in params.supported_versions:
         print('\t{}->{}({})'.format(
