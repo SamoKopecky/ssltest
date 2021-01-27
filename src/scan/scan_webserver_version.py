@@ -44,19 +44,21 @@ def scan_version_http(website):
         raise NoWebServerVersionFoundError()
 
 
-def scan_versions(website):
+def scan_versions(website, scan_nmap):
     """
     Use each function defined in scans list to
     find out web server versions.
 
+    :param scan_nmap:
     :param website: website to be scanned
     :return: versions of the server, if it is not found returns
     exception error.
     """
-    scans = [
-        scan_version_http,
-        scan_version_nmap
-    ]
+    scans = []
+    if website != '192.168.1.220':
+        scans.append(scan_version_http)
+    if scan_nmap != 'N' and scan_nmap != 'n':
+        scans.append(scan_version_nmap)
     versions = []
     for scan in scans:
         try:

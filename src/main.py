@@ -10,6 +10,7 @@ from src.scan.scan_webserver_version import scan_versions
 
 def main():
     website = str(input("Webová adresa: ") or 'vutbr.cz')
+    scan_nmap = str(input("Skenovať z nmap ? (Y/N): ") or 'N')
     cert, cipher, protocol, supported_versions = get_website_info(website)
     parameters = CryptoParams(cert, cipher, protocol, supported_versions)
     parameters.parse_cipher_suite()
@@ -17,7 +18,7 @@ def main():
     parameters.rate_parameters()
     parameters.rate_supported_protocol_versions()
     parameters.final_rating()
-    console_output(parameters, scan_versions(website))
+    console_output(parameters, scan_versions(website, scan_nmap))
 
 
 if __name__ == '__main__':

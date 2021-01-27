@@ -113,6 +113,9 @@ def create_session(hostname, port, context=ssl.create_default_context()):
     :param port: port
     :return: created secure socket
     """
+    if hostname == '192.168.1.220':
+        context.check_hostname = False
+        context.verify_mode = ssl.VerifyMode.CERT_NONE
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # 5 seconds
     sock.settimeout(5)
@@ -125,8 +128,8 @@ def create_session(hostname, port, context=ssl.create_default_context()):
     except socket.gaierror:
         print("Nastala chyba v DNS službe.")
         exit(socket.EAI_FAIL)
-    except socket.error:
-        print("Nastala nečakaná chyba.")
+    except socket.error as e:
+        print(e)
         exit(1)
     return ssl_socket
 
