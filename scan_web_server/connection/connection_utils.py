@@ -1,14 +1,10 @@
-import sys
 import ssl
 import socket
 import re
 from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-
-sys.path.append('../../')
-
-from src.utils import convert_openssh_to_iana
+from ..utils import convert_openssh_to_iana
 
 
 def get_website_info(hostname):
@@ -117,8 +113,7 @@ def create_session(hostname, port, context=ssl.create_default_context()):
         context.check_hostname = False
         context.verify_mode = ssl.VerifyMode.CERT_NONE
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # 5 seconds
-    sock.settimeout(5)
+    sock.settimeout(5)  # in seconds
     ssl_socket = context.wrap_socket(sock, server_hostname=hostname)
     try:
         ssl_socket.connect((hostname, port))

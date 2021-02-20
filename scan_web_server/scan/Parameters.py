@@ -1,18 +1,15 @@
-import sys
-
-sys.path.append('../../')
-
-from src.parameter_rating.CryptoParamsEnum import CryptoParamsEnum as CPEnum
-from src.utils import read_json, compare_key_length, pub_key_alg_from_cert, get_sig_alg_from_oid
+from .ParameterType import ParameterType
+from ..connection.connection_utils import get_website_info
+from ..utils import *
 
 
-class CryptoParams:
+class Parameters:
     """
     Holds all the information about the security
     of a webserver and functions for rating them.
 
     Attributes:
-        params -- list of all parameters to be writen out
+        parameters -- list of all parameters to be writen out
         supported_versions -- SSL/TLS protocol versions that are supported by a website
         security_levels_json -- json data that contains security levels for rating
         cert -- used certificate in a session
@@ -25,9 +22,10 @@ class CryptoParams:
         rating -- top level rating of a website
     """
 
-    def __init__(self, cert, cipher_suite, protocol, supported_versions):
+    def __init__(self, website):
+        cert, cipher_suite, protocol, supported_versions = get_website_info(website)
         # Create default dictionary for cipher suite and certificate parameters
-        self.params = {enum: ['N/A', 0] for enum in CPEnum}
+        self.parameters = {enum: ['N/A', 0] for enum in ParameterType}
         # Create default dictionary for supported SSL/TLS versions
         self.supported_versions = {version: 0 for version in supported_versions}
         self.security_levels_json = read_json('security_levels.json')
@@ -39,10 +37,10 @@ class CryptoParams:
         self.cert_subject = self.cert.subject
         self.cert_issuer = self.cert.issuer
         self.cipher_suite = cipher_suite
-        self.params[CPEnum.CERT_SIG_ALG][0] = get_sig_alg_from_oid(self.cert.signature_algorithm_oid)
-        self.params[CPEnum.CERT_SIG_ALG_HASH_FUN][0] = str(self.cert.signature_hash_algorithm.name).upper()
-        self.params[CPEnum.CERT_PUB_KEY_LEN][0] = str(self.cert.public_key().key_size)
-        self.params[CPEnum.PROTOCOL][0] = protocol
+        self.parameters[ParameterType.CERT_SIG_ALG][0] = get_sig_alg_from_oid(self.cert.signature_algorithm_oid)
+        self.parameters[ParameterType.CERT_SIG_ALG_HASH_FUN][0] = str(self.cert.signature_hash_algorithm.name).upper()
+        self.parameters[ParameterType.CERT_PUB_KEY_LEN][0] = str(self.cert.public_key().key_size)
+        self.parameters[ParameterType.PROTOCOL][0] = protocol
         self.rating = 0
 
     def parse_cipher_suite(self):
@@ -51,23 +49,23 @@ class CryptoParams:
 
         The cipher suite is split into each parameter and then sorted
         to categories with the help of a json file. Categories are
-        defined in CryptoParamsEnum.py class.
+        defined in ParameterType.py class.
         """
         json_data = read_json('cipher_parameters.json')
         raw_params = self.cipher_suite.split('_')
         raw_params.remove('TLS')
         # List of all cipher suite enum categories
-        cipher_suite_enums = [enum for enum in CPEnum if enum.is_parsable]
+        cipher_suite_enums = [enum for enum in ParameterType if enum.is_parsable]
         # For each parameter iterate through each enum value until a match is found
         for param in raw_params:
             for enum in cipher_suite_enums:
                 if param in json_data[enum.name].split(','):
                     cipher_suite_enums.remove(enum)
-                    self.params[enum] = [param, 0]
+                    self.parameters[enum] = [param, 0]
                     break
         # Needed when the public key algorithm is not defined in cipher suite
-        if self.params[CPEnum.CERT_PUB_KEY_ALG][0] == 'N/A':
-            self.params[CPEnum.CERT_PUB_KEY_ALG][0] = pub_key_alg_from_cert(self.cert.public_key())
+        if self.parameters[ParameterType.CERT_PUB_KEY_ALG][0] == 'N/A':
+            self.parameters[ParameterType.CERT_PUB_KEY_ALG][0] = pub_key_alg_from_cert(self.cert.public_key())
 
     def rate_parameters(self):
         """
@@ -76,26 +74,26 @@ class CryptoParams:
         First part is used if a length parameter needs to be rated
         Second part is used for not length parameters
         """
-        for enum in CPEnum:
+        for enum in ParameterType:
             # 1st part
-            if enum == CPEnum.SYM_ENCRYPT_ALG_KEY_LEN or \
-                    enum == CPEnum.CERT_PUB_KEY_LEN or \
-                    enum == CPEnum.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER:
-                self.params[enum][1] = compare_key_length(
-                    self.params[enum.key_pair][0],
-                    self.params[enum][0],
+            if enum == ParameterType.SYM_ENCRYPT_ALG_KEY_LEN or \
+                    enum == ParameterType.CERT_PUB_KEY_LEN or \
+                    enum == ParameterType.SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER:
+                self.parameters[enum][1] = compare_key_length(
+                    self.parameters[enum.key_pair][0],
+                    self.parameters[enum][0],
                     self.security_levels_json[enum.name]
                 )
                 continue
             # 2nd part
-            self.params[enum][1] = self.rate_parameter(enum, self.params[enum][0])
+            self.parameters[enum][1] = self.rate_parameter(enum, self.parameters[enum][0])
 
     def final_rating(self):
         """
         After all parameters have been rated the worse rating is recorded.
         """
         self.rating = max(
-            [solo_rating[1] for solo_rating in self.params.values()] + list(self.supported_versions.values()))
+            [solo_rating[1] for solo_rating in self.parameters.values()] + list(self.supported_versions.values()))
 
     def rate_parameter(self, enum, param):
         """
@@ -117,8 +115,8 @@ class CryptoParams:
 
         Might add more
         """
-        if self.params[CPEnum.PROTOCOL][0] == 'TLSv1.3':
-            self.params[CPEnum.KEY_EXCHANGE_ALG][0] = 'ECDHE'
+        if self.parameters[ParameterType.PROTOCOL][0] == 'TLSv1.3':
+            self.parameters[ParameterType.KEY_EXCHANGE_ALG][0] = 'ECDHE'
 
     def rate_supported_protocol_versions(self):
         """
@@ -126,4 +124,11 @@ class CryptoParams:
         with which can a connection be made to the website.
         """
         for key in self.supported_versions:
-            self.supported_versions[key] = self.rate_parameter(CPEnum.PROTOCOL, key)
+            self.supported_versions[key] = self.rate_parameter(ParameterType.PROTOCOL, key)
+
+    def scan(self):
+        self.parse_cipher_suite()
+        self.parse_protocol_version()
+        self.rate_parameters()
+        self.rate_supported_protocol_versions()
+        self.final_rating()

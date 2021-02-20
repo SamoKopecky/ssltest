@@ -1,13 +1,13 @@
 import nmap3
 import requests
-from src.custom_exceptions.CustomExceptions import NoWebServerVersionFoundError
+from ..exceptions.exceptions import NoWebServerVersionFoundError
 
 
 def scan_version_nmap(website):
     """
-    Gets the web server version with scan wrapper.
+    Gets the web server version with connection wrapper.
 
-    First ports are concatenated into a string for scan. After that
+    First ports are concatenated into a string for connection. After that
     for each port the result is looked up, if a version can't be found
     just skips to the next port.
     :param: website: website to be scanned
@@ -19,7 +19,7 @@ def scan_version_nmap(website):
     ports = list(map(lambda port: str(port) + ',', ports))
     string_ports = ''.join(ports)[:-1]
     print('Skanujem pomocou nmap verziu web serveru...')
-    result = nmap.scan_top_ports(website, args="-sV -p {}".format(string_ports))
+    result = nmap.scan_top_ports(website, args=f"-sV -p {string_ports}")
     for index in range(len(ports)):
         try:
             service = list(result.items())[0][1]['ports'][index]['service']

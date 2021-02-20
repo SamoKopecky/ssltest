@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class CryptoParamsEnum(Enum):
+class ParameterType(Enum):
     """
     Enum type class that defines parameter types for cipher suite and certificate parameters.
     """

@@ -1,5 +1,4 @@
 import json
-import os
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import dsa
@@ -30,8 +29,7 @@ def read_json(file_name):
     :param file_name: json file name
     :return: json data in python objects
     """
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    file = open(root_dir + '/../resources/' + file_name, 'r')
+    file = open('resources/' + file_name, 'r')
     json_data = json.loads(file.read())
     file.close()
     return json_data
@@ -46,25 +44,6 @@ def compare_key_length(algorithm, key_len, levels_str):
     :param levels_str: security levels read from a json file of the specific category
     :return: rating of a parameter pair or 0 if a rating isn't defined or found
     """
-    if key_len == 'N/A':
-        return 0
-    for idx in range(1, 5):
-        levels = levels_str[str(idx)].split(',')
-        if algorithm in levels:
-            # gets the operation assigned to the algorithm key length
-            operation = levels[levels.index(algorithm) + 1]
-            if return_function_from_operation(operation[:2])(int(key_len), int(operation[2:])):
-                return idx
-    return 0
-
-
-def return_function_from_operation(operation):
-    """
-    Defines operations used for comparing key lengths
-
-    :param operation: string representation of an operation
-    :return: lambda function of an operation
-    """
     functions = {
         ">=": lambda a, b: a >= b,
         ">>": lambda a, b: a > b,
@@ -72,7 +51,18 @@ def return_function_from_operation(operation):
         "<<": lambda a, b: a < b,
         "==": lambda a, b: a == b
     }
-    return functions[operation]
+
+    if key_len == 'N/A':
+        return 0
+    for idx in range(1, 5):
+        levels = levels_str[str(idx)].split(',')
+        if algorithm in levels:
+            # gets the operation assigned to the algorithm key length
+            operation = levels[levels.index(algorithm) + 1]
+            function = functions[operation[:2]]
+            if function(int(key_len), int(operation[2:])):
+                return idx
+    return 0
 
 
 def pub_key_alg_from_cert(public_key):

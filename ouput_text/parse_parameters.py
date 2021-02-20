@@ -1,9 +1,5 @@
-import sys
-
-sys.path.append('../../')
-
-from src.parameter_rating.CryptoParamsEnum import CryptoParamsEnum as CPEnum
-from src.parameter_rating.CryptoParams import CryptoParams
+from scan_web_server.scan.Parameters import Parameters
+from scan_web_server.scan.ParameterType import ParameterType
 
 
 def get_string_rating(rating: int):
@@ -23,7 +19,7 @@ def get_string_rating(rating: int):
     return ratings[rating]
 
 
-def console_output(params: CryptoParams, web_server_versions: list):
+def to_string(params: Parameters, web_server_versions: list):
     """
     Prints the rated parameters in a console.
 
@@ -41,14 +37,14 @@ def console_output(params: CryptoParams, web_server_versions: list):
         )
     print('Kryptografická sada: \n\t{}'.format(params.cipher_suite))
     print('Kryptografické parametre:')
-    for enum in CPEnum:
-        if params.params[enum][1] == 0:
+    for enum in ParameterType:
+        if params.parameters[enum][1] == 0:
             continue
         print('\t{}: {}->{}({})'.format(
             enum.string_alias,
-            params.params[enum][0],
-            get_string_rating(params.params[enum][1]),
-            params.params[enum][1])
+            params.parameters[enum][0],
+            get_string_rating(params.parameters[enum][1]),
+            params.parameters[enum][1])
         )
     print('\tCelková bezpečnosť kryptografickej sady: {}({})'.format(get_string_rating(params.rating), params.rating))
     print('Ostatné informácie o certifikáte:')
