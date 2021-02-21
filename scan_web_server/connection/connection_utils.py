@@ -7,12 +7,13 @@ from cryptography.hazmat.backends import default_backend
 from ..utils import convert_openssh_to_iana
 
 
-def get_website_info(hostname):
+def get_website_info(hostname, port):
     """
     Gathers objects to be rated.
 
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
+    :param port: port to scan on
     :parameter hostname: hostname of the webserver
     :return:
         certificate -- used certificate to verify the server
@@ -21,7 +22,7 @@ def get_website_info(hostname):
     """
     if '/' in hostname:
         hostname = fix_hostname(hostname)
-    ssl_socket = create_session(hostname, 443)
+    ssl_socket = create_session(hostname, port)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     cert = get_certificate(ssl_socket)
     ssl_socket.close()

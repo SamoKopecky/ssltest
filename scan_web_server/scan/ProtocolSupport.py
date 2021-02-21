@@ -1,14 +1,14 @@
 from .PType import PType
 from ..utils import *
-from OpenSSL import SSL
 from ..connection.connection_utils import *
 
 
 class ProtocolSupport:
 
-    def __init__(self, hostname):
+    def __init__(self, hostname, port):
         self.versions = {}
         self.hostname = hostname
+        self.port = port
         self.rating = 0
 
     def scan_protocols(self):
@@ -27,7 +27,7 @@ class ProtocolSupport:
         for version in ssl_versions:
             context = SSL.Context(version)
             try:
-                ssl_socket = create_session_pyopenssl(self.hostname, 443, context)
+                ssl_socket = create_session_pyopenssl(self.hostname, self.port, context)
                 version = ssl_socket.get_protocol_version_name()
                 ssl_socket.close()
                 if version not in supported_protocols:

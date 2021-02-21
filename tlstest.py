@@ -23,11 +23,11 @@ def main():
                                help='port to scan on (default: 443)')
     parser.add_argument('-j', '--json', action='store_true', default=False, help='change output to json format')
     args = parser.parse_args()
-    scan(args.url, args.nmap_version)
+    scan(args.url, args.port, args.nmap_version)
 
 
-def scan(website, scan_nmap):
-    certificate, cipher_suite, protocol = get_website_info(website)
+def scan(website, port, scan_nmap):
+    certificate, cipher_suite, protocol = get_website_info(website, port)
 
     cipher_suite_parameters = CipherSuite(cipher_suite, protocol)
     cipher_suite_parameters.rate()
@@ -35,7 +35,7 @@ def scan(website, scan_nmap):
     certificate_parameters = Certificate(certificate)
     certificate_parameters.rate()
 
-    protocol_support = ProtocolSupport(website)
+    protocol_support = ProtocolSupport(website, port)
     protocol_support.rate()
 
     versions = scan_versions(website, scan_nmap)
