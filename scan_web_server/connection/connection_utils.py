@@ -12,7 +12,7 @@ def get_website_info(hostname):
     Gathers objects to be rated.
 
     Uses functions in this module to create a connection and get the
-    servers certificate, cipher suite and protocol used in the connecton.
+    servers certificate, cipher suite and protocol used in the connection.
     :parameter hostname: hostname of the webserver
     :return:
         certificate -- used certificate to verify the server

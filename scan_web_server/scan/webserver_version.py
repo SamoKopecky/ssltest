@@ -23,10 +23,10 @@ def scan_version_nmap(website):
     for index in range(len(ports)):
         try:
             service = list(result.items())[0][1]['ports'][index]['service']
-            return str(service['product'] + '-' + service['version']), "nmap"
+            return "nmap", str(service['product'] + '-' + service['version'])
         except KeyError:
             continue
-    raise NoWebServerVersionFoundError()
+    raise NoWebServerVersionFoundError("nmap")
 
 
 def scan_version_http(website):
@@ -39,9 +39,9 @@ def scan_version_http(website):
     print('Skanujem HTTP response hlavičku pre webserver verziu...')
     response = requests.get('https://' + website)
     try:
-        return response.headers['server'], "http_header"
+        return "http_header", response.headers['server']
     except KeyError:
-        raise NoWebServerVersionFoundError()
+        raise NoWebServerVersionFoundError("http_header")
 
 
 def scan_versions(website, scan_nmap):
@@ -57,12 +57,12 @@ def scan_versions(website, scan_nmap):
     scans = []
     if website != '192.168.1.220':
         scans.append(scan_version_http)
-    if scan_nmap != 'N' and scan_nmap != 'n':
+    if scan_nmap:
         scans.append(scan_version_nmap)
     versions = []
     for scan in scans:
         try:
             versions.append(scan(website))
         except NoWebServerVersionFoundError as e:
-            versions.append(e)
+            versions.append((e.method, e.message))
     return versions
