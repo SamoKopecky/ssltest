@@ -10,7 +10,7 @@ def scan_version_nmap(website):
     First ports are concatenated into a string for connection. After that
     for each port the result is looked up, if a version can't be found
     just skips to the next port.
-    :param: website: website to be scanned
+    :parameter: website: website to be scanned
     :return: if found returns web server version,
     if not returns error string
     """
@@ -23,7 +23,7 @@ def scan_version_nmap(website):
     for index in range(len(ports)):
         try:
             service = list(result.items())[0][1]['ports'][index]['service']
-            return str(service['product'] + '-' + service['version'])
+            return str(service['product'] + '-' + service['version']), "nmap"
         except KeyError:
             continue
     raise NoWebServerVersionFoundError()
@@ -33,13 +33,13 @@ def scan_version_http(website):
     """
     Scan web server version from GET response header.
 
-    :param website: website to be scanned
+    :parameter website: website to be scanned
     :return: returns web server name, if found version too
     """
     print('Skanujem HTTP response hlavičku pre webserver verziu...')
     response = requests.get('https://' + website)
     try:
-        return response.headers['server']
+        return response.headers['server'], "http_header"
     except KeyError:
         raise NoWebServerVersionFoundError()
 
@@ -49,8 +49,8 @@ def scan_versions(website, scan_nmap):
     Use each function defined in scans list to
     find out web server versions.
 
-    :param scan_nmap:
-    :param website: website to be scanned
+    :parameter scan_nmap:
+    :parameter website: website to be scanned
     :return: versions of the server, if it is not found returns
     exception error.
     """

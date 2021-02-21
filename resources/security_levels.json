@@ -1,81 +1,74 @@
 {
-  "KEY_EXCHANGE_ALG": {
+  "kex_algorithm": {
     "1": "ECDHE,DHE",
     "2": "ECDH,DH,RSA",
     "3": "",
     "4": ""
   },
-  "CERT_SIG_ALG": {
+  "cert_sign_algorithm": {
     "1": "EC,RSA,ECDSA,DSA,DSS,EdDSA",
     "2": "",
     "3": "",
     "4": ""
   },
-  "SYM_ENCRYPT_ALG": {
+  "sym_enc_algorithm": {
     "1": "AES",
     "2": "",
     "3": "TDEA,2DES,3DES",
     "4": "SKIPJACK"
   },
-  "SYM_ENCRYPT_ALG_KEY_LEN": {
+  "sym_enc_algorithm_key_length": {
     "1": "AES,>=128",
     "2": "",
     "3": "",
     "4": "AES,<<128"
   },
-  "SYM_ENCRYPT_ALG_BLOCK_MODE": {
+  "sym_enc_algorithm_block_mode": {
     "1": "GCM,CCM",
     "2": "CBC",
     "3": "",
     "4": ""
   },
-  "SYM_ENCRYPT_ALG_BLOCK_MODE_NUMBER": {
+  "sym_ecn_algorithm_block_mode_number": {
     "1": "",
     "2": "CCM,==8",
     "3": "",
     "4": ""
   },
-  "HASH_FUN": {
+  "hash_function": {
     "1": "SHA223,SHA256,SHA384",
     "2": "SHA",
     "3": "",
     "4": "MD5"
   },
-  "HMAC": {
+  "hmac_function": {
     "1": "",
     "2": "",
     "3": "",
     "4": ""
   },
-  "PROTOCOL": {
+  "protocol": {
     "1": "TLSv1.3,TLSv1.2",
     "2": "TLSv1.1,TLSv1",
     "3": "",
     "4": "SSLv3,SSLv2"
   },
-  "PROTOCOL_VERSION": {
-    "1": "1.3,1.2",
-    "2": "1.1",
-    "3": "1",
-    "4": "3,2"
-  },
-  "CERT_SIG_ALG_HASH_FUN": {
+  "cert_sign_algorithm_hash_function": {
     "1": "SHA223,SHA256,SHA384",
     "2": "SHA",
     "3": "",
     "4": "MD5"
   },
-  "CERT_PUB_KEY_LEN": {
+  "cert_pub_key_length": {
     "1": "RSA,>=2048,ECDSA,>=224,EC,>=224",
     "2": "",
     "3": "ECDSA,>=160,RSA,>=1024,EC,>=160",
     "4": "ECDSA,<<160,RSA,<<1024,EC,<<160"
   },
-  "CERT_PUB_KEY_ALG": {
+  "cert_pub_key_algorithm": {
     "1": "EC,RSA,ECDSA",
     "2": "DSA,DSS",
     "3": "",
     "4": ""
   }
 }
-

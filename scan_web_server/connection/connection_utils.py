@@ -9,30 +9,30 @@ from ..utils import convert_openssh_to_iana
 
 def get_website_info(hostname):
     """
-    Gathers all the required information to rate a web server.
+    Gathers objects to be rated.
 
-    :param hostname: hostname of the webserver
+    Uses functions in this module to create a connection and get the
+    servers certificate, cipher suite and protocol used in the connecton.
+    :parameter hostname: hostname of the webserver
     :return:
-        cert -- used certificate to verify the server
+        certificate -- used certificate to verify the server
         cipher_suite -- negotiated cipher suite
         protocol -- protocol name and version
-        supported_versions -- SSL/TLS versions that the web server supports
     """
     if '/' in hostname:
         hostname = fix_hostname(hostname)
     ssl_socket = create_session(hostname, 443)
-    supported_versions = test_ssl_versions(hostname)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     cert = get_certificate(ssl_socket)
     ssl_socket.close()
-    return cert, cipher_suite, protocol, supported_versions
+    return cert, cipher_suite, protocol
 
 
 def get_certificate(ssl_socket):
     """
     Gathers a certificate in a der format.
 
-    :param ssl_socket: secured socket
+    :parameter ssl_socket: secured socket
     :return: gathered certificate
     """
     cert_pem = bytes(ssl_socket.getpeercert(binary_form=True))
@@ -44,7 +44,7 @@ def get_cipher_suite_and_protocol(ssl_socket):
     """
     Gathers the cipher suite and the protocol from the ssl_socket.
 
-    :param ssl_socket: secure socket
+    :parameter ssl_socket: secure socket
     :return: negotiated cipher suite and the protocol
     """
     cipher_suite = ssl_socket.cipher()[0]
@@ -53,43 +53,16 @@ def get_cipher_suite_and_protocol(ssl_socket):
     return cipher_suite, ssl_socket.version()
 
 
-def test_ssl_versions(hostname):
-    """
-    Tests for all possible SSL/TLS versions which the server supports
-
-    :param hostname: hostname of the website
-    :return: secure socket with the highest version and the supported protocols
-    """
-    ssl_versions = [
-        SSL.TLSv1_METHOD,
-        SSL.TLSv1_1_METHOD,
-        SSL.TLSv1_2_METHOD,
-        SSL.SSLv23_METHOD
-    ]
-    supported_protocols = []
-    for version in ssl_versions:
-        context = SSL.Context(version)
-        try:
-            ssl_socket = create_session_pyopenssl(hostname, 443, context)
-            version = ssl_socket.get_protocol_version_name()
-            ssl_socket.close()
-            if version not in supported_protocols:
-                supported_protocols.append(version)
-        except SSL.Error:
-            continue
-    return supported_protocols
-
-
 def create_session_pyopenssl(hostname, port, context):
     """
-    Creates a secure connection to any server on any port with a defined context
-    on a specific timeout.
+    Creates a secure connection to any server on any port with a defined context.
 
     This function creates a secure connection with pyopenssl lib. Original ssl lib
-    doesn't work with older TLS versions on some OpenSSL implementations.
-    :param hostname: hostname of the website
-    :param context: ssl context
-    :param port: port
+    doesn't work with older TLS versions on some OpenSSL implementations and thus
+    the program can't scan for all supported versions.
+    :parameter hostname: hostname of the website
+    :parameter context: ssl context
+    :parameter port: port
     :return: created secure socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -104,9 +77,9 @@ def create_session(hostname, port, context=ssl.create_default_context()):
     Creates a secure connection to any server on any port with a defined context
     on a specific timeout.
 
-    :param hostname: hostname of the website
-    :param context: ssl context
-    :param port: port
+    :parameter hostname: hostname of the website
+    :parameter context: ssl context
+    :parameter port: port
     :return: created secure socket
     """
     if hostname == '192.168.1.220':
@@ -133,7 +106,7 @@ def fix_hostname(hostname):
     """
     Extracts the domain name.
 
-    :param hostname: hostname address to be checked
+    :parameter hostname: hostname address to be checked
     :return: fixed hostname address
     """
     print('Upravujem webovú adresu...')

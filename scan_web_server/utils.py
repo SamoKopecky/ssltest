@@ -12,7 +12,7 @@ def convert_openssh_to_iana(search_term):
     Converts openssh format of a cipher suite to IANA format.
 
     Raises IndexError if not conversion is found
-    :param search_term: cipher suite
+    :parameter search_term: cipher suite
     :return: converted cipher suite
     """
     json_data = read_json('iana_openssl_cipher_mapping.json')
@@ -26,7 +26,7 @@ def read_json(file_name):
     """
     Helper function for reading a json file.
 
-    :param file_name: json file name
+    :parameter file_name: json file name
     :return: json data in python objects
     """
     file = open('resources/' + file_name, 'r')
@@ -35,13 +35,13 @@ def read_json(file_name):
     return json_data
 
 
-def compare_key_length(algorithm, key_len, levels_str):
+def rate_key_length_parameter(algorithm, key_len, enum):
     """
     Derives the rating of a algorithm key length.
 
-    :param algorithm: algorithm
-    :param key_len: key length of the algorithm
-    :param levels_str: security levels read from a json file of the specific category
+    :param enum:
+    :parameter algorithm: algorithm
+    :parameter key_len: key length of the algorithm
     :return: rating of a parameter pair or 0 if a rating isn't defined or found
     """
     functions = {
@@ -51,7 +51,7 @@ def compare_key_length(algorithm, key_len, levels_str):
         "<<": lambda a, b: a < b,
         "==": lambda a, b: a == b
     }
-
+    levels_str = read_json('security_levels.json')[enum.name]
     if key_len == 'N/A':
         return 0
     for idx in range(1, 5):
@@ -65,11 +65,29 @@ def compare_key_length(algorithm, key_len, levels_str):
     return 0
 
 
+def rate_parameter(enum, parameter):
+    """
+    Helper function for rating a parameter from a json file.
+
+    :param enum: specifies which parameter category should be used for rating
+    :param parameter: parameter that is going to be rated
+    :return: if a rating is found for a parameter returns that rating,
+    if not 0 is returned (default value)
+    """
+    security_levels_json = read_json('security_levels.json')
+    if parameter == 'N/A':
+        return 0
+    for idx in range(1, 5):
+        if parameter in security_levels_json[enum.name][str(idx)].split(','):
+            return idx
+    return 0
+
+
 def pub_key_alg_from_cert(public_key):
     """
     Gets the public key algorithm from the certificate.
 
-    :param public_key: instance of a public key
+    :parameter public_key: instance of a public key
     :return: string representation of a parameter
     """
     if isinstance(public_key, ec.EllipticCurvePublicKey):
@@ -88,7 +106,7 @@ def get_sig_alg_from_oid(oid):
     """
     Gets the signature algorithm from an oid of a certificate
 
-    :param oid: object identifier
+    :parameter oid: object identifier
     :return: signature algorithm in string representation
     """
     values = list(x509.SignatureAlgorithmOID.__dict__.values())
