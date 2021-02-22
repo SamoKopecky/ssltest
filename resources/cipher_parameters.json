@@ -1,5 +1,3 @@
-
-
 {
   "kex_algorithm": "DH,DHE,ECDH,ECDHE,SRP,ECCPWD,GOSTR341112,RSA",
   "cert_pub_key_algorithm": "anon,KRB5,PSK,DSS",
@@ -8,6 +6,5 @@
   "sym_enc_algorithm_block_mode": "CBC,EDE,GCM,CCM,CTR",
   "sym_ecn_algorithm_block_mode_number": "8",
   "hash_function": "MD5,SHA,SHA256,SHA384",
-  "hmac_function": "POLY1305,OMAC"
+  "hmac_function": "POLY1305,HMAC"
 }
-

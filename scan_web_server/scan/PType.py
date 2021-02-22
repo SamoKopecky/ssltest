@@ -23,6 +23,7 @@ class PType(Enum):
     cert_not_valid_after = auto()
     cert_subject = auto()
     cert_issuer = auto()
+    cert_alternative_names = auto()
 
     @property
     def key_pair(self):
@@ -96,7 +97,8 @@ class PType(Enum):
             self.cert_not_valid_before,
             self.cert_not_valid_after,
             self.cert_subject,
-            self.cert_issuer
+            self.cert_issuer,
+            self.cert_alternative_names
         ]
         return self in certificate_parameters
 

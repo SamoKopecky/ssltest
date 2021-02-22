@@ -24,9 +24,9 @@ def get_website_info(hostname, port):
         hostname = fix_hostname(hostname)
     ssl_socket = create_session(hostname, port)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
-    cert = get_certificate(ssl_socket)
+    certificate = get_certificate(ssl_socket)
     ssl_socket.close()
-    return cert, cipher_suite, protocol
+    return certificate, cipher_suite, protocol
 
 
 def get_certificate(ssl_socket):
@@ -36,9 +36,8 @@ def get_certificate(ssl_socket):
     :parameter ssl_socket: secured socket
     :return: gathered certificate
     """
-    cert_pem = bytes(ssl_socket.getpeercert(binary_form=True))
-    cert = x509.load_der_x509_certificate(cert_pem, default_backend())
-    return cert
+    certificate_pem = bytes(ssl_socket.getpeercert(binary_form=True))
+    return x509.load_der_x509_certificate(certificate_pem, default_backend())
 
 
 def get_cipher_suite_and_protocol(ssl_socket):

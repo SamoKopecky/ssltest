@@ -12,33 +12,44 @@ class Certificate:
 
     def parse_certificate(self):
         """
-        Extracts information from a certificate and parses it into a dictionary.
+        Parses information from a certificate and parses it into a dictionary.
         """
         self.parameters[PType.cert_pub_key_algorithm][0] = pub_key_alg_from_cert(self.certificate.public_key())
         self.parameters[PType.cert_version][0] = str(self.certificate.version.value)
         self.parameters[PType.cert_serial_number][0] = str(self.certificate.serial_number)
         self.parameters[PType.cert_not_valid_before][0] = str(self.certificate.not_valid_before.date())
         self.parameters[PType.cert_not_valid_after][0] = str(self.certificate.not_valid_after.date())
-        self.parse_organization(PType.cert_subject, self.certificate.subject)
-        self.parse_organization(PType.cert_issuer, self.certificate.issuer)
+        self.parameters[PType.cert_alternative_names][0] = self.parse_alternative_names()
+        self.parse_name(PType.cert_subject, self.certificate.subject)
+        self.parse_name(PType.cert_issuer, self.certificate.issuer)
         self.parameters[PType.cert_issuer][0] = self.parameters[PType.cert_issuer][0][:-1]
-        self.parameters[PType.cert_sign_algorithm][0] = get_sig_alg_from_oid(self.certificate.signature_algorithm_oid)
+        self.parameters[PType.cert_sign_algorithm][0] = get_sig_alg_from_oid(
+            self.certificate.signature_algorithm_oid)
         self.parameters[PType.cert_sign_algorithm_hash_function][0] = str(
             self.certificate.signature_hash_algorithm.name).upper()
         self.parameters[PType.cert_pub_key_length][0] = str(self.certificate.public_key().key_size)
 
-    def parse_organization(self, organization_type, organization):
+    def parse_alternative_names(self):
+        """
+        Parses the alternative names from the certificate extensions.
+
+        :return: list of alternative names
+        """
+        extension = self.certificate.extensions.get_extension_for_class(x509.SubjectAlternativeName)
+        return extension.value.get_values_for_type(x509.DNSName)
+
+    def parse_name(self, name_type, name):
         """
         Helper function for gathering subject and issuer information.
 
-        :param organization_type: PType enum
-        :param organization: objects that is parsed
+        :param name_type: PType enum
+        :param name: objects that is parsed
         :return:
         """
-        self.parameters[organization_type][0] = ''
-        for attribute in organization:
-            self.parameters[organization_type][0] += f'{attribute.oid._name}={attribute.value},'
-        self.parameters[organization_type][0] = self.parameters[organization_type][0][:-1]
+        self.parameters[name_type][0] = []
+        for attribute in name:
+            self.parameters[name_type][0].append(f'{attribute.oid._name}={attribute.value},')
+        self.parameters[name_type][0] = self.parameters[name_type][0][:-1]
 
     def rate_certificate(self):
         """
