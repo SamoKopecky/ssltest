@@ -32,25 +32,31 @@ def parse_options():
 
 
 def scan(website, port, scan_nmap):
+    final_rating = []
     certificate, cipher_suite, protocol = get_website_info(website, port)
 
     cipher_suite_parameters = CipherSuite(cipher_suite, protocol)
-    cipher_suite_parameters.rate()
+    final_rating.append(cipher_suite_parameters.rate())
 
     certificate_parameters = Certificate(certificate)
-    certificate_parameters.rate()
+    final_rating.append(certificate_parameters.rate())
 
     protocol_support = ProtocolSupport(website, port)
-    protocol_support.rate()
+    final_rating.append(protocol_support.rate())
 
     versions = WebServerVersion(website, port, scan_nmap)
     versions.scan_versions()
 
+    print_scan(certificate_parameters, cipher_suite_parameters, final_rating, protocol_support, versions)
+
+
+def print_scan(certificate_parameters, cipher_suite_parameters, final_rating, protocol_support, versions):
     # temporary output
     pprint(cipher_suite_parameters.parameters)
     pprint(certificate_parameters.parameters)
     pprint(protocol_support.versions)
     pprint(versions.versions)
+    print(f'rating: {max(final_rating)}')
 
 
 if __name__ == "__main__":
