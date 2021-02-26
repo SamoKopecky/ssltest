@@ -5,11 +5,16 @@ from pprint import pprint
 from scan_web_server.scan.CipherSuite import CipherSuite
 from scan_web_server.scan.Certificate import Certificate
 from scan_web_server.scan.ProtocolSupport import ProtocolSupport
-from scan_web_server.scan.webserver_version import scan_versions
+from scan_web_server.scan.WebServerVersion import WebServerVersion
 from scan_web_server.connection.connection_utils import get_website_info
 
 
 def main():
+    args = parse_options()
+    scan(args.url, args.port, args.nmap_version)
+
+
+def parse_options():
     parser = argparse.ArgumentParser(
         description='Script that scans a webservers cryptographic parameters and vulnerabilities')
     required = parser.add_argument_group('required arguments')
@@ -23,7 +28,7 @@ def main():
                                help='port to scan on (default: 443)')
     parser.add_argument('-j', '--json', action='store_true', default=False, help='change output to json format')
     args = parser.parse_args()
-    scan(args.url, args.port, args.nmap_version)
+    return args
 
 
 def scan(website, port, scan_nmap):
@@ -38,13 +43,14 @@ def scan(website, port, scan_nmap):
     protocol_support = ProtocolSupport(website, port)
     protocol_support.rate()
 
-    versions = scan_versions(website, scan_nmap)
+    versions = WebServerVersion(website, port, scan_nmap)
+    versions.scan_versions()
 
     # temporary output
     pprint(cipher_suite_parameters.parameters)
     pprint(certificate_parameters.parameters)
     pprint(protocol_support.versions)
-    pprint(versions)
+    pprint(versions.versions)
 
 
 if __name__ == "__main__":
