@@ -5,6 +5,9 @@ from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from ..utils import convert_openssh_to_iana
+from ..exceptions.UnknownConnectionError import UnknownConnectionError
+from ..exceptions.ConnectionTimeoutError import ConnectionTimeoutError
+from ..exceptions.DNSError import DNSError
 
 
 def get_website_info(hostname, port):
@@ -49,7 +52,10 @@ def get_cipher_suite_and_protocol(ssl_socket):
     """
     cipher_suite = ssl_socket.cipher()[0]
     if '-' in cipher_suite:
-        cipher_suite = convert_openssh_to_iana(cipher_suite)
+        try:
+            cipher_suite = convert_openssh_to_iana(cipher_suite)
+        except Exception as e:
+            print(e)
     return cipher_suite, ssl_socket.version()
 
 
@@ -91,14 +97,11 @@ def create_session(hostname, port, context=ssl.create_default_context()):
     try:
         ssl_socket.connect((hostname, port))
     except socket.timeout:
-        print("Server nepodpruje HTTPS protokol alebo server neodpovedá na požiadavky.")
-        exit(1)
+        raise ConnectionTimeoutError()
     except socket.gaierror:
-        print("Nastala chyba v DNS službe.")
-        exit(socket.EAI_FAIL)
+        raise DNSError()
     except socket.error as e:
-        print(e)
-        exit(1)
+        raise UnknownConnectionError(e)
     return ssl_socket
 
 

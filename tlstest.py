@@ -11,7 +11,11 @@ from scan_web_server.connection.connection_utils import get_website_info
 
 def main():
     args = parse_options()
-    scan(args.url, args.port, args.nmap_version)
+    for port in args.port:
+        try:
+            scan(args.url, port, args.nmap_version)
+        except Exception as ex:
+            print(ex)
 
 
 def parse_options():
@@ -23,14 +27,15 @@ def parse_options():
                         help='use nmap to scan the server version')
     parser.add_argument('-np', '--nmap-port', action='store_true', default=False,
                         help='use nmap to scan for a web server port')
-    parser.add_argument('-p', '--port', default=443, type=int, metavar='port',
-                        help='port to scan on (default: 443)')
+    parser.add_argument('-p', '--port', default=[443], type=int, nargs='*', metavar='port',
+                        help='port or ports(separate with spaces) to scan on (default: 443)')
     parser.add_argument('-j', '--json', action='store_true', default=False, help='change output to json format')
     args = parser.parse_args()
     return args
 
 
 def scan(website, port, scan_nmap):
+    print(f'---------------Scan for {port}------------------')  # Temporary
     final_rating = []
     certificate, cipher_suite, protocol = get_website_info(website, port)
 
@@ -50,7 +55,7 @@ def scan(website, port, scan_nmap):
 
 
 def print_scan(certificate_parameters, cipher_suite_parameters, final_rating, protocol_support, versions):
-    # temporary output
+    # Temporary
     pprint(cipher_suite_parameters.parameters)
     pprint(certificate_parameters.parameters)
     pprint(protocol_support.versions)

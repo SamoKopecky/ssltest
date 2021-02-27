@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives.asymmetric import dsa
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives.asymmetric import ed448
+from .exceptions.NoIanaPairFound import NoIanaPairFound
 
 
 def convert_openssh_to_iana(search_term):
@@ -19,7 +20,7 @@ def convert_openssh_to_iana(search_term):
     for row in json_data:
         if json_data[row] == search_term:
             return row
-    raise KeyError("cipher is not contained in .json file")
+    raise NoIanaPairFound()
 
 
 def read_json(file_name):
