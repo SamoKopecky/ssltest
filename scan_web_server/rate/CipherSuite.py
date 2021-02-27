@@ -1,5 +1,5 @@
-from .PType import PType
-from ..utils import *
+from scan_web_server.rate.PType import PType
+from scan_web_server.utils import *
 
 
 class CipherSuite:

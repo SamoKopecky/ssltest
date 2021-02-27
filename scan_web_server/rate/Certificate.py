@@ -1,5 +1,5 @@
-from .PType import PType
-from ..utils import *
+from scan_web_server.rate.PType import PType
+from scan_web_server.utils import *
 
 
 class Certificate:
@@ -35,7 +35,10 @@ class Certificate:
 
         :return: list of alternative names
         """
-        extension = self.certificate.extensions.get_extension_for_class(x509.SubjectAlternativeName)
+        try:
+            extension = self.certificate.extensions.get_extension_for_class(x509.SubjectAlternativeName)
+        except x509.extensions.ExtensionNotFound:
+            return []
         return extension.value.get_values_for_type(x509.DNSName)
 
     def parse_name(self, name_type, name):

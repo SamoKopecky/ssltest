@@ -71,7 +71,7 @@ class WebServerVersion:
         all_values = []
         for port in self.ports:
             try:
-                response = requests.get(f'https://{self.website}:{port}', timeout=1)
+                response = requests.get(f'https://{self.website}:{port}', timeout=5)
                 value = response.headers["server"]
             except KeyError:
                 value = 'value not found'

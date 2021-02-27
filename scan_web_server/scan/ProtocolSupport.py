@@ -1,4 +1,4 @@
-from .PType import PType
+from scan_web_server.rate.PType import PType
 from ..utils import *
 from ..connection.connection_utils import *
 
@@ -39,7 +39,6 @@ class ProtocolSupport:
     def rate_protocols(self):
         """
         Rates the scanned protocols
-        :return:
         """
         supported_protocols = self.scan_protocols()
         for protocol in supported_protocols:
