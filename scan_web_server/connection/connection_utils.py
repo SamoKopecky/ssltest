@@ -17,7 +17,7 @@ def get_website_info(hostname, port):
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
     :param port: port to scan on
-    :parameter hostname: hostname of the webserver
+    :param hostname: hostname of the webserver
     :return:
         certificate -- used certificate to verify the server
         cipher_suite -- negotiated cipher suite
@@ -36,7 +36,7 @@ def get_certificate(ssl_socket):
     """
     Gathers a certificate in a der format.
 
-    :parameter ssl_socket: secured socket
+    :param ssl_socket: secured socket
     :return: gathered certificate
     """
     certificate_pem = bytes(ssl_socket.getpeercert(binary_form=True))
@@ -47,7 +47,7 @@ def get_cipher_suite_and_protocol(ssl_socket):
     """
     Gathers the cipher suite and the protocol from the ssl_socket.
 
-    :parameter ssl_socket: secure socket
+    :param ssl_socket: secure socket
     :return: negotiated cipher suite and the protocol
     """
     cipher_suite = ssl_socket.cipher()[0]
@@ -66,9 +66,9 @@ def create_session_pyopenssl(hostname, port, context):
     This function creates a secure connection with pyopenssl lib. Original ssl lib
     doesn't work with older TLS versions on some OpenSSL implementations and thus
     the program can't scan for all supported versions.
-    :parameter hostname: hostname of the website
-    :parameter context: ssl context
-    :parameter port: port
+    :param hostname: hostname of the website
+    :param context: ssl context
+    :param port: port
     :return: created secure socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -83,9 +83,9 @@ def create_session(hostname, port, context=ssl.create_default_context()):
     Creates a secure connection to any server on any port with a defined context
     on a specific timeout.
 
-    :parameter hostname: hostname of the website
-    :parameter context: ssl context
-    :parameter port: port
+    :param hostname: hostname of the website
+    :param context: ssl context
+    :param port: port
     :return: created secure socket
     """
     if hostname == '192.168.1.220':
@@ -109,15 +109,15 @@ def fix_hostname(hostname):
     """
     Extracts the domain name.
 
-    :parameter hostname: hostname address to be checked
+    :param hostname: hostname address to be checked
     :return: fixed hostname address
     """
-    print('Upravujem webovú adresu...')
+    print('Correcting url...')
     if hostname[:4] == 'http':
         # Removes http(s):// and anything after TLD (*.com)
         hostname = re.search('[/]{2}([^/]+)', hostname).group(1)
     else:
         # Removes anything after TLD (*.com)
         hostname = re.search('^([^/]+)', hostname).group(0)
-    print('Použítá webová adresa: {}'.format(hostname))
+    print('Corrected url: {}'.format(hostname))
     return hostname

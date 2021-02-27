@@ -42,7 +42,7 @@ class WebServerVersion:
         ports = map(lambda port: f'{port}', self.ports)
         ports = ','.join(ports)
 
-        print('Skanujem pomocou nmap verziu web serveru...')
+        print('Scanning webserver for version with nmap...')
         result = nmap.scan_top_ports(self.website, args=f"-sV -p {ports}")
 
         for index in range(len(self.ports)):
@@ -67,7 +67,7 @@ class WebServerVersion:
         tuple of (http_header, port, extracted info) to the class
         list of scans.
         """
-        print('Skanujem HTTP response hlavičku pre webserver verziu...')
+        print('Scanning webserver for version using http headers...')
         all_values = []
         for port in self.ports:
             try:

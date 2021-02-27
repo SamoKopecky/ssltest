@@ -13,7 +13,7 @@ def convert_openssh_to_iana(search_term):
     Converts openssh format of a cipher suite to IANA format.
 
     Raises IndexError if not conversion is found
-    :parameter search_term: cipher suite
+    :param search_term: cipher suite
     :return: converted cipher suite
     """
     json_data = read_json('iana_openssl_cipher_mapping.json')
@@ -27,7 +27,7 @@ def read_json(file_name):
     """
     Helper function for reading a json file.
 
-    :parameter file_name: json file name
+    :param file_name: json file name
     :return: json data in python objects
     """
     file = open('resources/' + file_name, 'r')
@@ -41,8 +41,8 @@ def rate_key_length_parameter(algorithm, key_len, enum):
     Derives the rating of a algorithm key length.
 
     :param enum:
-    :parameter algorithm: algorithm
-    :parameter key_len: key length of the algorithm
+    :param algorithm: algorithm
+    :param key_len: key length of the algorithm
     :return: rating of a parameter pair or 0 if a rating isn't defined or found
     """
     functions = {
@@ -88,7 +88,7 @@ def pub_key_alg_from_cert(public_key):
     """
     Gets the public key algorithm from the certificate.
 
-    :parameter public_key: instance of a public key
+    :param public_key: instance of a public key
     :return: string representation of a parameter
     """
     if isinstance(public_key, ec.EllipticCurvePublicKey):
@@ -107,7 +107,7 @@ def get_sig_alg_from_oid(oid):
     """
     Gets the signature algorithm from an oid of a certificate
 
-    :parameter oid: object identifier
+    :param oid: object identifier
     :return: signature algorithm in string representation
     """
     values = list(x509.SignatureAlgorithmOID.__dict__.values())

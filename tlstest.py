@@ -19,6 +19,11 @@ def main():
 
 
 def parse_options():
+    """
+    Function that parses the input options
+
+    :return: object of parsed arguments
+    """
     parser = argparse.ArgumentParser(
         description='Script that scans a webservers cryptographic parameters and vulnerabilities')
     required = parser.add_argument_group('required arguments')
@@ -35,7 +40,15 @@ def parse_options():
 
 
 def scan(website, port, scan_nmap):
-    print(f'---------------Scan for {port}------------------')  # Temporary
+    """
+    This function calls all the other functions required to scan
+
+    :param website: url to be scanned
+    :param port: list of ports to be scanned
+    :param scan_nmap: whether to scan with nmap or not
+    :return:
+    """
+    print(f'---------------Scanning for port {port}---------------')  # Temporary
     final_rating = []
     certificate, cipher_suite, protocol = get_website_info(website, port)
 
@@ -55,7 +68,9 @@ def scan(website, port, scan_nmap):
 
 
 def print_scan(certificate_parameters, cipher_suite_parameters, final_rating, protocol_support, versions):
-    # Temporary
+    """
+    Temporary function for printing output
+    """
     pprint(cipher_suite_parameters.parameters)
     pprint(certificate_parameters.parameters)
     pprint(protocol_support.versions)

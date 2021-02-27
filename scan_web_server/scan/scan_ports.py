@@ -7,6 +7,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def scan_ports(website):
+    """
+    TODO: tweak nmap
+    """
     print('Scanning for ports...')
     nmap = nmap3.NmapHostDiscovery()
     result = nmap.nmap_portscan_only(website)
