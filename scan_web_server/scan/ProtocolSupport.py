@@ -47,6 +47,5 @@ class ProtocolSupport:
         self.rating = max(self.versions.values())
 
     def rate(self):
-        self.scan_protocols()
         self.rate_protocols()
         return self.rating

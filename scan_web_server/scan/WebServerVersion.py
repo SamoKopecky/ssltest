@@ -71,13 +71,15 @@ class WebServerVersion:
         all_values = []
         for port in self.ports:
             try:
-                response = requests.get(f'https://{self.website}:{port}', timeout=5)
+                response = requests.head(f'https://{self.website}:{port}', timeout=5, headers={'Connection': 'close'})
                 value = response.headers["server"]
             except KeyError:
                 value = 'value not found'
             except (requests.exceptions.InvalidSchema,
                     requests.exceptions.SSLError,
-                    requests.exceptions.ConnectionError):
+                    requests.exceptions.ConnectionError,
+                    requests.exceptions.Timeout,
+                    requests.exceptions.ReadTimeout):
                 value = 'unable to connect'
             all_values.append(("http_header", f'{port}', f'{value}'))
 

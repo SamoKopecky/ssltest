@@ -1,21 +1,31 @@
 #!/usr/bin/python3
 import argparse
+import sys
+import logging
 from pprint import pprint
-
 from scan_web_server.rate.CipherSuite import CipherSuite
 from scan_web_server.rate.Certificate import Certificate
 from scan_web_server.scan.ProtocolSupport import ProtocolSupport
 from scan_web_server.scan.WebServerVersion import WebServerVersion
 from scan_web_server.connection.connection_utils import get_website_info
+from scan_web_server.scan.port_discovery import discover_ports
+from scan_web_server.utils import fix_hostname
 
 
 def main():
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
     args = parse_options()
+    if '/' in args.url:
+        args.url = fix_hostname(args.url)
+    if args.nmap_discover is True:
+        scanned_ports = discover_ports(args.url)
+        scanned_ports = list(filter(lambda scanned_port: scanned_port not in args.port, scanned_ports))
+        args.port.extend(scanned_ports)
     for port in args.port:
         try:
-            scan(args.url, port, args.nmap_version)
+            scan(args.url, port, args.nmap_server)
         except Exception as ex:
-            print(ex)
+            print(f'Unexpected exception occurred: {ex}')
 
 
 def parse_options():
@@ -28,10 +38,10 @@ def parse_options():
         description='Script that scans a webservers cryptographic parameters and vulnerabilities')
     required = parser.add_argument_group('required arguments')
     required.add_argument('-u', '--url', required=True, metavar='url', help='url to scan')
-    parser.add_argument('-nv', '--nmap-version', action='store_true', default=False,
+    parser.add_argument('-ns', '--nmap-server', action='store_true', default=False,
                         help='use nmap to scan the server version')
-    parser.add_argument('-np', '--nmap-port', action='store_true', default=False,
-                        help='use nmap to scan for a web server port')
+    parser.add_argument('-nd', '--nmap-discover', action='store_true', default=False,
+                        help='use nmap to discover web server ports')
     parser.add_argument('-p', '--port', default=[443], type=int, nargs='*', metavar='port',
                         help='port or ports(separate with spaces) to scan on (default: 443)')
     parser.add_argument('-j', '--json', action='store_true', default=False, help='change output to json format')

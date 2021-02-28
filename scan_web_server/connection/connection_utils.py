@@ -1,6 +1,7 @@
 import ssl
 import socket
-import re
+import time
+import logging
 from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -23,8 +24,6 @@ def get_website_info(hostname, port):
         cipher_suite -- negotiated cipher suite
         protocol -- protocol name and version
     """
-    if '/' in hostname:
-        hostname = fix_hostname(hostname)
     ssl_socket = create_session(hostname, port)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     certificate = get_certificate(ssl_socket)
@@ -73,7 +72,21 @@ def create_session_pyopenssl(hostname, port, context):
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ssl_socket = SSL.Connection(context, sock)
-    ssl_socket.connect((hostname, port))
+    sleep = 0
+    # Loop until there is a valid response or after 15 seconds
+    while True:
+        try:
+            logging.debug(f'connecting... (tls version scanning)')
+            ssl_socket.connect((hostname, port))
+            break
+        except OSError as e:
+            if sleep >= 5:
+                logging.debug('raise unknown connection error')
+                raise UnknownConnectionError(e)
+            logging.debug('increasing sleep duration')
+            sleep += 1
+        logging.debug(f'sleeping for {sleep}')
+        time.sleep(sleep)
     ssl_socket.do_handshake()
     return ssl_socket
 
@@ -94,30 +107,25 @@ def create_session(hostname, port, context=ssl.create_default_context()):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(5)  # in seconds
     ssl_socket = context.wrap_socket(sock, server_hostname=hostname)
-    try:
-        ssl_socket.connect((hostname, port))
-    except socket.timeout:
-        raise ConnectionTimeoutError()
-    except socket.gaierror:
-        raise DNSError()
-    except socket.error as e:
-        raise UnknownConnectionError(e)
+    sleep = 0
+    # Loop until there is a valid response or after 15 seconds
+    while True:
+        try:
+            logging.debug(f'connecting... (main connection)')
+            ssl_socket.connect((hostname, port))
+            break
+        except socket.timeout:
+            raise ConnectionTimeoutError()
+        except socket.gaierror:
+            raise DNSError()
+        except ValueError as e:
+            raise UnknownConnectionError(e)
+        except socket.error as e:
+            if sleep >= 5:
+                logging.debug('raise unknown connection error')
+                raise UnknownConnectionError(e)
+            logging.debug('increasing sleep duration')
+            sleep += 1
+        logging.debug(f'sleeping for {sleep}')
+        time.sleep(sleep)
     return ssl_socket
-
-
-def fix_hostname(hostname):
-    """
-    Extracts the domain name.
-
-    :param hostname: hostname address to be checked
-    :return: fixed hostname address
-    """
-    print('Correcting url...')
-    if hostname[:4] == 'http':
-        # Removes http(s):// and anything after TLD (*.com)
-        hostname = re.search('[/]{2}([^/]+)', hostname).group(1)
-    else:
-        # Removes anything after TLD (*.com)
-        hostname = re.search('^([^/]+)', hostname).group(0)
-    print('Corrected url: {}'.format(hostname))
-    return hostname

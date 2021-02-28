@@ -1,4 +1,5 @@
 import json
+import re
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import dsa
@@ -113,3 +114,21 @@ def get_sig_alg_from_oid(oid):
     values = list(x509.SignatureAlgorithmOID.__dict__.values())
     keys = list(x509.SignatureAlgorithmOID.__dict__.keys())
     return keys[values.index(oid)].split('_')[0]
+
+
+def fix_hostname(hostname):
+    """
+    Extracts the domain name.
+
+    :param   hostname: hostname address to be checked
+    :return: fixed hostname address
+    """
+    print('Correcting url...')
+    if hostname[:4] == 'http':
+        # Removes http(s):// and anything after TLD (*.com)
+        hostname = re.search('[/]{2}([^/]+)', hostname).group(1)
+    else:
+        # Removes anything after TLD (*.com)
+        hostname = re.search('^([^/]+)', hostname).group(0)
+    print('Corrected url: {}'.format(hostname))
+    return hostname
