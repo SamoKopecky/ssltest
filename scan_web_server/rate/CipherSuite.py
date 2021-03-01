@@ -14,7 +14,7 @@ class CipherSuite:
 
     def parse_cipher_suite(self):
         """
-        Parses used cipher suite into python readable objects.
+        Parse used cipher suite into python readable objects.
 
         The cipher suite is split into each parameter and then sorted
         to categories with the help of a json file. Categories are
@@ -35,7 +35,7 @@ class CipherSuite:
 
     def rate_cipher_suite(self):
         """
-        Rates all cipher suite parameters.
+        Rate all cipher suite parameters.
 
         First part is used if a length parameter needs to be rated
         Second part is used for not length parameters
@@ -55,7 +55,7 @@ class CipherSuite:
 
     def parse_protocol_version(self):
         """
-        Reads the protocol version and applies special edge cases.
+        Read the protocol version and apply special edge cases.
 
         Might add more.
         """

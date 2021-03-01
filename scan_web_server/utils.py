@@ -1,5 +1,6 @@
 import json
 import re
+import os
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import dsa
@@ -11,7 +12,7 @@ from .exceptions.NoIanaPairFound import NoIanaPairFound
 
 def convert_openssh_to_iana(search_term):
     """
-    Converts openssh format of a cipher suite to IANA format.
+    Convert openssh format of a cipher suite to IANA format.
 
     Raises IndexError if not conversion is found
     :param search_term: cipher suite
@@ -26,12 +27,13 @@ def convert_openssh_to_iana(search_term):
 
 def read_json(file_name):
     """
-    Helper function for reading a json file.
+    Read a json file and return its content.
 
     :param file_name: json file name
     :return: json data in python objects
     """
-    file = open('resources/' + file_name, 'r')
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    file = open(f'{root_dir}/../resources/{file_name}', 'r')
     json_data = json.loads(file.read())
     file.close()
     return json_data
@@ -39,7 +41,7 @@ def read_json(file_name):
 
 def rate_key_length_parameter(algorithm, key_len, enum):
     """
-    Derives the rating of a algorithm key length.
+    Get the rating of an algorithm key length.
 
     :param enum:
     :param algorithm: algorithm
@@ -69,7 +71,7 @@ def rate_key_length_parameter(algorithm, key_len, enum):
 
 def rate_parameter(enum, parameter):
     """
-    Helper function for rating a parameter from a json file.
+    Rate a parameter using a defined json file.
 
     :param enum: specifies which parameter category should be used for rating
     :param parameter: parameter that is going to be rated
@@ -87,7 +89,7 @@ def rate_parameter(enum, parameter):
 
 def pub_key_alg_from_cert(public_key):
     """
-    Gets the public key algorithm from the certificate.
+    Get the public key algorithm from a certificate.
 
     :param public_key: instance of a public key
     :return: string representation of a parameter
@@ -106,7 +108,7 @@ def pub_key_alg_from_cert(public_key):
 
 def get_sig_alg_from_oid(oid):
     """
-    Gets the signature algorithm from an oid of a certificate
+    Get a signature algorithm from an oid of a certificate
 
     :param oid: object identifier
     :return: signature algorithm in string representation
@@ -118,7 +120,7 @@ def get_sig_alg_from_oid(oid):
 
 def fix_hostname(hostname):
     """
-    Extracts the domain name.
+    Extract the root domain name.
 
     :param   hostname: hostname address to be checked
     :return: fixed hostname address

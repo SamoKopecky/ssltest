@@ -13,7 +13,7 @@ from ..exceptions.DNSError import DNSError
 
 def get_website_info(hostname, port):
     """
-    Gathers objects to be rated.
+    Gather objects to be used in rating a web server.
 
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
@@ -33,7 +33,7 @@ def get_website_info(hostname, port):
 
 def get_certificate(ssl_socket):
     """
-    Gathers a certificate in a der format.
+    Gather a certificate in a der binary format.
 
     :param ssl_socket: secured socket
     :return: gathered certificate
@@ -44,7 +44,7 @@ def get_certificate(ssl_socket):
 
 def get_cipher_suite_and_protocol(ssl_socket):
     """
-    Gathers the cipher suite and the protocol from the ssl_socket.
+    Gather the cipher suite and the protocol from the ssl_socket.
 
     :param ssl_socket: secure socket
     :return: negotiated cipher suite and the protocol
@@ -60,7 +60,7 @@ def get_cipher_suite_and_protocol(ssl_socket):
 
 def create_session_pyopenssl(hostname, port, context):
     """
-    Creates a secure connection to any server on any port with a defined context.
+    Create a secure connection to any server on any port with a defined context.
 
     This function creates a secure connection with pyopenssl lib. Original ssl lib
     doesn't work with older TLS versions on some OpenSSL implementations and thus
@@ -93,7 +93,7 @@ def create_session_pyopenssl(hostname, port, context):
 
 def create_session(hostname, port, context=ssl.create_default_context()):
     """
-    Creates a secure connection to any server on any port with a defined context
+    Create a secure connection to any server on any port with a defined context
     on a specific timeout.
 
     :param hostname: hostname of the website

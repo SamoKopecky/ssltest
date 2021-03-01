@@ -12,7 +12,7 @@ class Certificate:
 
     def parse_certificate(self):
         """
-        Parses information from a certificate and parses it into a dictionary.
+        Parse information from a certificate and into a dictionary.
         """
         self.parameters[PType.cert_pub_key_algorithm][0] = pub_key_alg_from_cert(self.certificate.public_key())
         self.parameters[PType.cert_version][0] = str(self.certificate.version.value)
@@ -31,7 +31,7 @@ class Certificate:
 
     def parse_alternative_names(self):
         """
-        Parses the alternative names from the certificate extensions.
+        Parse the alternative names from the certificate extensions.
 
         :return: list of alternative names
         """
@@ -43,7 +43,7 @@ class Certificate:
 
     def parse_name(self, name_type, name):
         """
-        Helper function for gathering subject and issuer information.
+        Parse subject and issuer information.
 
         :param name_type: PType enum
         :param name: objects that is parsed
@@ -56,7 +56,7 @@ class Certificate:
 
     def rate_certificate(self):
         """
-        Rates all valid certificate parameters.
+        Rate all valid certificate parameters.
 
         First part is used if a length parameter needs to be rated.
         Second part is used for not length parameters.

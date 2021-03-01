@@ -28,7 +28,7 @@ class PType(Enum):
     @property
     def key_pair(self):
         """
-        Defines the algorithm to which the algorithm length belongs to.
+        Define the algorithm to which the algorithm length belongs to.
 
         :return: algorithm type
         """
@@ -42,7 +42,7 @@ class PType(Enum):
     @property
     def string_alias(self):
         """
-        Defines a string alias of a specific parameter
+        Define a string alias of a parameter.
 
         :return: string
         """
@@ -65,7 +65,7 @@ class PType(Enum):
     @property
     def is_cipher_suite(self):
         """
-        Defines which parameters are parsable from a cipher suite
+        Define which parameters are parsable from cipher suites.
 
         :return: true if a parameter is parsable
         """
@@ -83,7 +83,7 @@ class PType(Enum):
     @property
     def is_certificate(self):
         """
-        Defines which parameters are parsable from a certificate.
+        Define which parameters are parsable from a certificate.
 
         :return: true if a parameter is parsable
         """
@@ -105,7 +105,7 @@ class PType(Enum):
     @property
     def is_ratable(self):
         """
-        Defines which parameter can be rated.
+        Define which parameter can be rated.
 
         :return: true if a parameter can be rated
         """

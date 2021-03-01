@@ -27,7 +27,7 @@ class WebServerVersion:
 
     def scan_version_nmap(self):
         """
-        Gets the web server version with nmap wrapper.
+        Get the web server version with nmap wrapper.
 
         First ports are concatenated into a string for connection. After that
         for each port the result is looked up, if a version can't be found
@@ -87,7 +87,7 @@ class WebServerVersion:
 
     def scan_versions(self):
         """
-        Calls the required functions to scan for webserver versions
+        Call the required functions to scan for webserver versions.
         """
         scans = []
         if self.website != '192.168.1.220':  # for testing purposes

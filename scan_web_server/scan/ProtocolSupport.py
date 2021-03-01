@@ -13,7 +13,7 @@ class ProtocolSupport:
 
     def scan_protocols(self):
         """
-        Tests for all possible TLS versions which the server supports.
+        Test for all possible TLS versions which the server supports.
 
         :return: list of the supported protocols.
         """
@@ -38,7 +38,7 @@ class ProtocolSupport:
 
     def rate_protocols(self):
         """
-        Rates the scanned protocols
+        Rate the scanned protocols.
         """
         print('Scanning for TLS versions...')
         supported_protocols = self.scan_protocols()

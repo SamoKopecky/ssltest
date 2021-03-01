@@ -8,7 +8,7 @@
 
 - [cryptography](https://pypi.org/project/cryptography/)
 - [pyopenssl](https://pypi.org/project/pyOpenSSL/)
-- [nmap3](https://pypi.org/project/python3-nmap/) with nmap installed
+- [python3-nmap](https://pypi.org/project/python3-nmap/) with nmap installed
 - [requests](https://pypi.org/project/requests/)
 - [urllib3](https://pypi.org/project/urllib3/)
 

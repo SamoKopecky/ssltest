@@ -2,7 +2,7 @@ from scan_web_server.connection.connection_utils import create_session
 import socket
 
 
-def test_heartbleed(hostname):
+def test(hostname):
     sock = create_session(hostname, 443)
     plain_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     plain_sock.connect((hostname, 443))
@@ -48,3 +48,7 @@ def test_heartbleed(hostname):
     plain_sock.send(heartbeat_request)
     # sock.close()
     plain_sock.close()
+
+
+def test_heartbleed(hostname, port):
+    return 'heartbleed'

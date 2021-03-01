@@ -10,6 +10,7 @@ from scan_web_server.scan.WebServerVersion import WebServerVersion
 from scan_web_server.connection.connection_utils import get_website_info
 from scan_web_server.scan.port_discovery import discover_ports
 from scan_web_server.utils import fix_hostname
+from scan_vulnerabilities.Hearbleed import test_heartbleed
 
 
 def main():
@@ -23,14 +24,14 @@ def main():
         args.port.extend(scanned_ports)
     for port in args.port:
         try:
-            scan(args.url, port, args.nmap_server)
+            scan(args, port)
         except Exception as ex:
             print(f'Unexpected exception occurred: {ex}')
 
 
 def parse_options():
     """
-    Function that parses the input options
+    Parse input options.
 
     :return: object of parsed arguments
     """
@@ -45,13 +46,15 @@ def parse_options():
     parser.add_argument('-p', '--port', default=[443], type=int, nargs='*', metavar='port',
                         help='port or ports(separate with spaces) to scan on (default: 443)')
     parser.add_argument('-j', '--json', action='store_true', default=False, help='change output to json format')
+    parser.add_argument('-H', '--heartbleed', action='store_true', default=False,
+                        help='scan for heartbleed vulnerability')
     args = parser.parse_args()
     return args
 
 
-def scan(website, port, scan_nmap):
+def scan(args, port):
     """
-    This function calls all the other functions required to scan
+    Call other scanning functions for a specific url and port
 
     :param website: url to be scanned
     :param port: list of ports to be scanned
@@ -60,7 +63,7 @@ def scan(website, port, scan_nmap):
     """
     print(f'---------------Scanning for port {port}---------------')  # Temporary
     final_rating = []
-    certificate, cipher_suite, protocol = get_website_info(website, port)
+    certificate, cipher_suite, protocol = get_website_info(args.url, port)
 
     cipher_suite_parameters = CipherSuite(cipher_suite, protocol)
     final_rating.append(cipher_suite_parameters.rate())
@@ -68,13 +71,15 @@ def scan(website, port, scan_nmap):
     certificate_parameters = Certificate(certificate)
     final_rating.append(certificate_parameters.rate())
 
-    protocol_support = ProtocolSupport(website, port)
+    protocol_support = ProtocolSupport(args.url, port)
     final_rating.append(protocol_support.rate())
 
-    versions = WebServerVersion(website, port, scan_nmap)
+    versions = WebServerVersion(args.url, port, args.nmap_server)
     versions.scan_versions()
 
     print_scan(certificate_parameters, cipher_suite_parameters, final_rating, protocol_support, versions)
+    if args.heartbleed is True:
+        print(test_heartbleed(args.url, port))
 
 
 def print_scan(certificate_parameters, cipher_suite_parameters, final_rating, protocol_support, versions):

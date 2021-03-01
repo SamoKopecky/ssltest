@@ -9,7 +9,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def discover_ports(website):
     """
-    Scans the url for available ports
+    Scan a web server for all available https ports.
 
     :param website: url to be scanned
     :return: list of usable ports
