@@ -1,16 +1,16 @@
-from scan_web_server.rate.PType import PType
 from scan_web_server.utils import *
+from .Parameters import Parameters
+from .PType import PType
 
 
-class CipherSuite:
+class CipherSuite(Parameters):
 
     def __init__(self, cipher_suite, protocol):
         # Create a dictionary for cipher suite parameters with PType keys
-        self.parameters = {enum: ['N/A', 0] for enum in PType if enum.is_cipher_suite}
-        self.parameters[PType.protocol] = ['N/A', 0]
+        super().__init__()
+        self.parameters = {enum: {} for enum in PType if enum.is_cipher_suite}
+        self.protocol = protocol
         self.cipher_suite = cipher_suite
-        self.parameters[PType.protocol][0] = protocol
-        self.rating = 0
 
     def parse_cipher_suite(self):
         """
@@ -24,34 +24,24 @@ class CipherSuite:
         raw_parameters = self.cipher_suite.split('_')
         raw_parameters.remove('TLS')
         parameter_enums = list(self.parameters.keys())
-        parameter_enums.remove(PType.protocol)
         # For each parameter iterate through each enum value until a match is found
         for raw_parameter in raw_parameters:
             for enum in parameter_enums:
                 if raw_parameter in json_data[enum.name].split(','):
                     parameter_enums.remove(enum)
-                    self.parameters[enum] = [raw_parameter, 0]
+                    self.parameters[enum] = {raw_parameter: 0}
                     break
+        for enum in list(self.parameters.keys()):
+            if not bool(self.parameters[enum]):
+                self.parameters[enum] = {'N/A': 0}
 
     def rate_cipher_suite(self):
         """
         Rate all cipher suite parameters.
-
-        First part is used if a length parameter needs to be rated
-        Second part is used for not length parameters
         """
-        for enum in list(self.parameters.keys()):
-            # 1st part
-            if enum == PType.sym_enc_algorithm_key_length or \
-                    enum == PType.sym_ecn_algorithm_block_mode_number:
-                self.parameters[enum][1] = rate_key_length_parameter(
-                    self.parameters[enum.key_pair][0],
-                    self.parameters[enum][0], enum
-                )
-                continue
-            # 2nd part
-            self.parameters[enum][1] = rate_parameter(enum, self.parameters[enum][0])
-        self.rating = max([rating[1] for rating in self.parameters.values()])
+        rateable_parameters = list(self.parameters.keys())
+        key_types = [PType.sym_enc_algorithm_key_length, PType.sym_ecn_algorithm_block_mode_number]
+        self.rate_parameters(rateable_parameters, key_types)
 
     def parse_protocol_version(self):
         """
@@ -59,8 +49,9 @@ class CipherSuite:
 
         Might add more.
         """
-        if self.parameters[PType.protocol][0] == 'TLSv1.3':
-            self.parameters[PType.kex_algorithm][0] = 'ECDHE'
+        self.parameters[PType.protocol] = {self.protocol: 0}
+        if self.protocol == 'TLSv1.3':
+            self.parameters[PType.kex_algorithm] = {'ECDHE': 0}
 
     def rate(self):
         self.parse_cipher_suite()

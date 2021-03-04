@@ -1,33 +1,37 @@
-from scan_web_server.rate.PType import PType
 from scan_web_server.utils import *
+from .Parameters import Parameters
+from .PType import PType
 
 
-class Certificate:
+class Certificate(Parameters):
 
     def __init__(self, certificate):
         # Create a dictionary for certificate parameters with PType keys
-        self.parameters = {enum: ['N/A', 0] for enum in PType if enum.is_certificate}
+        super().__init__()
+        self.parameters = {enum: {} for enum in PType if enum.is_certificate and enum.is_ratable}
+        self.non_parameters = {enum: [] for enum in PType if enum.is_certificate and not enum.is_ratable}
         self.certificate = certificate
-        self.rating = 0
 
     def parse_certificate(self):
         """
         Parse information from a certificate and into a dictionary.
         """
-        self.parameters[PType.cert_pub_key_algorithm][0] = pub_key_alg_from_cert(self.certificate.public_key())
-        self.parameters[PType.cert_version][0] = str(self.certificate.version.value)
-        self.parameters[PType.cert_serial_number][0] = str(self.certificate.serial_number)
-        self.parameters[PType.cert_not_valid_before][0] = str(self.certificate.not_valid_before.date())
-        self.parameters[PType.cert_not_valid_after][0] = str(self.certificate.not_valid_after.date())
-        self.parameters[PType.cert_alternative_names][0] = self.parse_alternative_names()
-        self.parse_name(PType.cert_subject, self.certificate.subject)
-        self.parse_name(PType.cert_issuer, self.certificate.issuer)
-        self.parameters[PType.cert_issuer][0] = self.parameters[PType.cert_issuer][0][:-1]
-        self.parameters[PType.cert_sign_algorithm][0] = get_sig_alg_from_oid(
-            self.certificate.signature_algorithm_oid)
-        self.parameters[PType.cert_sign_algorithm_hash_function][0] = str(
-            self.certificate.signature_hash_algorithm.name).upper()
-        self.parameters[PType.cert_pub_key_length][0] = str(self.certificate.public_key().key_size)
+        self.parameters[PType.cert_pub_key_algorithm][pub_key_alg_from_cert(self.certificate.public_key())] = 0
+        self.parameters[PType.cert_pub_key_length][str(self.certificate.public_key().key_size)] = 0
+
+        hash_function = str(self.certificate.signature_hash_algorithm.name).upper()
+        self.parameters[PType.cert_sign_algorithm_hash_function][hash_function] = 0
+
+        sign_algorithm = get_sig_alg_from_oid(self.certificate.signature_algorithm_oid)
+        self.parameters[PType.cert_sign_algorithm][sign_algorithm] = 0
+
+        self.non_parameters[PType.cert_version].append(str(self.certificate.version.value))
+        self.non_parameters[PType.cert_serial_number].append(str(self.certificate.serial_number))
+        self.non_parameters[PType.cert_not_valid_before].append(str(self.certificate.not_valid_before.date()))
+        self.non_parameters[PType.cert_not_valid_after].append(str(self.certificate.not_valid_after.date()))
+        self.non_parameters[PType.cert_alternative_names] = self.parse_alternative_names()
+        self.non_parameters[PType.cert_subject] = self.parse_name(self.certificate.subject)
+        self.non_parameters[PType.cert_issuer] = self.parse_name(self.certificate.issuer)
 
     def parse_alternative_names(self):
         """
@@ -41,39 +45,26 @@ class Certificate:
             return []
         return extension.value.get_values_for_type(x509.DNSName)
 
-    def parse_name(self, name_type, name):
+    @staticmethod
+    def parse_name(name):
         """
-        Parse subject and issuer information.
+        Parse subject and issuer information and return as list.
 
-        :param name_type: PType enum
         :param name: objects that is parsed
         :return:
         """
-        self.parameters[name_type][0] = []
+        name_info = []
         for attribute in name:
-            self.parameters[name_type][0].append(f'{attribute.oid._name}={attribute.value},')
-        self.parameters[name_type][0] = self.parameters[name_type][0][:-1]
+            name_info.append(f'{attribute.oid._name}={attribute.value}')
+        return name_info[:-1]
 
     def rate_certificate(self):
         """
         Rate all valid certificate parameters.
-
-        First part is used if a length parameter needs to be rated.
-        Second part is used for not length parameters.
         """
-        certificate_types = list(self.parameters.keys())
-        rateable_parameters = [enum for enum in certificate_types if enum.is_ratable]
-        for enum in rateable_parameters:
-            # 1st part
-            if enum == PType.cert_pub_key_length:
-                self.parameters[enum][1] = rate_key_length_parameter(
-                    self.parameters[enum.key_pair][0],
-                    self.parameters[enum][0], enum
-                )
-                continue
-            # 2nd part
-            self.parameters[enum][1] = rate_parameter(enum, self.parameters[enum][0])
-        self.rating = max([solo_rating[1] for solo_rating in self.parameters.values()])
+        rateable_parameters = list(self.parameters.keys())
+        key_types = [PType.cert_pub_key_length]
+        self.rate_parameters(rateable_parameters, key_types)
 
     def rate(self):
         self.parse_certificate()

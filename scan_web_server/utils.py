@@ -44,7 +44,7 @@ def rate_key_length_parameter(algorithm, key_len, enum):
     Get the rating of an algorithm key length.
 
     :param enum:
-    :param algorithm: algorithm
+    :param algorithm: algorithm of the key length
     :param key_len: key length of the algorithm
     :return: rating of a parameter pair or 0 if a rating isn't defined or found
     """
@@ -69,12 +69,12 @@ def rate_key_length_parameter(algorithm, key_len, enum):
     return 0
 
 
-def rate_parameter(enum, parameter):
+def rate_parameter(enum, parameter: dict):
     """
     Rate a parameter using a defined json file.
 
-    :param enum: specifies which parameter category should be used for rating
     :param parameter: parameter that is going to be rated
+    :param enum: specifies which parameter category should be used for rating
     :return: if a rating is found for a parameter returns that rating,
     if not 0 is returned (default value)
     """
@@ -85,6 +85,10 @@ def rate_parameter(enum, parameter):
         if parameter in security_levels_json[enum.name][str(idx)].split(','):
             return idx
     return 0
+
+
+def get_first_key(dictionary):
+    return [key for key in dictionary.keys()][0]
 
 
 def pub_key_alg_from_cert(public_key):

@@ -105,7 +105,7 @@ def create_session(hostname, port, context=ssl.create_default_context()):
         context.check_hostname = False
         context.verify_mode = ssl.VerifyMode.CERT_NONE
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(5)  # in seconds
+    sock.settimeout(3)  # in seconds
     ssl_socket = context.wrap_socket(sock, server_hostname=hostname)
     sleep = 0
     # Loop until there is a valid response or after 15 seconds
