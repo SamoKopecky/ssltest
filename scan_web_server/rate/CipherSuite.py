@@ -57,4 +57,3 @@ class CipherSuite(Parameters):
         self.parse_cipher_suite()
         self.parse_protocol_version()
         self.rate_cipher_suite()
-        return self.rating

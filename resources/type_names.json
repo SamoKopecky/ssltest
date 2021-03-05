@@ -1,0 +1,21 @@
+{
+  "protocol": "protocol",
+  "kex_algorithm": "kex_algorithm",
+  "cert_pub_key_algorithm": "cert_pub_key_algorithm",
+  "cert_pub_key_length": "cert_pub_key_length",
+  "sym_enc_algorithm": "sym_enc_algorithm",
+  "sym_enc_algorithm_key_length": "sym_enc_algorithm_key_length",
+  "sym_enc_algorithm_block_mode": "sym_enc_algorithm_block_mode ",
+  "sym_ecn_algorithm_block_mode_number": "sym_ecn_algorithm_block_mode_number",
+  "hash_function": "hash_function",
+  "cert_sign_algorithm": "cert_sign_algorithm",
+  "cert_sign_algorithm_hash_function": "cert_sign_algorithm_hash_function",
+  "hmac_function": "hmac_function",
+  "cert_version": "cert_version",
+  "cert_serial_number": "cert_serial_number",
+  "cert_not_valid_before": "cert_not_valid_before",
+  "cert_not_valid_after": "cert_not_valid_after",
+  "cert_subject": "cert_subject",
+  "cert_issuer": "cert_issuer",
+  "cert_alternative_names": "cert_alternative_names"
+}

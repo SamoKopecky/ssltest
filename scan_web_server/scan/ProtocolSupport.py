@@ -45,7 +45,3 @@ class ProtocolSupport:
         for protocol in supported_protocols:
             self.versions[protocol] = rate_parameter(PType.protocol, protocol)
         self.rating = max(self.versions.values())
-
-    def rate(self):
-        self.rate_protocols()
-        return self.rating

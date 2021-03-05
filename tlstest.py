@@ -2,7 +2,6 @@
 import argparse
 import sys
 import logging
-from pprint import pprint
 from scan_web_server.rate.CipherSuite import CipherSuite
 from scan_web_server.rate.Certificate import Certificate
 from scan_web_server.scan.ProtocolSupport import ProtocolSupport
@@ -10,7 +9,7 @@ from scan_web_server.scan.WebServerVersion import WebServerVersion
 from scan_web_server.connection.connection_utils import get_website_info
 from scan_web_server.scan.port_discovery import discover_ports
 from scan_web_server.utils import fix_hostname
-from scan_vulnerabilities.Hearbleed import test_heartbleed
+from scan_web_server.utils import dump_to_json
 
 
 def main():
@@ -18,15 +17,21 @@ def main():
     args = parse_options()
     if '/' in args.url:
         args.url = fix_hostname(args.url)
-    if args.nmap_discover is True:
+    if args.nmap_discover:
         scanned_ports = discover_ports(args.url)
         scanned_ports = list(filter(lambda scanned_port: scanned_port not in args.port, scanned_ports))
         args.port.extend(scanned_ports)
+    data = ''
     for port in args.port:
         try:
-            scan(args, port)
+            data += scan(args, port)
         except Exception as ex:
             print(f'Unexpected exception occurred: {ex}')
+    if args.json is not None:
+        file = open('output.json', 'w')
+        file.write(data)
+    else:
+        print('text output')
 
 
 def parse_options():
@@ -45,7 +50,8 @@ def parse_options():
                         help='use nmap to discover web server ports')
     parser.add_argument('-p', '--port', default=[443], type=int, nargs='*', metavar='port',
                         help='port or ports(separate with spaces) to scan on (default: 443)')
-    parser.add_argument('-j', '--json', action='store_true', default=False, help='change output to json format')
+    parser.add_argument('-j', '--json', action='store', metavar='output_file', required=False,
+                        help='change output to json format, if specified requires output file name as an argument')
     parser.add_argument('-H', '--heartbleed', action='store_true', default=False,
                         help='scan for heartbleed vulnerability')
     args = parser.parse_args()
@@ -56,41 +62,28 @@ def scan(args, port):
     """
     Call other scanning functions for a specific url and port
 
-    :param website: url to be scanned
-    :param port: list of ports to be scanned
-    :param scan_nmap: whether to scan with nmap or not
+    :param args: parsed arguments
+    :param port: list of port to be scanned
     :return:
     """
     print(f'---------------Scanning for port {port}---------------')  # Temporary
-    final_rating = []
     certificate, cipher_suite, protocol = get_website_info(args.url, port)
 
-    cipher_suite_parameters = CipherSuite(cipher_suite, protocol)
-    final_rating.append(cipher_suite_parameters.rate())
+    cipher_suite = CipherSuite(cipher_suite, protocol)
+    cipher_suite.rate()
 
-    certificate_parameters = Certificate(certificate)
-    final_rating.append(certificate_parameters.rate())
+    certificate = Certificate(certificate)
+    certificate.rate()
 
     protocol_support = ProtocolSupport(args.url, port)
-    final_rating.append(protocol_support.rate())
+    protocol_support.rate_protocols()
 
     versions = WebServerVersion(args.url, port, args.nmap_server)
     versions.scan_versions()
 
-    print_scan(certificate_parameters, cipher_suite_parameters, final_rating, protocol_support, versions)
-    if args.heartbleed is True:
-        print(test_heartbleed(args.url, port))
-
-
-def print_scan(certificate_parameters, cipher_suite_parameters, final_rating, protocol_support, versions):
-    """
-    Temporary function for printing output
-    """
-    pprint(cipher_suite_parameters.parameters)
-    pprint(certificate_parameters.parameters)
-    pprint(protocol_support.versions)
-    pprint(versions.versions)
-    print(f'rating: {max(final_rating)}')
+    return dump_to_json(cipher_suite.parameters, certificate.parameters,
+                        certificate.non_parameters, protocol_support.versions, versions.versions,
+                        port, args.url)
 
 
 if __name__ == "__main__":

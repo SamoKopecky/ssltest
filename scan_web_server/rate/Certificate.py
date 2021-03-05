@@ -69,4 +69,3 @@ class Certificate(Parameters):
     def rate(self):
         self.parse_certificate()
         self.rate_certificate()
-        return self.rating

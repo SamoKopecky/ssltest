@@ -138,3 +138,27 @@ def fix_hostname(hostname):
         hostname = re.search('^([^/]+)', hostname).group(0)
     print('Corrected url: {}'.format(hostname))
     return hostname
+
+
+def dump_to_json(cipher_suite, certificate_parameters, certificate_non_parameters, protocol_support, versions, port,
+                 url):
+    """
+    TODO
+    :param cipher_suite:
+    :param certificate_parameters:
+    :param certificate_non_parameters:
+    :param protocol_support:
+    :param versions:
+    :param port:
+    :param url:
+    :return:
+    """
+    dump = {}
+    parameters = {key.name: value for key, value in cipher_suite.items()}
+    parameters.update({key.name: value for key, value in certificate_parameters.items()})
+    certificate_info = {key.name: value for key, value in certificate_non_parameters.items()}
+    dump.update({'parameters': parameters})
+    dump.update({'certificate_info': certificate_info})
+    dump.update({'protocol_support': protocol_support})
+    dump.update({'web_server_versions': versions})
+    return json.dumps({f'{url}:{port}': dump}, indent=2)

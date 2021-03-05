@@ -4,26 +4,12 @@ import requests
 
 class WebServerVersion:
 
-    def __init__(self, website, ports, scan_nmap):
+    def __init__(self, website, port, scan_nmap):
         self.scans = []
-        self.ports = []
-        self.versions = []
+        self.port = port
+        self.versions = {}
         self.website = website
         self.scan_nmap = scan_nmap
-        self.set_port(ports)
-
-    def set_port(self, ports):
-        """
-        Port setter method
-
-        Method sets the just passes the port normally or creates
-        one element array.
-        :param ports: ports from constructor
-        """
-        if isinstance(ports, int):
-            self.ports = [ports]
-        else:
-            self.ports = ports
 
     def scan_version_nmap(self):
         """
@@ -37,27 +23,19 @@ class WebServerVersion:
         """
         keys = ['product', 'version']
         nmap = nmap3.Nmap()
-        all_values = []
-
-        ports = map(lambda port: f'{port}', self.ports)
-        ports = ','.join(ports)
-
         print('Scanning webserver for version with nmap...')
-        result = nmap.scan_top_ports(self.website, args=f"-sV -p {ports}")
+        result = nmap.scan_top_ports(self.website, args=f"-sV -p {self.port}")
 
-        for index in range(len(self.ports)):
-            values = []
-            service = list(result.items())[0][1]['ports'][index]['service']
-            for key in keys:
-                try:
-                    values.append(service[key])
-                except KeyError:
-                    error = 'unable to find'
-                    if error not in values and not values:
-                        values.append(error)
-            all_values.append(("nmap", f'{self.ports[index]}', ','.join(values)))
-
-        self.versions.extend(all_values)
+        values = []
+        service = list(result.items())[0][1]['ports'][0]['service']
+        for key in keys:
+            try:
+                values.append(service[key])
+            except KeyError:
+                error = 'unable to find'
+                if error not in values and not values:
+                    values.append(error)
+        self.versions['nmap'] = ','.join(values)
 
     def scan_version_http(self):
         """
@@ -68,22 +46,18 @@ class WebServerVersion:
         list of scans.
         """
         print('Scanning webserver for version using http headers...')
-        all_values = []
-        for port in self.ports:
-            try:
-                response = requests.head(f'https://{self.website}:{port}', timeout=5, headers={'Connection': 'close'})
-                value = response.headers["server"]
-            except KeyError:
-                value = 'value not found'
-            except (requests.exceptions.InvalidSchema,
-                    requests.exceptions.SSLError,
-                    requests.exceptions.ConnectionError,
-                    requests.exceptions.Timeout,
-                    requests.exceptions.ReadTimeout):
-                value = 'unable to connect'
-            all_values.append(("http_header", f'{port}', f'{value}'))
-
-        self.versions.extend(all_values)
+        try:
+            response = requests.head(f'https://{self.website}:{self.port}', timeout=3, headers={'Connection': 'close'})
+            value = response.headers["server"]
+        except KeyError:
+            value = 'value not found'
+        except (requests.exceptions.InvalidSchema,
+                requests.exceptions.SSLError,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+                requests.exceptions.ReadTimeout):
+            value = 'unable to connect'
+        self.versions["http_header"] = value
 
     def scan_versions(self):
         """
