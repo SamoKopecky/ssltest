@@ -10,10 +10,12 @@ from scan_web_server.connection.connection_utils import get_website_info
 from scan_web_server.scan.port_discovery import discover_ports
 from scan_web_server.utils import fix_hostname
 from scan_web_server.utils import dump_to_json
+from text_output.TextOutput import TextOutput
 
 
 def main():
     logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+
     args = parse_options()
     if '/' in args.url:
         args.url = fix_hostname(args.url)
@@ -31,7 +33,8 @@ def main():
         file = open('output.json', 'w')
         file.write(data)
     else:
-        print('text output')
+        text_output = TextOutput(data)
+        text_output.text_output()
 
 
 def parse_options():

@@ -88,7 +88,7 @@ def rate_parameter(enum, parameter: dict):
 
 
 def get_first_key(dictionary):
-    return [key for key in dictionary.keys()][0]
+    return list(dictionary.keys())[0]
 
 
 def pub_key_alg_from_cert(public_key):

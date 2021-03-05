@@ -1,4 +1,4 @@
-from scan_web_server.utils import *
+from ..utils import *
 from .Parameters import Parameters
 from .PType import PType
 
