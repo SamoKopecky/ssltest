@@ -2,6 +2,7 @@
 import argparse
 import sys
 import logging
+import json
 from scan_web_server.rate.CipherSuite import CipherSuite
 from scan_web_server.rate.Certificate import Certificate
 from scan_web_server.scan.ProtocolSupport import ProtocolSupport
@@ -9,7 +10,7 @@ from scan_web_server.scan.WebServerVersion import WebServerVersion
 from scan_web_server.connection.connection_utils import get_website_info
 from scan_web_server.scan.port_discovery import discover_ports
 from scan_web_server.utils import fix_hostname
-from scan_web_server.utils import dump_to_json
+from scan_web_server.utils import dump_to_dict
 from text_output.TextOutput import TextOutput
 
 
@@ -23,17 +24,17 @@ def main():
         scanned_ports = discover_ports(args.url)
         scanned_ports = list(filter(lambda scanned_port: scanned_port not in args.port, scanned_ports))
         args.port.extend(scanned_ports)
-    data = ''
+    output_data = {}
     for port in args.port:
         try:
-            data += scan(args, port)
+            output_data.update(scan(args, port))
         except Exception as ex:
             print(f'Unexpected exception occurred: {ex}')
     if args.json is not None:
         file = open('output.json', 'w')
-        file.write(data)
+        file.write(json.dumps(output_data, indent=2))
     else:
-        text_output = TextOutput(data)
+        text_output = TextOutput(json.dumps(output_data))
         text_output.text_output()
 
 
@@ -69,7 +70,7 @@ def scan(args, port):
     :param port: list of port to be scanned
     :return:
     """
-    print(f'---------------Scanning for port {port}---------------')  # Temporary
+    print(f'----------------Scanning for {args.url}:{port}---------------------')
     certificate, cipher_suite, protocol = get_website_info(args.url, port)
 
     cipher_suite = CipherSuite(cipher_suite, protocol)
@@ -84,9 +85,9 @@ def scan(args, port):
     versions = WebServerVersion(args.url, port, args.nmap_server)
     versions.scan_versions()
 
-    return dump_to_json(cipher_suite.parameters, certificate.parameters,
-                        certificate.non_parameters, protocol_support.versions, versions.versions,
-                        port, args.url)
+    print('Done.')
+    return dump_to_dict(cipher_suite.parameters, certificate.parameters,
+                        certificate.non_parameters, protocol_support.versions, versions.versions, port, args.url)
 
 
 if __name__ == "__main__":

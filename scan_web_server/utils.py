@@ -140,10 +140,11 @@ def fix_hostname(hostname):
     return hostname
 
 
-def dump_to_json(cipher_suite, certificate_parameters, certificate_non_parameters, protocol_support, versions, port,
-                 url):
+def dump_to_dict(cipher_suite, certificate_parameters, certificate_non_parameters, protocol_support, versions,
+                 port, url):
     """
     TODO
+    :param dump:
     :param cipher_suite:
     :param certificate_parameters:
     :param certificate_non_parameters:
@@ -161,4 +162,8 @@ def dump_to_json(cipher_suite, certificate_parameters, certificate_non_parameter
     dump.update({'certificate_info': certificate_info})
     dump.update({'protocol_support': protocol_support})
     dump.update({'web_server_versions': versions})
-    return json.dumps({f'{url}:{port}': dump}, indent=2)
+    return {f'{url}:{port}': dump}
+
+
+def dict_to_json(dict_v):
+    return json.dumps(dict_v, indent=2)

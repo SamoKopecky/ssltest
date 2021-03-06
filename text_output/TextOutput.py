@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from scan_web_server.utils import *
 
 
@@ -15,14 +17,27 @@ class TextOutput:
         self.type_names = read_json('type_names.json')
 
     def text_output(self):
+        """
+        TODO
+        :return:
+        """
+        if not self.data:
+            return
         json_data = json.loads(self.data)
-        self.first_port_data = list(json_data.values())[0]
-        self.print_parameters(self.first_port_data['parameters'])
-        self.print_supported_versions(self.first_port_data['protocol_support'])
-        self.print_certificate_info(self.first_port_data['certificate_info'])
-        self.print_versions(self.first_port_data['web_server_versions'])
+        for key, value in list(json_data.items()):
+            print(f'----------------Scan for {key}---------------------')
+            self.first_port_data = value
+            self.print_parameters(self.first_port_data['parameters'])
+            self.print_supported_versions(self.first_port_data['protocol_support'])
+            self.print_certificate_info(self.first_port_data['certificate_info'])
+            self.print_versions(self.first_port_data['web_server_versions'])
 
     def print_parameters(self, data):
+        """
+        TODO
+        :param data:
+        :return:
+        """
         print('Cryptographic parameters:')
         for key, value in list(data.items()):
             values = list(value.items())[0]
@@ -30,6 +45,11 @@ class TextOutput:
                 print(f'\t{self.type_names[key]}: {values[0]}->{self.ratings[values[1]]}')
 
     def print_certificate_info(self, data):
+        """
+        TODO
+        :param data:
+        :return:
+        """
         print('Certificate information:')
         for key, value in list(data.items()):
             if len(value) > 1:
@@ -43,12 +63,22 @@ class TextOutput:
             print(to_print)
 
     def print_supported_versions(self, data):
+        """
+        TODO
+        :param data:
+        :return:
+        """
         print('Protocol support:')
         for key, value in list(data.items()):
             print(f'\t{key}->{self.ratings[value]}')
 
     @staticmethod
     def print_versions(data):
+        """
+        TODO
+        :param data:
+        :return:
+        """
         print('Web server versions')
         for key, value in list(data.items()):
             print(f'\t{key}: {value}')

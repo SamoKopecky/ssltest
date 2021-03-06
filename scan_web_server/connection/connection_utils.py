@@ -24,6 +24,7 @@ def get_website_info(hostname, port):
         cipher_suite -- negotiated cipher suite
         protocol -- protocol name and version
     """
+    print('Creating session...')
     ssl_socket = create_session(hostname, port)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     certificate = get_certificate(ssl_socket)
