@@ -15,9 +15,12 @@ from text_output.TextOutput import TextOutput
 
 
 def main():
-    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-
     args = parse_options()
+    if args.verbose:
+        logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+    else:
+        logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+
     if '/' in args.url:
         args.url = fix_hostname(args.url)
     if args.nmap_discover:
@@ -30,11 +33,12 @@ def main():
             output_data.update(scan(args, port))
         except Exception as ex:
             print(f'Unexpected exception occurred: {ex}')
+    json_output_data = json.dumps(output_data, indent=2)
     if args.json is not None:
         file = open('output.json', 'w')
-        file.write(json.dumps(output_data, indent=2))
+        file.write(json_output_data)
     else:
-        text_output = TextOutput(json.dumps(output_data))
+        text_output = TextOutput(json_output_data)
         text_output.text_output()
 
 
@@ -58,6 +62,7 @@ def parse_options():
                         help='change output to json format, if specified requires output file name as an argument')
     parser.add_argument('-H', '--heartbleed', action='store_true', default=False,
                         help='scan for heartbleed vulnerability')
+    parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
     args = parser.parse_args()
     return args
 
@@ -68,7 +73,7 @@ def scan(args, port):
 
     :param args: parsed arguments
     :param port: list of port to be scanned
-    :return:
+    :return: a single dictionary containing scanned data
     """
     print(f'----------------Scanning for {args.url}:{port}---------------------')
     certificate, cipher_suite, protocol = get_website_info(args.url, port)
@@ -86,8 +91,12 @@ def scan(args, port):
     versions.scan_versions()
 
     print('Done.')
-    return dump_to_dict(cipher_suite.parameters, certificate.parameters,
-                        certificate.non_parameters, protocol_support.versions, versions.versions, port, args.url)
+    return dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
+                        (certificate.parameters, certificate.rating),
+                        (protocol_support.versions, protocol_support.rating),
+                        certificate.non_parameters,
+                        versions.versions,
+                        port, args.url)
 
 
 if __name__ == "__main__":

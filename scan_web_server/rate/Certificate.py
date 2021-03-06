@@ -56,7 +56,7 @@ class Certificate(Parameters):
         name_info = []
         for attribute in name:
             name_info.append(f'{attribute.oid._name}={attribute.value}')
-        return name_info[:-1]
+        return name_info
 
     def rate_certificate(self):
         """

@@ -1,0 +1,7 @@
+{
+  "0": "unknown/error",
+  "1": "recommended",
+  "2": "not recommended",
+  "3": "deprecated",
+  "4": "dangerous"
+}

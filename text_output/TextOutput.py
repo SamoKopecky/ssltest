@@ -5,49 +5,54 @@ from scan_web_server.utils import *
 
 class TextOutput:
     def __init__(self, data):
-        self.ratings = {
-            0: 'nezistené/chyba',
-            1: 'bezpečné',
-            2: 'nedoporúčané',
-            3: 'zastarané',
-            4: 'zakázané'
-        }
-        self.data = data
-        self.first_port_data = {}
+        self.ratings = read_json('security_levels_names.json')
         self.type_names = read_json('type_names.json')
+        self.data = data
+        self.current_data = {}
+
+    def rating_name(self, rating):
+        """
+        Convert int to string using a json file.
+
+        :param rating: integer
+        """
+        return self.ratings[str(rating)]
 
     def text_output(self):
         """
-        TODO
-        :return:
+        Call all other text output functions for each port and url.
         """
         if not self.data:
             return
         json_data = json.loads(self.data)
         for key, value in list(json_data.items()):
-            print(f'----------------Scan for {key}---------------------')
-            self.first_port_data = value
-            self.print_parameters(self.first_port_data['parameters'])
-            self.print_supported_versions(self.first_port_data['protocol_support'])
-            self.print_certificate_info(self.first_port_data['certificate_info'])
-            self.print_versions(self.first_port_data['web_server_versions'])
+            print(f'----------------Result for {key}---------------------')
+            self.current_data = value
+            self.print_parameters(self.current_data['parameters'])
+            self.print_supported_versions(self.current_data['protocol_support'])
+            self.print_certificate_info(self.current_data['certificate_info'])
+            self.print_versions(self.current_data['web_server_versions'])
 
     def print_parameters(self, data):
         """
-        TODO
-        :param data:
-        :return:
+        Print cipher suite and cert parameters.
+
+        :param data: data to print
         """
         print('Cryptographic parameters:')
         for key, value in list(data.items()):
+            if key == 'rating':
+                print(f'\t{key}: {self.rating_name(value)}')
+                continue
             values = list(value.items())[0]
             if values[0] != 'N/A':
-                print(f'\t{self.type_names[key]}: {values[0]}->{self.ratings[values[1]]}')
+                print(f'\t{self.type_names[key]}: {values[0]}->{self.rating_name(values[1])}')
 
     def print_certificate_info(self, data):
         """
-        TODO
-        :param data:
+        Print other cert info such as subject/issuer.
+
+        :param data: data to print
         :return:
         """
         print('Certificate information:')
@@ -64,19 +69,24 @@ class TextOutput:
 
     def print_supported_versions(self, data):
         """
-        TODO
-        :param data:
+        Print supported TLS protocol versions.
+
+        :param data: data to print
         :return:
         """
         print('Protocol support:')
         for key, value in list(data.items()):
-            print(f'\t{key}->{self.ratings[value]}')
+            if key == 'rating':
+                print(f'\t{key}: {self.rating_name(value)}')
+                continue
+            print(f'\t{key}->{self.rating_name(value)}')
 
     @staticmethod
     def print_versions(data):
         """
-        TODO
-        :param data:
+        Print web server versions.
+
+        :param data: data to print
         :return:
         """
         print('Web server versions')

@@ -140,30 +140,37 @@ def fix_hostname(hostname):
     return hostname
 
 
-def dump_to_dict(cipher_suite, certificate_parameters, certificate_non_parameters, protocol_support, versions,
-                 port, url):
+def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
+                 certificate_non_parameters, versions, port, url):
     """
-    TODO
-    :param dump:
-    :param cipher_suite:
-    :param certificate_parameters:
-    :param certificate_non_parameters:
-    :param protocol_support:
-    :param versions:
-    :param port:
-    :param url:
-    :return:
+    Dump web server parameters to a single dict.
+
+    :param cipher_suite: tuple containing parameters and the worst rating
+    :param certificate_parameters: tuple containing parameters and the worst rating
+    :param certificate_non_parameters: certificate parameters such as subject/issuer
+    :param protocol_support: dictionary of supported tls protocols
+    :param versions: web server versions
+    :param port: scanned port
+    :param url: scanned url
+    :return: dictionary
     """
     dump = {}
-    parameters = {key.name: value for key, value in cipher_suite.items()}
-    parameters.update({key.name: value for key, value in certificate_parameters.items()})
+
+    # Parameters
+    worst_rating = max([cipher_suite[1], certificate_parameters[1]])
+    parameters = {key.name: value for key, value in cipher_suite[0].items()}
+    parameters.update({key.name: value for key, value in certificate_parameters[0].items()})
+    parameters.update({'rating': worst_rating})
+
+    # Other cert info
     certificate_info = {key.name: value for key, value in certificate_non_parameters.items()}
+
+    # Protocol support
+    protocols = protocol_support[0]
+    protocols.update({'rating': protocol_support[1]})
+
     dump.update({'parameters': parameters})
     dump.update({'certificate_info': certificate_info})
-    dump.update({'protocol_support': protocol_support})
+    dump.update({'protocol_support': protocols})
     dump.update({'web_server_versions': versions})
     return {f'{url}:{port}': dump}
-
-
-def dict_to_json(dict_v):
-    return json.dumps(dict_v, indent=2)
