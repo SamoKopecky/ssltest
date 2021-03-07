@@ -15,7 +15,7 @@
   "cert_serial_number": "Certificate serial number",
   "cert_not_valid_before": "Valid from",
   "cert_not_valid_after": "Valid until",
-  "cert_subject": "Certificate subject",
-  "cert_issuer": "Certificate issuer",
-  "cert_alternative_names": "Certificate alternative names"
+  "cert_subject": "Subject",
+  "cert_issuer": "Issuer",
+  "cert_alternative_names": "Alternative names"
 }
