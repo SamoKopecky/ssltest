@@ -5,9 +5,9 @@ from .PType import PType
 
 class Certificate(Parameters):
 
-    def __init__(self, certificate):
-        # Create a dictionary for certificate parameters with PType keys
+    def __init__(self, certificate: x509.Certificate):
         super().__init__()
+        # Create a dictionary for certificate parameters with PType keys
         self.parameters = {enum: {} for enum in PType if enum.is_certificate and enum.is_ratable}
         self.non_parameters = {enum: [] for enum in PType if enum.is_certificate and not enum.is_ratable}
         self.certificate = certificate
@@ -16,15 +16,17 @@ class Certificate(Parameters):
         """
         Parse information from a certificate and into a dictionary.
         """
+        # Public key algorithm
         self.parameters[PType.cert_pub_key_algorithm][pub_key_alg_from_cert(self.certificate.public_key())] = 0
+        # Public key length
         self.parameters[PType.cert_pub_key_length][str(self.certificate.public_key().key_size)] = 0
-
+        # Certificate hash function
         hash_function = str(self.certificate.signature_hash_algorithm.name).upper()
         self.parameters[PType.cert_sign_algorithm_hash_function][hash_function] = 0
-
+        # Signature algorithm
         sign_algorithm = get_sig_alg_from_oid(self.certificate.signature_algorithm_oid)
         self.parameters[PType.cert_sign_algorithm][sign_algorithm] = 0
-
+        # Other non ratable parameters
         self.non_parameters[PType.cert_version].append(str(self.certificate.version.value))
         self.non_parameters[PType.cert_serial_number].append(str(self.certificate.serial_number))
         self.non_parameters[PType.cert_not_valid_before].append(str(self.certificate.not_valid_before.date()))
@@ -46,7 +48,7 @@ class Certificate(Parameters):
         return extension.value.get_values_for_type(x509.DNSName)
 
     @staticmethod
-    def parse_name(name):
+    def parse_name(name: x509.Certificate.__name__):
         """
         Parse subject and issuer information and return as list.
 

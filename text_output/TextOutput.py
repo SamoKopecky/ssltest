@@ -1,20 +1,18 @@
-from pprint import pprint
-
 from scan_web_server.utils import *
 
 
 class TextOutput:
-    def __init__(self, data):
+    def __init__(self, data: str):
         self.ratings = read_json('security_levels_names.json')
         self.type_names = read_json('type_names.json')
         self.data = data
         self.current_data = {}
 
-    def rating_name(self, rating):
+    def rating_name(self, rating: int):
         """
         Convert int to string using a json file.
 
-        :param rating: integer
+        :param rating: rating value to be converted to string
         """
         return self.ratings[str(rating)]
 
@@ -33,7 +31,7 @@ class TextOutput:
             self.print_certificate_info(self.current_data['certificate_info'])
             self.print_versions(self.current_data['web_server_versions'])
 
-    def print_parameters(self, data):
+    def print_parameters(self, data: dict):
         """
         Print cipher suite and cert parameters.
 
@@ -48,7 +46,7 @@ class TextOutput:
             if values[0] != 'N/A':
                 print(f'\t{self.type_names[key]}: {values[0]}->{self.rating_name(values[1])}')
 
-    def print_certificate_info(self, data):
+    def print_certificate_info(self, data: dict):
         """
         Print other cert info such as subject/issuer.
 
@@ -67,7 +65,7 @@ class TextOutput:
                 to_print = f'\t{self.type_names[key]}: {value[0]}'
             print(to_print)
 
-    def print_supported_versions(self, data):
+    def print_supported_versions(self, data: dict):
         """
         Print supported TLS protocol versions.
 
@@ -82,7 +80,7 @@ class TextOutput:
             print(f'\t{key}->{self.rating_name(value)}')
 
     @staticmethod
-    def print_versions(data):
+    def print_versions(data: dict):
         """
         Print web server versions.
 

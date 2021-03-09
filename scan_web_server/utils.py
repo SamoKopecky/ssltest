@@ -8,9 +8,10 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives.asymmetric import ed448
 from .exceptions.NoIanaPairFound import NoIanaPairFound
+from .rate.PType import PType
 
 
-def convert_openssh_to_iana(search_term):
+def convert_openssh_to_iana(search_term: str):
     """
     Convert openssh format of a cipher suite to IANA format.
 
@@ -25,7 +26,7 @@ def convert_openssh_to_iana(search_term):
     raise NoIanaPairFound()
 
 
-def read_json(file_name):
+def read_json(file_name: str):
     """
     Read a json file and return its content.
 
@@ -39,12 +40,12 @@ def read_json(file_name):
     return json_data
 
 
-def rate_key_length_parameter(algorithm, key_len, enum):
+def rate_key_length_parameter(algorithm_type: PType, key_len: str, key_len_type: PType):
     """
     Get the rating of an algorithm key length.
 
-    :param enum:
-    :param algorithm: algorithm of the key length
+    :param key_len_type: type of the key length parameter
+    :param algorithm_type: algorithm of the key length
     :param key_len: key length of the algorithm
     :return: rating of a parameter pair or 0 if a rating isn't defined or found
     """
@@ -55,26 +56,26 @@ def rate_key_length_parameter(algorithm, key_len, enum):
         "<<": lambda a, b: a < b,
         "==": lambda a, b: a == b
     }
-    levels_str = read_json('security_levels.json')[enum.name]
+    levels_str = read_json('security_levels.json')[key_len_type.name]
     if key_len == 'N/A':
         return 0
     for idx in range(1, 5):
         levels = levels_str[str(idx)].split(',')
-        if algorithm in levels:
+        if algorithm_type in levels:
             # gets the operation assigned to the algorithm key length
-            operation = levels[levels.index(algorithm) + 1]
+            operation = levels[levels.index(algorithm_type) + 1]
             function = functions[operation[:2]]
             if function(int(key_len), int(operation[2:])):
                 return idx
     return 0
 
 
-def rate_parameter(enum, parameter: dict):
+def rate_parameter(p_type: PType, parameter: str):
     """
     Rate a parameter using a defined json file.
 
     :param parameter: parameter that is going to be rated
-    :param enum: specifies which parameter category should be used for rating
+    :param p_type: specifies which parameter category should be used for rating
     :return: if a rating is found for a parameter returns that rating,
     if not 0 is returned (default value)
     """
@@ -82,12 +83,12 @@ def rate_parameter(enum, parameter: dict):
     if parameter == 'N/A':
         return 0
     for idx in range(1, 5):
-        if parameter in security_levels_json[enum.name][str(idx)].split(','):
+        if parameter in security_levels_json[p_type.name][str(idx)].split(','):
             return idx
     return 0
 
 
-def get_first_key(dictionary):
+def get_first_key(dictionary: dict):
     return list(dictionary.keys())[0]
 
 
@@ -110,7 +111,7 @@ def pub_key_alg_from_cert(public_key):
         return 'N/A'
 
 
-def get_sig_alg_from_oid(oid):
+def get_sig_alg_from_oid(oid: x509.ObjectIdentifier):
     """
     Get a signature algorithm from an oid of a certificate
 
@@ -122,22 +123,22 @@ def get_sig_alg_from_oid(oid):
     return keys[values.index(oid)].split('_')[0]
 
 
-def fix_hostname(hostname):
+def fix_url(url: str):
     """
     Extract the root domain name.
 
-    :param   hostname: hostname address to be checked
+    :param url: hostname address to be checked
     :return: fixed hostname address
     """
     print('Correcting url...')
-    if hostname[:4] == 'http':
+    if url[:4] == 'http':
         # Removes http(s):// and anything after TLD (*.com)
-        hostname = re.search('[/]{2}([^/]+)', hostname).group(1)
+        url = re.search('[/]{2}([^/]+)', url).group(1)
     else:
         # Removes anything after TLD (*.com)
-        hostname = re.search('^([^/]+)', hostname).group(0)
-    print('Corrected url: {}'.format(hostname))
-    return hostname
+        url = re.search('^([^/]+)', url).group(0)
+    print('Corrected url: {}'.format(url))
+    return url
 
 
 def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,

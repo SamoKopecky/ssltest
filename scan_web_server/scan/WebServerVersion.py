@@ -4,27 +4,24 @@ import requests
 
 class WebServerVersion:
 
-    def __init__(self, website, port, scan_nmap):
+    def __init__(self, url: str, port: int, scan_nmap: bool):
         self.scans = []
         self.port = port
         self.versions = {}
-        self.website = website
+        self.url = url
         self.scan_nmap = scan_nmap
 
     def scan_version_nmap(self):
         """
         Get the web server version with nmap wrapper.
 
-        First ports are concatenated into a string for connection. After that
-        for each port the result is looked up, if a version can't be found
-        just skips to the next port.
-        Appends triple value tuple of (nmap, port, extracted info) to the class
-        list of scans.
+        Scans for all valid key values in the result and appends
+        them together.
         """
         keys = ['product', 'version']
         nmap = nmap3.Nmap()
         print('Scanning webserver for version with nmap...')
-        result = nmap.scan_top_ports(self.website, args=f"-sV -p {self.port}")
+        result = nmap.scan_top_ports(self.url, args=f"-sV -p {self.port}")
 
         values = []
         service = list(result.items())[0][1]['ports'][0]['service']
@@ -39,15 +36,11 @@ class WebServerVersion:
 
     def scan_version_http(self):
         """
-        Scan web server version from GET response headers.
-
-        Cycles through ports and appends triple value
-        tuple of (http_header, port, extracted info) to the class
-        list of scans.
+        Scan web server version from HEAD response header.
         """
         print('Scanning webserver for version using http headers...')
         try:
-            response = requests.head(f'https://{self.website}:{self.port}', timeout=3, headers={'Connection': 'close'})
+            response = requests.head(f'https://{self.url}:{self.port}', timeout=3, headers={'Connection': 'close'})
             value = response.headers["server"]
         except KeyError:
             value = 'value not found'
@@ -64,7 +57,8 @@ class WebServerVersion:
         Call the required functions to scan for webserver versions.
         """
         scans = []
-        if self.website != '192.168.1.220':  # for testing purposes
+        # for testing purposes
+        if self.url != '192.168.1.220':
             scans.append(self.scan_version_http)
         if self.scan_nmap:
             scans.append(self.scan_version_nmap)

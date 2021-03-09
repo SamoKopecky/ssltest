@@ -11,28 +11,28 @@ from ..exceptions.ConnectionTimeoutError import ConnectionTimeoutError
 from ..exceptions.DNSError import DNSError
 
 
-def get_website_info(hostname, port):
+def get_website_info(url: str, port: int):
     """
     Gather objects to be used in rating a web server.
 
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
     :param port: port to scan on
-    :param hostname: hostname of the webserver
+    :param url: url of the webserver
     :return:
         certificate -- used certificate to verify the server
         cipher_suite -- negotiated cipher suite
         protocol -- protocol name and version
     """
     print('Creating session...')
-    ssl_socket = create_session(hostname, port)
+    ssl_socket = create_session(url, port)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     certificate = get_certificate(ssl_socket)
     ssl_socket.close()
     return certificate, cipher_suite, protocol
 
 
-def get_certificate(ssl_socket):
+def get_certificate(ssl_socket: ssl.SSLSocket):
     """
     Gather a certificate in a der binary format.
 
@@ -43,7 +43,7 @@ def get_certificate(ssl_socket):
     return x509.load_der_x509_certificate(certificate_pem, default_backend())
 
 
-def get_cipher_suite_and_protocol(ssl_socket):
+def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     """
     Gather the cipher suite and the protocol from the ssl_socket.
 
@@ -59,14 +59,14 @@ def get_cipher_suite_and_protocol(ssl_socket):
     return cipher_suite, ssl_socket.version()
 
 
-def create_session_pyopenssl(hostname, port, context):
+def create_session_pyopenssl(url: str, port: int, context: SSL.Context):
     """
     Create a secure connection to any server on any port with a defined context.
 
     This function creates a secure connection with pyopenssl lib. Original ssl lib
     doesn't work with older TLS versions on some OpenSSL implementations and thus
     the program can't scan for all supported versions.
-    :param hostname: hostname of the website
+    :param url: url of the website
     :param context: ssl context
     :param port: port
     :return: created secure socket
@@ -78,7 +78,7 @@ def create_session_pyopenssl(hostname, port, context):
     while True:
         try:
             logging.debug(f'connecting... (tls version scanning)')
-            ssl_socket.connect((hostname, port))
+            ssl_socket.connect((url, port))
             break
         except OSError as e:
             if sleep >= 5:
@@ -92,28 +92,28 @@ def create_session_pyopenssl(hostname, port, context):
     return ssl_socket
 
 
-def create_session(hostname, port, context=ssl.create_default_context()):
+def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_default_context()):
     """
     Create a secure connection to any server on any port with a defined context
     on a specific timeout.
 
-    :param hostname: hostname of the website
+    :param url: url of the website
     :param context: ssl context
     :param port: port
     :return: created secure socket
     """
-    if hostname == '192.168.1.220':
+    if url == '192.168.1.220':
         context.check_hostname = False
         context.verify_mode = ssl.VerifyMode.CERT_NONE
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(3)  # in seconds
-    ssl_socket = context.wrap_socket(sock, server_hostname=hostname)
+    ssl_socket = context.wrap_socket(sock, server_hostname=url)
     sleep = 0
     # Loop until there is a valid response or after 15 seconds
     while True:
         try:
             logging.debug(f'connecting... (main connection)')
-            ssl_socket.connect((hostname, port))
+            ssl_socket.connect((url, port))
             break
         except socket.timeout:
             raise ConnectionTimeoutError()

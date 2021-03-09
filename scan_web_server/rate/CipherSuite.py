@@ -5,9 +5,9 @@ from .PType import PType
 
 class CipherSuite(Parameters):
 
-    def __init__(self, cipher_suite, protocol):
-        # Create a dictionary for cipher suite parameters with PType keys
+    def __init__(self, cipher_suite: str, protocol: str):
         super().__init__()
+        # Create a dictionary for cipher suite parameters with PType keys
         self.parameters = {enum: {} for enum in PType if enum.is_cipher_suite}
         self.protocol = protocol
         self.cipher_suite = cipher_suite
@@ -32,7 +32,8 @@ class CipherSuite(Parameters):
                     self.parameters[enum] = {raw_parameter: 0}
                     break
         for enum in list(self.parameters.keys()):
-            if not bool(self.parameters[enum]):
+            # Check if parameter has no value
+            if not self.parameters[enum]:
                 self.parameters[enum] = {'N/A': 0}
 
     def rate_cipher_suite(self):

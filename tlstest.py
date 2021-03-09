@@ -9,7 +9,7 @@ from scan_web_server.scan.ProtocolSupport import ProtocolSupport
 from scan_web_server.scan.WebServerVersion import WebServerVersion
 from scan_web_server.connection.connection_utils import get_website_info
 from scan_web_server.scan.port_discovery import discover_ports
-from scan_web_server.utils import fix_hostname
+from scan_web_server.utils import fix_url
 from scan_web_server.utils import dump_to_dict
 from text_output.TextOutput import TextOutput
 
@@ -22,7 +22,7 @@ def main():
         logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
     if '/' in args.url:
-        args.url = fix_hostname(args.url)
+        args.url = fix_url(args.url)
     if args.nmap_discover:
         scanned_ports = discover_ports(args.url)
         scanned_ports = list(filter(lambda scanned_port: scanned_port not in args.port, scanned_ports))
@@ -67,7 +67,7 @@ def parse_options():
     return args
 
 
-def scan(args, port):
+def scan(args, port: int):
     """
     Call other scanning functions for a specific url and port
 

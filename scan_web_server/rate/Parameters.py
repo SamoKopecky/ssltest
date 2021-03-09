@@ -7,23 +7,20 @@ class Parameters(ABC):
         self.parameters = {}
         self.rating = 0
 
-    def rate_parameters(self, rateable_parameters, key_types):
+    def rate_parameters(self, rateable_parameters: list, key_types: list):
         """
-        Rate all cipher suite parameters.
-
-        First part is used if a length parameter needs to be rated
-        Second part is used for not length parameters
+        Rates the parameters from the ratable_parameters list.
         """
         for p_type in rateable_parameters:
             parameter = get_first_key(self.parameters[p_type])
-            # 1st part
+            # length parameters
             if p_type in key_types:
                 self.parameters[p_type][parameter] = rate_key_length_parameter(
                     get_first_key(self.parameters[p_type.key_pair]),
                     parameter, p_type
                 )
                 continue
-            # 2nd part
+            # normal parameters
             self.parameters[p_type][parameter] = rate_parameter(p_type, parameter)
         self.rating = self.get_max_rating()
 

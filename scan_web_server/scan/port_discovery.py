@@ -7,17 +7,17 @@ import logging
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def discover_ports(website):
+def discover_ports(url: str):
     """
     Scan a web server for all available https ports.
 
-    :param website: url to be scanned
+    :param url: url to be scanned
     :return: list of usable ports
     """
     print('Discovering ports...')
     nmap = nmap3.NmapHostDiscovery()
     # Scan with nmap for all open ports
-    result = nmap.nmap_portscan_only(website)
+    result = nmap.nmap_portscan_only(url)
     open_ports = [port['portid'] for port in list(result.items())[0][1]['ports']]
     usable_ports = []
     logging.debug(f'ports : {open_ports}')
@@ -26,13 +26,14 @@ def discover_ports(website):
         # Loop until there is a valid response or after 10 seconds
         while True:
             try:
-                head = requests.head(f'https://{website}:{port}', timeout=5, verify=False,
+                head = requests.head(f'https://{url}:{port}', timeout=5, verify=False,
                                      headers={'Connection': 'close'})
                 if head.status_code < 400:
                     usable_ports.append(int(port))
                     break
             except requests.exceptions.SSLError:
                 break
+            # Valid exception, there might a port alive after timeout
             except (requests.exceptions.ReadTimeout, requests.exceptions.Timeout):
                 usable_ports.append(int(port))
                 break
