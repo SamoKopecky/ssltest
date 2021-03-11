@@ -40,29 +40,6 @@ class PType(Enum):
         return pairs[self]
 
     @property
-    def string_alias(self):
-        """
-        Define a string alias of a parameter.
-
-        :return: string
-        """
-        aliases = {
-            self.protocol: 'Typ a verzia protokolu',
-            self.kex_algorithm: 'Algoritmus výmenu kľúčov',
-            self.cert_pub_key_algorithm: 'Algoritmus verejného kľúča',
-            self.cert_pub_key_length: 'Veľkosť verejného kľúča',
-            self.sym_enc_algorithm: 'Algoritmus symetrickej šifry',
-            self.sym_enc_algorithm_key_length: 'Veľkosť kľúča symetrickej šifry',
-            self.sym_enc_algorithm_block_mode: 'Blokový mód symetrickej šifry',
-            self.sym_ecn_algorithm_block_mode_number: 'Dodatočná inoformácia k blokovému módu',
-            self.hash_function: 'Hash funkcia',
-            self.cert_sign_algorithm: 'Algoritmus podpisu certifikátu',
-            self.cert_sign_algorithm_hash_function: 'Hash funkcia pre podpis certifikátu',
-            self.hmac_function: 'Hmac funkcia',
-        }
-        return aliases[self]
-
-    @property
     def is_cipher_suite(self):
         """
         Define which parameters are parsable from cipher suites.

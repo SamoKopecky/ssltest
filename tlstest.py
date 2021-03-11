@@ -10,29 +10,20 @@ from scan_web_server.scan.WebServerVersion import WebServerVersion
 from scan_web_server.connection.connection_utils import get_website_info
 from scan_web_server.scan.port_discovery import discover_ports
 from scan_web_server.utils import fix_url
-from scan_web_server.utils import dump_to_dict
 from text_output.TextOutput import TextOutput
 
 
 def main():
     args = parse_options()
-    if args.verbose:
-        logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
-    else:
-        logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-
     if '/' in args.url:
         args.url = fix_url(args.url)
-    if args.nmap_discover:
-        scanned_ports = discover_ports(args.url)
-        scanned_ports = list(filter(lambda scanned_port: scanned_port not in args.port, scanned_ports))
-        args.port.extend(scanned_ports)
-    output_data = {}
-    for port in args.port:
-        try:
-            output_data.update(scan(args, port))
-        except Exception as ex:
-            print(f'Unexpected exception occurred: {ex}')
+    verbose_option(args)
+    nmap_discover_option(args)
+    output_data = scan_all(args)
+    output_handler(args, output_data)
+
+
+def output_handler(args, output_data):
     json_output_data = json.dumps(output_data, indent=2)
     if args.json is not None:
         file = open('output.json', 'w')
@@ -40,6 +31,30 @@ def main():
     else:
         text_output = TextOutput(json_output_data)
         text_output.text_output()
+
+
+def scan_all(args):
+    output_data = {}
+    for port in args.port:
+        try:
+            output_data.update(scan(args, port))
+        except Exception as ex:
+            print(f'Unexpected exception occurred: {ex}')
+    return output_data
+
+
+def nmap_discover_option(args):
+    if args.nmap_discover:
+        scanned_ports = discover_ports(args.url)
+        scanned_ports = list(filter(lambda scanned_port: scanned_port not in args.port, scanned_ports))
+        args.port.extend(scanned_ports)
+
+
+def verbose_option(args):
+    if args.verbose:
+        logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+    else:
+        logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 
 def parse_options():
@@ -91,12 +106,12 @@ def scan(args, port: int):
     versions.scan_versions()
 
     print('Done.')
-    return dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
-                        (certificate.parameters, certificate.rating),
-                        (protocol_support.versions, protocol_support.rating),
-                        certificate.non_parameters,
-                        versions.versions,
-                        port, args.url)
+    return TextOutput.dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
+                                   (certificate.parameters, certificate.rating),
+                                   (protocol_support.versions, protocol_support.rating),
+                                   certificate.non_parameters,
+                                   versions.versions,
+                                   port, args.url)
 
 
 if __name__ == "__main__":
