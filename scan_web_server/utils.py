@@ -88,10 +88,6 @@ def rate_parameter(p_type: PType, parameter: str):
     return 0
 
 
-def get_first_key(dictionary: dict):
-    return list(dictionary.keys())[0]
-
-
 def pub_key_alg_from_cert(public_key):
     """
     Get the public key algorithm from a certificate.

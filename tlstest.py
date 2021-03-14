@@ -19,7 +19,7 @@ def main():
         args.url = fix_url(args.url)
     verbose_option(args)
     nmap_discover_option(args)
-    output_data = scan_all(args)
+    output_data = scan_all_ports(args)
     output_handler(args, output_data)
 
 
@@ -33,7 +33,7 @@ def output_handler(args, output_data):
         text_output.text_output()
 
 
-def scan_all(args):
+def scan_all_ports(args):
     output_data = {}
     for port in args.port:
         try:
@@ -46,7 +46,7 @@ def scan_all(args):
 def nmap_discover_option(args):
     if args.nmap_discover:
         scanned_ports = discover_ports(args.url)
-        scanned_ports = list(filter(lambda scanned_port: scanned_port not in args.port, scanned_ports))
+        scanned_ports = list(filter(lambda port: port not in args.port, scanned_ports))
         args.port.extend(scanned_ports)
 
 

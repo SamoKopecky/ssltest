@@ -1,4 +1,5 @@
-from ..utils import *
+from cryptography import x509
+from ..utils import pub_key_alg_from_cert, get_sig_alg_from_oid
 from .Parameters import Parameters
 from .PType import PType
 
@@ -8,8 +9,8 @@ class Certificate(Parameters):
     def __init__(self, certificate: x509.Certificate):
         super().__init__()
         # Create a dictionary for certificate parameters with PType keys
-        self.parameters = {enum: {} for enum in PType if enum.is_certificate and enum.is_ratable}
-        self.non_parameters = {enum: [] for enum in PType if enum.is_certificate and not enum.is_ratable}
+        self.parameters = {p_type: {} for p_type in PType if p_type.is_certificate and p_type.is_ratable}
+        self.non_parameters = {p_type: [] for p_type in PType if p_type.is_certificate and not p_type.is_ratable}
         self.certificate = certificate
 
     def parse_certificate(self):

@@ -1,4 +1,5 @@
-from scan_web_server.utils import *
+import json
+from scan_web_server.utils import read_json
 
 
 class TextOutput:
@@ -87,7 +88,7 @@ class TextOutput:
         :param data: data to print
         :return:
         """
-        print('Web server versions')
+        print('Web server versions:')
         for key, value in list(data.items()):
             print(f'\t{key}: {value}')
 

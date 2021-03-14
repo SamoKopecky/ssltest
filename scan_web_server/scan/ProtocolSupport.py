@@ -1,6 +1,7 @@
-from scan_web_server.rate.PType import PType
-from ..utils import *
-from ..connection.connection_utils import *
+from OpenSSL import SSL
+from ..utils import rate_parameter
+from ..rate.PType import PType
+from ..connection.connection_utils import create_session_pyopenssl
 
 
 class ProtocolSupport:

@@ -1,4 +1,4 @@
-from scan_web_server.utils import *
+from scan_web_server.utils import rate_key_length_parameter, rate_parameter
 from abc import ABC
 
 
@@ -12,11 +12,11 @@ class Parameters(ABC):
         Rates the parameters from the ratable_parameters list.
         """
         for p_type in rateable_parameters:
-            parameter = get_first_key(self.parameters[p_type])
+            parameter = self.get_first_key(self.parameters[p_type])
             # length parameters
             if p_type in key_types:
                 self.parameters[p_type][parameter] = rate_key_length_parameter(
-                    get_first_key(self.parameters[p_type.key_pair]),
+                    self.get_first_key(self.parameters[p_type.key_pair]),
                     parameter, p_type
                 )
                 continue
@@ -33,3 +33,7 @@ class Parameters(ABC):
             for value in dicts.values():
                 values.append(value)
         return max(values)
+
+    @staticmethod
+    def get_first_key(dictionary: dict):
+        return next(iter(dictionary))

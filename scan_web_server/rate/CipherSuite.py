@@ -1,4 +1,4 @@
-from ..utils import *
+from ..utils import read_json
 from .Parameters import Parameters
 from .PType import PType
 
@@ -23,18 +23,18 @@ class CipherSuite(Parameters):
         json_data = read_json('cipher_parameters.json')
         raw_parameters = self.cipher_suite.split('_')
         raw_parameters.remove('TLS')
-        parameter_enums = list(self.parameters.keys())
+        parameter_types = list(self.parameters.keys())
         # For each parameter iterate through each enum value until a match is found
-        for raw_parameter in raw_parameters:
-            for enum in parameter_enums:
-                if raw_parameter in json_data[enum.name].split(','):
-                    parameter_enums.remove(enum)
-                    self.parameters[enum] = {raw_parameter: 0}
+        for p_raw in raw_parameters:
+            for p_type in parameter_types:
+                if p_raw in json_data[p_type.name].split(','):
+                    parameter_types.remove(p_type)
+                    self.parameters[p_type] = {p_raw: 0}
                     break
-        for enum in list(self.parameters.keys()):
+        for p_type in list(self.parameters.keys()):
             # Check if parameter has no value
-            if not self.parameters[enum]:
-                self.parameters[enum] = {'N/A': 0}
+            if not self.parameters[p_type]:
+                self.parameters[p_type] = {'N/A': 0}
 
     def rate_cipher_suite(self):
         """
