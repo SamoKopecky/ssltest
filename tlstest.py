@@ -136,7 +136,7 @@ def scan(args, port: int):
     versions.scan_versions()
 
     vulnerabilities = vulnerability_scan(args)
-
+    test
     print('Done.')
     return TextOutput.dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
                                    (certificate.parameters, certificate.rating),
