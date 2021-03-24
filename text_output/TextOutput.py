@@ -31,6 +31,7 @@ class TextOutput:
             self.print_supported_versions(self.current_data['protocol_support'])
             self.print_certificate_info(self.current_data['certificate_info'])
             self.print_versions(self.current_data['web_server_versions'])
+            self.print_vulnerabilities(self.current_data['vulnerabilities'])
 
     def print_parameters(self, data: dict):
         """
@@ -88,13 +89,27 @@ class TextOutput:
         :param data: data to print
         :return:
         """
+        string_map = {
+            'http_header': 'Http header',
+            'nmap': 'Nmap'
+        }
         print('Web server versions:')
         for key, value in list(data.items()):
-            print(f'\t{key}: {value}')
+            print(f'\t{key}: {string_map.get(value)}')
+
+    @staticmethod
+    def print_vulnerabilities(data: dict):
+        string_map = {
+            True: 'Yes',
+            False: 'No'
+        }
+        print('Scanned vulnerabilities:')
+        for key, value in list(data.items()):
+            print(f'\t{key}->{string_map.get(value)}')
 
     @staticmethod
     def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
-                     certificate_non_parameters, versions, port, url):
+                     certificate_non_parameters, versions, vulnerabilities, port, url):
         """
         Dump web server parameters to a single dict.
 
@@ -105,6 +120,7 @@ class TextOutput:
         :param versions: web server versions
         :param port: scanned port
         :param url: scanned url
+        :param vulnerabilities: scanned vulnerabilities
         :return: dictionary
         """
         dump = {}
@@ -126,4 +142,5 @@ class TextOutput:
         dump.update({'certificate_info': certificate_info})
         dump.update({'protocol_support': protocols})
         dump.update({'web_server_versions': versions})
+        dump.update({'vulnerabilities': vulnerabilities})
         return {f'{url}:{port}': dump}

@@ -3,6 +3,7 @@ import argparse
 import sys
 import logging
 import json
+import textwrap
 from scan_web_server.rate.CipherSuite import CipherSuite
 from scan_web_server.rate.Certificate import Certificate
 from scan_web_server.scan.ProtocolSupport import ProtocolSupport
@@ -11,6 +12,7 @@ from scan_web_server.connection.connection_utils import get_website_info
 from scan_web_server.scan.port_discovery import discover_ports
 from scan_web_server.utils import fix_url
 from text_output.TextOutput import TextOutput
+import scan_vulnerabilities.Hearbleed as Heartbleed
 
 
 def main():
@@ -21,6 +23,22 @@ def main():
     nmap_discover_option(args)
     output_data = scan_all_ports(args)
     output_handler(args, output_data)
+
+
+def vulnerability_scan(args):
+    scans = []
+    results = {}
+    switcher = {
+        1: Heartbleed.scan,
+        2: print,
+        3: print,
+        4: print
+    }
+    for test in args.test:
+        scans.append(switcher.get(test))
+    for scan_method in scans:
+        results.update(scan_method(args.url))
+    return results
 
 
 def output_handler(args, output_data):
@@ -64,19 +82,31 @@ def parse_options():
     :return: object of parsed arguments
     """
     parser = argparse.ArgumentParser(
-        description='Script that scans a webservers cryptographic parameters and vulnerabilities')
+        usage='use -h or --help for more information',
+        description='Script that scans a webservers cryptographic parameters and vulnerabilities',
+        formatter_class=argparse.RawTextHelpFormatter)
     required = parser.add_argument_group('required arguments')
     required.add_argument('-u', '--url', required=True, metavar='url', help='url to scan')
     parser.add_argument('-ns', '--nmap-server', action='store_true', default=False,
                         help='use nmap to scan the server version')
     parser.add_argument('-nd', '--nmap-discover', action='store_true', default=False,
                         help='use nmap to discover web server ports')
-    parser.add_argument('-p', '--port', default=[443], type=int, nargs='*', metavar='port',
-                        help='port or ports(separate with spaces) to scan on (default: 443)')
+    parser.add_argument('-p', '--port', default=[443], type=int, nargs='+', metavar='port',
+                        help='port or ports(separate with spaces) to scan on (default: %(default)s)')
     parser.add_argument('-j', '--json', action='store', metavar='output_file', required=False,
-                        help='change output to json format, if specified requires output file name as an argument')
-    parser.add_argument('-H', '--heartbleed', action='store_true', default=False,
-                        help='scan for heartbleed vulnerability')
+                        help=textwrap.dedent('''\
+                        change output to json format, if specified requires
+                        output file name as an argument
+                        '''))
+    parser.add_argument('-t', '--test', type=int, metavar='test_num', nargs='+',
+                        help=textwrap.dedent('''\
+                        test the server for a specified vulnerability
+                        possible vulnerabilities (separate with spaces):
+                            1: Heartbleed
+                            2: ChangeCipherSpec Injection
+                            3: Insecure renegotiation
+                            4: ZombiePOODLE/GOLDENPOODLE
+                        '''))
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
     args = parser.parse_args()
     return args
@@ -105,12 +135,14 @@ def scan(args, port: int):
     versions = WebServerVersion(args.url, port, args.nmap_server)
     versions.scan_versions()
 
+    vulnerabilities = vulnerability_scan(args)
+
     print('Done.')
     return TextOutput.dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
                                    (certificate.parameters, certificate.rating),
                                    (protocol_support.versions, protocol_support.rating),
                                    certificate.non_parameters,
-                                   versions.versions,
+                                   versions.versions, vulnerabilities,
                                    port, args.url)
 
 
