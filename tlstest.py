@@ -4,6 +4,7 @@ import sys
 import logging
 import json
 import textwrap
+import traceback
 from scan_web_server.rate.CipherSuite import CipherSuite
 from scan_web_server.rate.Certificate import Certificate
 from scan_web_server.scan.ProtocolSupport import ProtocolSupport
@@ -57,6 +58,9 @@ def scan_all_ports(args):
         try:
             output_data.update(scan(args, port))
         except Exception as ex:
+            tb = traceback.extract_stack()
+            logging.debug(''.join(traceback.format_list(tb)[:-1]))
+            logging.debug(ex)
             print(f'Unexpected exception occurred: {ex}')
     return output_data
 

@@ -1,5 +1,5 @@
-from time import sleep
 import socket
+from .utils import receive_data
 
 client_hello = bytes([
     # Record protocol
@@ -63,10 +63,20 @@ heartbeat_request = bytes([
 
 def scan(hostname):
     plain_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    plain_sock.settimeout(2)
     plain_sock.connect((hostname, 443))
     plain_sock.send(client_hello)
-    sleep(1)
+    server_hello = receive_data(plain_sock, 2)
+    # Server hello content type in record protocol
+    if server_hello[5] != 0x2:
+        plain_sock.close()
+        return {'heartbleed': False}
     plain_sock.send(heartbeat_request)
-    sleep(1)
+    heartbeat_response = receive_data(plain_sock, 2)
     plain_sock.close()
+    if not heartbeat_response:
+        return {'heartbleed': False}
+    # Heartbeat content type in record protocol
+    elif heartbeat_response[0] == 0x18:
+        return {'heartbleed': True}
     return {'heartbleed': False}

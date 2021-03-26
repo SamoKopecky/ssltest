@@ -95,7 +95,7 @@ class TextOutput:
         }
         print('Web server versions:')
         for key, value in list(data.items()):
-            print(f'\t{key}: {string_map.get(value)}')
+            print(f'\t{string_map.get(key)}: {value}')
 
     @staticmethod
     def print_vulnerabilities(data: dict):
