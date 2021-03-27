@@ -41,7 +41,7 @@ class ProtocolSupport:
         """
         Rate the scanned protocols.
         """
-        print('Scanning for TLS versions...')
+        print('Scanning TLS versions...')
         supported_protocols = self.scan_protocols()
         for protocol in supported_protocols:
             self.versions[protocol] = rate_parameter(PType.protocol, protocol)

@@ -13,7 +13,10 @@ from scan_web_server.connection.connection_utils import get_website_info
 from scan_web_server.scan.port_discovery import discover_ports
 from scan_web_server.utils import fix_url
 from text_output.TextOutput import TextOutput
-import scan_vulnerabilities.Hearbleed as Heartbleed
+import scan_vulnerabilities.hearbleed as heartbleed
+import scan_vulnerabilities.ccs_injection as ccs_injection
+import scan_vulnerabilities.insec_renegotiation as rene
+import scan_vulnerabilities.poodle as poodle
 
 
 def main():
@@ -26,23 +29,36 @@ def main():
     output_handler(args, output_data)
 
 
-def vulnerability_scan(args):
+def vulnerability_scan(address, tests):
+    """
+    Call tests given in input options
+
+    :param address: tuple of an url and port
+    :param tests: input option for tests
+    :return: dictionary of scanned results
+    """
     scans = []
     results = {}
     switcher = {
-        1: Heartbleed.scan,
-        2: print,
-        3: print,
-        4: print
+        1: (heartbleed.scan, 'Heartbleed'),
+        2: (ccs_injection.scan, 'CSS injection'),
+        3: (rene.scan, 'insecure renegotiation'),
+        4: (poodle.scan, 'ZombiePOODLE/GOLDENPOOLDE')
     }
-    for test in args.test:
+    for test in tests:
         scans.append(switcher.get(test))
     for scan_method in scans:
-        results.update(scan_method(args.url))
+        results.update({scan_method[1]: scan_method[0](address)})
     return results
 
 
 def output_handler(args, output_data):
+    """
+    Handle output depending on the input options
+
+    :param args: input options
+    :param output_data: json data to output
+    """
     json_output_data = json.dumps(output_data, indent=2)
     if args.json is not None:
         file = open('output.json', 'w')
@@ -53,6 +69,12 @@ def output_handler(args, output_data):
 
 
 def scan_all_ports(args):
+    """
+    Call scan function for each port
+
+    :param args: input options
+    :return: dictionary of scanned data
+    """
     output_data = {}
     for port in args.port:
         try:
@@ -66,6 +88,11 @@ def scan_all_ports(args):
 
 
 def nmap_discover_option(args):
+    """
+    Discover usable ports
+
+    :param args: input options
+    """
     if args.nmap_discover:
         scanned_ports = discover_ports(args.url)
         scanned_ports = list(filter(lambda port: port not in args.port, scanned_ports))
@@ -73,6 +100,11 @@ def nmap_discover_option(args):
 
 
 def verbose_option(args):
+    """
+    Handle verbose option
+
+    :param args: input options
+    """
     if args.verbose:
         logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
     else:
@@ -96,7 +128,7 @@ def parse_options():
     parser.add_argument('-nd', '--nmap-discover', action='store_true', default=False,
                         help='use nmap to discover web server ports')
     parser.add_argument('-p', '--port', default=[443], type=int, nargs='+', metavar='port',
-                        help='port or ports(separate with spaces) to scan on (default: %(default)s)')
+                        help='port or ports (separate with spaces) to scan on (default: %(default)s)')
     parser.add_argument('-j', '--json', action='store', metavar='output_file', required=False,
                         help=textwrap.dedent('''\
                         change output to json format, if specified requires
@@ -139,7 +171,7 @@ def scan(args, port: int):
     versions = WebServerVersion(args.url, port, args.nmap_server)
     versions.scan_versions()
 
-    vulnerabilities = vulnerability_scan(args)
+    vulnerabilities = vulnerability_scan((args.url, port), args.test)
 
     print('Done.')
     return TextOutput.dump_to_dict((cipher_suite.parameters, cipher_suite.rating),

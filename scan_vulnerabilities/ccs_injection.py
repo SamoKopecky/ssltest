@@ -1,14 +1,13 @@
-import socket
-from .utils import receive_data
+from .utils import send_client_hello, receive_data
 
 client_hello = bytes([
     # Record protocol
     0x16,  # Content type (Handshake)
     0x03, 0x03,  # Version (1.2)
-    0x00, 0xd2,  # Length
+    0x00, 0xcd,  # Length
     # Handshake protocol
     0x01,  # Handshake type
-    0x00, 0x00, 0xce,  # Length
+    0x00, 0x00, 0xc9,  # Length
     0x03, 0x03,  # TLS version
     # Random bytes
     0xf0, 0x36, 0x90, 0x63, 0x5a, 0x8c, 0xea, 0xaf,
@@ -33,7 +32,7 @@ client_hello = bytes([
     0x00, 0x35, 0x00, 0x2f, 0x00, 0xff,
     0x01,  # Compression method length
     0x00,  # Compression method
-    0x00, 0x47,  # Extension length
+    0x00, 0x42,  # Extension length
     # Supported groups
     0x00, 0x0a, 0x00, 0x0c, 0x00, 0x0a, 0x00, 0x1d,
     0x00, 0x17, 0x00, 0x1e, 0x00, 0x19, 0x00, 0x18,
@@ -46,37 +45,38 @@ client_hello = bytes([
     0x08, 0x05, 0x08, 0x06, 0x04, 0x01, 0x05, 0x01,
     0x06, 0x01, 0x03, 0x03, 0x03, 0x01, 0x03, 0x02,
     0x04, 0x02, 0x05, 0x02, 0x06, 0x02,
-    # Heartbeat
-    0x00, 0x0f, 0x00, 0x01, 0x01
 ])
 
-heartbeat_request = bytes([
+ccs_message = bytes([
     # Record protocol
-    0x18,  # Content type (Handshake)
-    0x03, 0x03,  # Version (1.2)
-    0x00, 0x03,  # Length
-    # Heartbeat
-    0x01,  # Type (Request)
-    0x40, 0x00,  # Payload length
+    0x14,  # Protocol type (ccs)
+    0x03, 0x03,  # Version
+    0x00, 0x01,  # Length
+    0x01  # CSS message
 ])
 
 
-def scan(hostname):
-    plain_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    plain_sock.settimeout(2)
-    plain_sock.connect((hostname, 443))
-    plain_sock.send(client_hello)
-    server_hello = receive_data(plain_sock, 2)
+def scan(address):
+    """
+    Scan the webserver for CSS injection vulnerability (CVE-2014-0224)
+
+    :param address: tuple of an url and port
+    :return: if the server is vulnerable
+    """
+    print('Scanning CCS injection vulnerability...')
+    timeout = 2
+    server_hello, sock = send_client_hello(address, client_hello, timeout)
     # Server hello content type in record protocol
-    if server_hello[5] != 0x2:
-        plain_sock.close()
-        return {'heartbleed': False}
-    plain_sock.send(heartbeat_request)
-    heartbeat_response = receive_data(plain_sock, 2)
-    plain_sock.close()
-    if not heartbeat_response:
-        return {'heartbleed': False}
-    # Heartbeat content type in record protocol
-    elif heartbeat_response[0] == 0x18:
-        return {'heartbleed': True}
-    return {'heartbleed': False}
+    if server_hello[5] != 0x02:
+        sock.close()
+        return False
+    sock.send(ccs_message)
+    server_response = receive_data(sock, timeout)
+    sock.close()
+    # No response from server means the CSS message is accepted
+    if not server_response:
+        return True
+    # 0x15 stands for alert message, 0x2 stands for unexpected message
+    if server_response[0] == 0x15 and server_response[6] == 0x0a:
+        return False
+    return True
