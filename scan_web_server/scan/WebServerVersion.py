@@ -32,7 +32,7 @@ class WebServerVersion:
                 error = 'unable to find'
                 if error not in values and not values:
                     values.append(error)
-        self.versions['nmap'] = ','.join(values)
+        self.versions['nmap'] = ' '.join(values)
 
     def scan_version_http(self):
         """
@@ -57,7 +57,7 @@ class WebServerVersion:
         Call the required functions to scan for webserver versions.
         """
         scans = []
-        # for testing purposes
+        # for testing purposes TODO: delete later
         if self.url != '192.168.1.220':
             scans.append(self.scan_version_http)
         if self.scan_nmap:

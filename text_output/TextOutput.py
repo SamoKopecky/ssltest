@@ -86,6 +86,8 @@ class TextOutput:
 
         :param data: data to print
         """
+        if not data:
+            return
         string_map = {
             'http_header': 'Http header',
             'nmap': 'Nmap'
@@ -101,6 +103,8 @@ class TextOutput:
 
         :param data: data to print
         """
+        if not data:
+            return
         string_map = {
             True: 'Yes',
             False: 'No'

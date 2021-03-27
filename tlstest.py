@@ -27,18 +27,21 @@ def main():
     verbose_option(args)
     nmap_discover_option(args)
     output_data = scan_all_ports(args)
-    output_handler(args, output_data)
+    json_option(args, output_data)
 
 
 def vulnerability_scan(address, tests):
     """
-    Call tests given in input options
+    Forwards the appropriate tests to multithreading function
 
     :param address: tuple of an url and port
     :param tests: input option for tests
     :return: dictionary of scanned results
     """
+    if not tests:
+        return
     scans = []
+
     switcher = {
         1: (heartbleed.scan, 'Heartbleed'),
         2: (ccs_injection.scan, 'CSS injection'),
@@ -50,7 +53,7 @@ def vulnerability_scan(address, tests):
     return scan_vulnerabilities(scans, address)
 
 
-def output_handler(args, output_data):
+def json_option(args, output_data):
     """
     Handle output depending on the input options
 
@@ -79,8 +82,7 @@ def scan_all_ports(args):
             output_data.update(scan(args, port))
         except Exception as ex:
             tb = traceback.extract_stack()
-            logging.debug(''.join(traceback.format_list(tb)[:-1]))
-            logging.debug(ex)
+            logging.debug(''.join(traceback.format_list(tb)))
             print(f'Unexpected exception occurred: {ex}')
     return output_data
 
@@ -121,7 +123,7 @@ def parse_options():
         formatter_class=argparse.RawTextHelpFormatter)
     required = parser.add_argument_group('required arguments')
     required.add_argument('-u', '--url', required=True, metavar='url', help='url to scan')
-    parser.add_argument('-ns', '--nmap-server', action='store_true', default=False,
+    parser.add_argument('-ns', '--nmap-scan', action='store_true', default=False,
                         help='use nmap to scan the server version')
     parser.add_argument('-nd', '--nmap-discover', action='store_true', default=False,
                         help='use nmap to discover web server ports')
@@ -143,7 +145,20 @@ def parse_options():
                         '''))
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
     args = parser.parse_args()
+    check_test_numbers(args, parser)
     return args
+
+
+def check_test_numbers(args, parser):
+    unknown_tests = filter(lambda test: test not in [1, 2, 3, 4], args.test)
+    unknown_tests = list(map(str, unknown_tests))
+    if unknown_tests:
+        parser.print_usage()
+        if len(unknown_tests) > 1:
+            print(f'Numbers {", ".join(unknown_tests)} are not test numbers.')
+        else:
+            print(f'Number {unknown_tests[0]} is not a test number.')
+        exit(1)
 
 
 def scan(args, port: int):
@@ -166,7 +181,7 @@ def scan(args, port: int):
     protocol_support = ProtocolSupport(args.url, port)
     protocol_support.rate_protocols()
 
-    versions = WebServerVersion(args.url, port, args.nmap_server)
+    versions = WebServerVersion(args.url, port, args.nmap_scan)
     versions.scan_versions()
 
     vulnerabilities = vulnerability_scan((args.url, port), args.test)
