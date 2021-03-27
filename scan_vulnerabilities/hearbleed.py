@@ -1,3 +1,4 @@
+import inspect
 import socket
 from .utils import receive_data, send_client_hello
 
@@ -78,6 +79,7 @@ def scan(address):
     sock.send(heartbeat_request)
     heartbeat_response = receive_data(sock, timeout)
     sock.close()
+    print('Heartbeat scan done.')
     # Server ignores heartbeat request
     if not heartbeat_response:
         return False

@@ -1,4 +1,6 @@
+import inspect
 import logging
+import os
 from time import sleep, time
 import socket
 
@@ -11,19 +13,23 @@ def receive_data(sock, timeout):
     :param timeout: timeout in seconds
     :return: array of bytes of received data
     """
+    stack = inspect.stack()
+    full_test_name = stack[len(stack) - 6].filename
+    # Get current test name for debugging purposes
+    test_name = full_test_name.split(os.path.sep)[-1]
     all_data = []
     begin = time()
     while 1:
         if all_data and time() - begin > timeout:
-            logging.debug("timed out with received data")
+            logging.debug(f"({test_name}) timed out with received data")
             break
         elif time() - begin > timeout * 2:
-            logging.debug("timed out with no received data")
+            logging.debug(f"({test_name}) timed out with no received data")
             break
         try:
             data = sock.recv(2048)
             if data:
-                logging.debug("receiving data")
+                logging.debug(f"({test_name}) receiving data")
                 all_data.extend(data)
                 begin = time()
             else:

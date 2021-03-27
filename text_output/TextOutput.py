@@ -53,7 +53,6 @@ class TextOutput:
         Print other cert info such as subject/issuer.
 
         :param data: data to print
-        :return:
         """
         print('Certificate information:')
         for key, value in list(data.items()):
@@ -72,7 +71,6 @@ class TextOutput:
         Print supported TLS protocol versions.
 
         :param data: data to print
-        :return:
         """
         print('Protocol support:')
         for key, value in list(data.items()):
@@ -87,7 +85,6 @@ class TextOutput:
         Print web server versions.
 
         :param data: data to print
-        :return:
         """
         string_map = {
             'http_header': 'Http header',
@@ -99,6 +96,11 @@ class TextOutput:
 
     @staticmethod
     def print_vulnerabilities(data: dict):
+        """
+        Print scanned vulnerabilities
+
+        :param data: data to print
+        """
         string_map = {
             True: 'Yes',
             False: 'No'

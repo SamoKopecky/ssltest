@@ -2,11 +2,7 @@ import json
 import re
 import os
 from cryptography import x509
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives.asymmetric import dsa
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.asymmetric import ed25519
-from cryptography.hazmat.primitives.asymmetric import ed448
+from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
 from .exceptions.NoIanaPairFound import NoIanaPairFound
 from .rate.PType import PType
 
@@ -135,6 +131,3 @@ def fix_url(url: str):
         url = re.search('^([^/]+)', url).group(0)
     print('Corrected url: {}'.format(url))
     return url
-
-
-

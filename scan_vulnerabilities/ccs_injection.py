@@ -1,3 +1,5 @@
+import inspect
+
 from .utils import send_client_hello, receive_data
 
 client_hello = bytes([
@@ -73,10 +75,11 @@ def scan(address):
     sock.send(ccs_message)
     server_response = receive_data(sock, timeout)
     sock.close()
+    print('CCS injection scan done.')
     # No response from server means the CSS message is accepted
     if not server_response:
         return True
-    # 0x15 stands for alert message, 0x2 stands for unexpected message
+    # 0x15 stands for alert message type, 0x2 stands for unexpected message
     if server_response[0] == 0x15 and server_response[6] == 0x0a:
         return False
     return True

@@ -13,6 +13,7 @@ from scan_web_server.connection.connection_utils import get_website_info
 from scan_web_server.scan.port_discovery import discover_ports
 from scan_web_server.utils import fix_url
 from text_output.TextOutput import TextOutput
+from scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
 import scan_vulnerabilities.hearbleed as heartbleed
 import scan_vulnerabilities.ccs_injection as ccs_injection
 import scan_vulnerabilities.insec_renegotiation as rene
@@ -38,7 +39,6 @@ def vulnerability_scan(address, tests):
     :return: dictionary of scanned results
     """
     scans = []
-    results = {}
     switcher = {
         1: (heartbleed.scan, 'Heartbleed'),
         2: (ccs_injection.scan, 'CSS injection'),
@@ -47,9 +47,7 @@ def vulnerability_scan(address, tests):
     }
     for test in tests:
         scans.append(switcher.get(test))
-    for scan_method in scans:
-        results.update({scan_method[1]: scan_method[0](address)})
-    return results
+    return scan_vulnerabilities(scans, address)
 
 
 def output_handler(args, output_data):
@@ -173,7 +171,7 @@ def scan(args, port: int):
 
     vulnerabilities = vulnerability_scan((args.url, port), args.test)
 
-    print('Done.')
+    print('Scanning done.')
     return TextOutput.dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
                                    (certificate.parameters, certificate.rating),
                                    (protocol_support.versions, protocol_support.rating),
