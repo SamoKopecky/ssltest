@@ -39,9 +39,8 @@ def vulnerability_scan(address, tests):
     :return: dictionary of scanned results
     """
     if not tests:
-        return
+        return {}
     scans = []
-
     switcher = {
         1: (heartbleed.scan, 'Heartbleed'),
         2: (ccs_injection.scan, 'CSS injection'),
@@ -150,11 +149,13 @@ def parse_options():
 
 
 def check_test_numbers(args, parser):
-    unknown_tests = filter(lambda test: test not in [1, 2, 3, 4], args.test)
-    unknown_tests = list(map(str, unknown_tests))
+    if not args.test:
+        return
+    unknown_tests = list(filter(lambda test: test not in [1, 2, 3, 4], args.test))
     if unknown_tests:
         parser.print_usage()
         if len(unknown_tests) > 1:
+            unknown_tests = list(map(str, unknown_tests))
             print(f'Numbers {", ".join(unknown_tests)} are not test numbers.')
         else:
             print(f'Number {unknown_tests[0]} is not a test number.')
