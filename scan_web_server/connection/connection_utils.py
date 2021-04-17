@@ -119,7 +119,7 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
             raise ConnectionTimeoutError()
         except socket.gaierror:
             raise DNSError()
-        except ValueError as e:
+        except ConnectionResetError as e:
             raise UnknownConnectionError(e)
         except socket.error as e:
             if sleep >= 5:

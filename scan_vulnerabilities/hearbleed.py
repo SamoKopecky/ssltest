@@ -1,6 +1,4 @@
-import inspect
-import socket
-from .utils import receive_data, send_client_hello
+from .utils import *
 
 client_hello = bytes([
     # Record protocol
@@ -72,8 +70,7 @@ def scan(address):
     print('Scanning Heartbleed vulnerability...')
     timeout = 2
     server_hello, sock = send_client_hello(address, client_hello, timeout)
-    # Server hello content type in record protocol
-    if server_hello[5] != 0x2:
+    if not is_server_hello(server_hello):
         sock.close()
         return False
     sock.send(heartbeat_request)

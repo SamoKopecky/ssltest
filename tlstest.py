@@ -44,7 +44,7 @@ def vulnerability_scan(address, tests):
     switcher = {
         1: (heartbleed.scan, 'Heartbleed'),
         2: (ccs_injection.scan, 'CSS injection'),
-        3: (rene.scan, 'insecure renegotiation'),
+        3: (rene.scan, 'Insecure renegotiation'),
         4: (poodle.scan, 'ZombiePOODLE/GOLDENPOOLDE')
     }
     for test in tests:

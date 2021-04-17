@@ -55,3 +55,10 @@ def send_client_hello(address, client_hello, timeout):
     sock.send(client_hello)
     response = receive_data(sock, 2)
     return response, sock
+
+
+def is_server_hello(server_hello):
+    # Server hello content type in record protocol
+    if server_hello[5] != 0x02:
+        return False
+    return True
