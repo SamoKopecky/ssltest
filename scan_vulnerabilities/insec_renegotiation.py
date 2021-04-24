@@ -54,10 +54,16 @@ client_hello = bytes([
 ])
 
 
-def scan(url):
+def scan(address):
+    """
+    Scan the webserver for insecure renegotiation (CVE-2009-3555)
+
+    :param address: tuple of an url and port
+    :return: if the server is vulnerable
+    """
     print("Scanning Renegotiation vulnerability...")
     timeout = 2
-    server_hello, sock = send_client_hello(url, client_hello, timeout)
+    server_hello, sock = send_client_hello(address, client_hello, timeout)
     sock.close()
     print("Renegotiation vulnerability scan done.")
     if not is_server_hello(server_hello):
@@ -65,7 +71,7 @@ def scan(url):
     # If there is no renegotiation info found it means the server doesn't
     # support secure renegotiation extension
     renegotiation_info = server_hello.find(renegotiation_extension)
+    # -1 means no match
     if renegotiation_info == -1:
         return True
-
     return False

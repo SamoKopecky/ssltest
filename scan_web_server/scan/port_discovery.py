@@ -1,8 +1,9 @@
 import nmap3
 import requests
 import urllib3
-import time
 import logging
+
+from ..utils import incremental_sleep
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -17,6 +18,7 @@ def discover_ports(url: str):
     print('Discovering ports...')
     nmap = nmap3.NmapHostDiscovery()
     # Scan with nmap for all open ports
+    logging.debug('Scanning with nmap for all open ports...')
     result = nmap.nmap_portscan_only(url)
     open_ports = [port['portid'] for port in list(result.items())[0][1]['ports']]
     usable_ports = []
@@ -37,11 +39,7 @@ def discover_ports(url: str):
             except (requests.exceptions.ReadTimeout, requests.exceptions.Timeout):
                 usable_ports.append(int(port))
                 break
-            except requests.exceptions.ConnectionError:
-                if sleep >= 4:
-                    break
-                sleep += 1
-            logging.debug(f'sleeping for {sleep}...')
-            time.sleep(sleep)
+            except requests.exceptions.ConnectionError as exception:
+                sleep = incremental_sleep(sleep, exception, 5)
     logging.debug(f'scanned ports : {usable_ports}')
     return usable_ports

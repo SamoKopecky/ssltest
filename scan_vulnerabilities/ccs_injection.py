@@ -69,6 +69,7 @@ def scan(address):
     timeout = 2
     server_hello, sock = send_client_hello(address, client_hello, timeout)
     if not is_server_hello(server_hello):
+        print('CCS injection scan done.')
         sock.close()
         return False
     sock.send(ccs_message)

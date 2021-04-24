@@ -1,6 +1,9 @@
 import json
+import logging
 import re
 import os
+import time
+
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
 from .exceptions.NoIanaPairFound import NoIanaPairFound
@@ -131,3 +134,14 @@ def fix_url(url: str):
         url = re.search('^([^/]+)', url).group(0)
     print('Corrected url: {}'.format(url))
     return url
+
+
+def incremental_sleep(sleep_dur, exception, max_timeout_dur):
+    if sleep_dur >= max_timeout_dur:
+        logging.debug('raise unknown connection error')
+        raise exception
+    logging.debug('increasing sleep duration')
+    sleep_dur += 1
+    logging.debug(f'sleeping for {sleep_dur}')
+    time.sleep(sleep_dur)
+    return sleep_dur

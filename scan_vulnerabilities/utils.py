@@ -53,12 +53,15 @@ def send_client_hello(address, client_hello, timeout):
     sock.settimeout(timeout)
     sock.connect(address)
     sock.send(client_hello)
-    response = receive_data(sock, 2)
+    response = receive_data(sock, timeout)
     return response, sock
 
 
 def is_server_hello(server_hello):
     # Server hello content type in record protocol
-    if server_hello[5] != 0x02:
+    try:
+        if server_hello[5] != 0x02:
+            return False
+    except IndexError:
         return False
     return True

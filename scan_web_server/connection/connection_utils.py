@@ -5,7 +5,7 @@ import logging
 from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-from ..utils import convert_openssh_to_iana
+from ..utils import convert_openssh_to_iana, incremental_sleep
 from ..exceptions.UnknownConnectionError import UnknownConnectionError
 from ..exceptions.ConnectionTimeoutError import ConnectionTimeoutError
 from ..exceptions.DNSError import DNSError
@@ -52,10 +52,7 @@ def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     """
     cipher_suite = ssl_socket.cipher()[0]
     if '-' in cipher_suite:
-        try:
-            cipher_suite = convert_openssh_to_iana(cipher_suite)
-        except Exception as e:
-            print(e)
+        cipher_suite = convert_openssh_to_iana(cipher_suite)
     return cipher_suite, ssl_socket.version()
 
 
@@ -81,13 +78,7 @@ def create_session_pyopenssl(url: str, port: int, context: SSL.Context):
             ssl_socket.connect((url, port))
             break
         except OSError as e:
-            if sleep >= 5:
-                logging.debug('raise unknown connection error')
-                raise UnknownConnectionError(e)
-            logging.debug('increasing sleep duration')
-            sleep += 1
-        logging.debug(f'sleeping for {sleep}')
-        time.sleep(sleep)
+            sleep = incremental_sleep(sleep, e, 5)
     ssl_socket.do_handshake()
     return ssl_socket
 
@@ -110,6 +101,7 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
     ssl_socket = context.wrap_socket(sock, server_hostname=url)
     sleep = 0
     # Loop until there is a valid response or after 15 seconds
+    # because of rate limiting on some servers
     while True:
         try:
             logging.debug(f'connecting... (main connection)')
@@ -122,11 +114,5 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
         except ConnectionResetError as e:
             raise UnknownConnectionError(e)
         except socket.error as e:
-            if sleep >= 5:
-                logging.debug('raise unknown connection error')
-                raise UnknownConnectionError(e)
-            logging.debug('increasing sleep duration')
-            sleep += 1
-        logging.debug(f'sleeping for {sleep}')
-        time.sleep(sleep)
+            sleep = incremental_sleep(sleep, e, 5)
     return ssl_socket

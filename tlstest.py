@@ -80,8 +80,8 @@ def scan_all_ports(args):
         try:
             output_data.update(scan(args, port))
         except Exception as ex:
-            tb = traceback.extract_stack()
-            logging.debug(''.join(traceback.format_list(tb)))
+            tb = traceback.format_exc()
+            logging.debug(tb)
             print(f'Unexpected exception occurred: {ex}')
     return output_data
 
@@ -92,8 +92,14 @@ def nmap_discover_option(args):
 
     :param args: input options
     """
+    scanned_ports = []
     if args.nmap_discover:
-        scanned_ports = discover_ports(args.url)
+        try:
+            scanned_ports = discover_ports(args.url)
+        except Exception as ex:
+            tb = traceback.format_exc()
+            logging.debug(tb)
+            print(f'Unexpected exception occurred: {ex}')
         scanned_ports = list(filter(lambda port: port not in args.port, scanned_ports))
         args.port.extend(scanned_ports)
 

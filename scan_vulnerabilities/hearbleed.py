@@ -72,6 +72,7 @@ def scan(address):
     server_hello, sock = send_client_hello(address, client_hello, timeout)
     if not is_server_hello(server_hello):
         sock.close()
+        print('Heartbeat scan done.')
         return False
     sock.send(heartbeat_request)
     heartbeat_response = receive_data(sock, timeout)
