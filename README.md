@@ -11,5 +11,6 @@
 - [python3-nmap](https://pypi.org/project/python3-nmap/) with nmap installed
 - [requests](https://pypi.org/project/requests/)
 - [urllib3](https://pypi.org/project/urllib3/)
+- to install these packages use `pip3 install -r requirements.txt` command
 
 https://www.overleaf.com/read/ggrmdgqqcwvq

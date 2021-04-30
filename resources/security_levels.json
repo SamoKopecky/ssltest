@@ -37,7 +37,7 @@
   },
   "hash_function": {
     "1": "SHA223,SHA256,SHA384",
-    "2": "SHA",
+    "2": "SHA,SHA1",
     "3": "",
     "4": "MD5"
   },
@@ -55,7 +55,7 @@
   },
   "cert_sign_algorithm_hash_function": {
     "1": "SHA223,SHA256,SHA384",
-    "2": "SHA",
+    "2": "SHA,SHA1",
     "3": "",
     "4": "MD5"
   },
