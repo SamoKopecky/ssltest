@@ -1,5 +1,6 @@
 import json
-from scan_web_server.utils import read_json
+
+from scan_parameters.utils import read_json
 
 
 class TextOutput:
@@ -30,7 +31,7 @@ class TextOutput:
             self.print_parameters(self.current_data['parameters'])
             self.print_supported_versions(self.current_data['protocol_support'])
             self.print_certificate_info(self.current_data['certificate_info'])
-            self.print_versions(self.current_data['web_server_versions'])
+            self.print_software(self.current_data['web_server_software'])
             self.print_vulnerabilities(self.current_data['vulnerabilities'])
 
     def print_parameters(self, data: dict):
@@ -80,9 +81,9 @@ class TextOutput:
             print(f'\t{key}->{self.rating_name(value)}')
 
     @staticmethod
-    def print_versions(data: dict):
+    def print_software(data: dict):
         """
-        Print web server versions.
+        Print web server software.
 
         :param data: data to print
         """
@@ -92,7 +93,7 @@ class TextOutput:
             'http_header': 'Http header',
             'nmap': 'Nmap'
         }
-        print('Web server versions:')
+        print('Web server software:')
         for key, value in list(data.items()):
             print(f'\t{string_map.get(key)}: {value}')
 
@@ -115,7 +116,7 @@ class TextOutput:
 
     @staticmethod
     def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
-                     certificate_non_parameters, versions, vulnerabilities, port, url):
+                     certificate_non_parameters, software, vulnerabilities, port, url):
         """
         Dump web server parameters to a single dict.
 
@@ -123,7 +124,7 @@ class TextOutput:
         :param certificate_parameters: tuple containing parameters and the worst rating
         :param certificate_non_parameters: certificate parameters such as subject/issuer
         :param protocol_support: dictionary of supported tls protocols
-        :param versions: web server versions
+        :param software: web server software
         :param port: scanned port
         :param url: scanned url
         :param vulnerabilities: scanned vulnerabilities
@@ -137,7 +138,7 @@ class TextOutput:
         parameters.update({key.name: value for key, value in certificate_parameters[0].items()})
         parameters.update({'rating': worst_rating})
 
-        # Other cert info
+        # Non ratable cert info
         certificate_info = {key.name: value for key, value in certificate_non_parameters.items()}
 
         # Protocol support
@@ -147,6 +148,6 @@ class TextOutput:
         dump.update({'parameters': parameters})
         dump.update({'certificate_info': certificate_info})
         dump.update({'protocol_support': protocols})
-        dump.update({'web_server_versions': versions})
+        dump.update({'web_server_software': software})
         dump.update({'vulnerabilities': vulnerabilities})
         return {f'{url}:{port}': dump}

@@ -1,7 +1,7 @@
 import ssl
 import socket
-import time
 import logging
+
 from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend

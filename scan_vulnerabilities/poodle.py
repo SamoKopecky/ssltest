@@ -1,5 +1,4 @@
 from .utils import *
-from scan_web_server.connection.connection_utils import create_session
 
 client_hello = bytes([
     # Record protocol
@@ -54,14 +53,17 @@ client_hello = bytes([
 
 
 def scan(address):
+    """
+    Not finished yet, just analyzing if the web server supports
+    any CBC ciphers
+    :param address:
+    :return:
+    """
     print("Scanning Poodle vulnerability...")
     server_hello, sock = send_client_hello(address, client_hello, 2)
     # If no server hello is sent the server doesn't support
     # CBC ciphers
     if not is_server_hello(server_hello):
         return False
-    ssl_sock = create_session(address[0], address[1])
-
-    # new_sock.write(b'testtesttesttesttesttesttesttesttest')
     print("Poodle vulnerability scan done.")
     return True

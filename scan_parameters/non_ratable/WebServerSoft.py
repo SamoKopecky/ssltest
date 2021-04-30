@@ -2,7 +2,7 @@ import nmap3
 import requests
 
 
-class WebServerVersion:
+class WebServerSoft:
 
     def __init__(self, url: str, port: int, scan_nmap: bool):
         self.scans = []
@@ -11,9 +11,9 @@ class WebServerVersion:
         self.url = url
         self.scan_nmap = scan_nmap
 
-    def scan_version_nmap(self):
+    def scan_software_nmap(self):
         """
-        Get the web server version with nmap wrapper.
+        Get the web server software with nmap wrapper.
 
         Scans for all valid key values in the result and appends
         them together.
@@ -34,9 +34,9 @@ class WebServerVersion:
                     values.append(error)
         self.versions['nmap'] = ' '.join(values)
 
-    def scan_version_http(self):
+    def scan_software_http(self):
         """
-        Scan web server version from HEAD response header.
+        Scan web server software from HEAD response header.
         """
         print('Scanning webserver for version using http headers...')
         try:
@@ -52,15 +52,15 @@ class WebServerVersion:
             value = 'unable to connect'
         self.versions["http_header"] = value
 
-    def scan_versions(self):
+    def scan_server_software(self):
         """
-        Call the required functions to scan for webserver versions.
+        Call the required functions to scan the webserver software.
         """
         scans = []
         # for testing purposes TODO: delete later
         if self.url != '192.168.1.220':
-            scans.append(self.scan_version_http)
+            scans.append(self.scan_software_http)
         if self.scan_nmap:
-            scans.append(self.scan_version_nmap)
+            scans.append(self.scan_software_nmap)
         for scan in scans:
             scan()

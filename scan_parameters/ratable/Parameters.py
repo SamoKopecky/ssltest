@@ -1,4 +1,4 @@
-from scan_web_server.utils import rate_key_length_parameter, rate_parameter
+from scan_parameters.utils import rate_key_length_parameter, rate_parameter
 from abc import ABC
 
 
@@ -9,7 +9,7 @@ class Parameters(ABC):
 
     def rate_parameters(self, rateable_parameters: list, key_types: list):
         """
-        Rates the parameters from the ratable_parameters list.
+        Rate the parameters from the ratable_parameters list.
         """
         for p_type in rateable_parameters:
             parameter = self.key(self.parameters[p_type])
@@ -26,7 +26,7 @@ class Parameters(ABC):
 
     def get_max_rating(self):
         """
-        Returns the worse rating from all of the parameters.
+        Return the worse rating from all of the parameters.
         """
         values = []
         for dicts in self.parameters.values():

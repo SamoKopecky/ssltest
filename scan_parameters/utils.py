@@ -7,7 +7,7 @@ import time
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
 from .exceptions.NoIanaPairFound import NoIanaPairFound
-from .rate.PType import PType
+from .ratable.PType import PType
 
 
 def convert_openssh_to_iana(search_term: str):
@@ -55,6 +55,7 @@ def rate_key_length_parameter(algorithm_type: PType, key_len: str, key_len_type:
         "<<": lambda a, b: a < b,
         "==": lambda a, b: a == b
     }
+    # TODO: All of the algorithms are not yet added to the security_levels.json
     levels_str = read_json('security_levels.json')[key_len_type.name]
     if key_len == 'N/A':
         return 0
@@ -78,6 +79,7 @@ def rate_parameter(p_type: PType, parameter: str):
     :return: if a rating is found for a parameter returns that rating,
     if not 0 is returned (default value)
     """
+    # TODO: All of the algorithms are not yet added to the security_levels.json
     security_levels_json = read_json('security_levels.json')
     if parameter == 'N/A':
         return 0

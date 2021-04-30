@@ -9,7 +9,9 @@ class Certificate(Parameters):
     def __init__(self, certificate: x509.Certificate):
         super().__init__()
         # Create a dictionary for certificate parameters with PType keys
+        # Parameters that can be rated (Signature algorithm, ...)
         self.parameters = {p_type: {} for p_type in PType if p_type.is_certificate and p_type.is_ratable}
+        # Parameters that can't be rated (Subject, Issuer, ...)
         self.non_parameters = {p_type: [] for p_type in PType if p_type.is_certificate and not p_type.is_ratable}
         self.certificate = certificate
 

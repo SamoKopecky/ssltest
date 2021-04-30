@@ -1,23 +1,25 @@
 #!/usr/bin/python3
+
 import argparse
 import sys
 import logging
 import json
 import textwrap
 import traceback
-from scan_web_server.rate.CipherSuite import CipherSuite
-from scan_web_server.rate.Certificate import Certificate
-from scan_web_server.scan.ProtocolSupport import ProtocolSupport
-from scan_web_server.scan.WebServerVersion import WebServerVersion
-from scan_web_server.connection.connection_utils import get_website_info
-from scan_web_server.scan.port_discovery import discover_ports
-from scan_web_server.utils import fix_url
-from text_output.TextOutput import TextOutput
-from scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
 import scan_vulnerabilities.hearbleed as heartbleed
 import scan_vulnerabilities.ccs_injection as ccs_injection
 import scan_vulnerabilities.insec_renegotiation as rene
 import scan_vulnerabilities.poodle as poodle
+
+from scan_parameters.ratable.CipherSuite import CipherSuite
+from scan_parameters.ratable.Certificate import Certificate
+from scan_parameters.non_ratable.ProtocolSupport import ProtocolSupport
+from scan_parameters.non_ratable.WebServerSoft import WebServerSoft
+from scan_parameters.connection.connection_utils import get_website_info
+from scan_parameters.non_ratable.port_discovery import discover_ports
+from scan_parameters.utils import fix_url
+from text_output.TextOutput import TextOutput
+from scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
 
 
 def main():
@@ -188,8 +190,8 @@ def scan(args, port: int):
     protocol_support = ProtocolSupport(args.url, port)
     protocol_support.rate_protocols()
 
-    versions = WebServerVersion(args.url, port, args.nmap_scan)
-    versions.scan_versions()
+    versions = WebServerSoft(args.url, port, args.nmap_scan)
+    versions.scan_server_software()
 
     vulnerabilities = vulnerability_scan((args.url, port), args.test)
 

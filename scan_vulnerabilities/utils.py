@@ -1,8 +1,9 @@
 import inspect
 import logging
 import os
-from time import sleep, time
 import socket
+
+from time import sleep, time
 
 
 def receive_data(sock, timeout):

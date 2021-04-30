@@ -1,6 +1,6 @@
 from OpenSSL import SSL
 from ..utils import rate_parameter
-from ..rate.PType import PType
+from ..ratable.PType import PType
 from ..connection.connection_utils import create_session_pyopenssl
 
 

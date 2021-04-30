@@ -1,5 +1,3 @@
-import inspect
-
 from .utils import *
 
 client_hello = bytes([
