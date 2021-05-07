@@ -1,6 +1,7 @@
 import json
 
 from scan_parameters.utils import read_json
+from scan_parameters.ratable.PType import PType
 
 
 class TextOutput:
@@ -74,11 +75,16 @@ class TextOutput:
         :param data: data to print
         """
         print('Protocol support:')
-        for key, value in list(data.items()):
+        for key, values in list(data.items()):
             if key == 'rating':
-                print(f'\t{key}: {self.rating_name(value)}')
+                print(f'\t{key}: {self.rating_name(values)}')
                 continue
-            print(f'\t{key}->{self.rating_name(value)}')
+            if len(values) > 1:
+                output = []
+                for k, v in list(values.items()):
+                    output.append(f'\t\t{k}->{v}')
+                values = '\n'.join(output)
+            print(f'\t{self.type_names[key]}:\n{values}')
 
     @staticmethod
     def print_software(data: dict):
@@ -142,7 +148,10 @@ class TextOutput:
         certificate_info = {key.name: value for key, value in certificate_non_parameters.items()}
 
         # Protocol support
-        protocols = protocol_support[0]
+        protocols = {}
+        keys = {key.name: value for key, value in protocol_support[0].items()}
+        for key, value in list(keys.items()):
+            protocols[key] = value
         protocols.update({'rating': protocol_support[1]})
 
         dump.update({'parameters': parameters})

@@ -1,5 +1,7 @@
 {
   "protocol": "Protocol",
+  "protocols": "Supported protocols",
+  "no_protocol": "Unsupported protocols",
   "kex_algorithm": "Key exchange algorithm",
   "cert_pub_key_algorithm": "Public key algorithm",
   "cert_pub_key_length": "Public key length",

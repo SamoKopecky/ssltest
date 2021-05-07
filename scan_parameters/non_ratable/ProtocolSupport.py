@@ -7,7 +7,7 @@ from ..connection.connection_utils import create_session_pyopenssl
 class ProtocolSupport:
 
     def __init__(self, url: str, port: int):
-        self.versions = {}
+        self.versions = {PType.protocols: {}, PType.no_protocol: {}}
         self.url = url
         self.port = port
         self.rating = 0
@@ -18,33 +18,39 @@ class ProtocolSupport:
 
         :return: list of the supported protocols.
         """
-        ssl_versions = [
-            SSL.TLSv1_METHOD,
-            SSL.TLSv1_1_METHOD,
-            SSL.TLSv1_2_METHOD,
-            SSL.SSLv23_METHOD
-        ]
+        ssl_versions = {
+            SSL.TLSv1_METHOD: "TLSv1",
+            SSL.TLSv1_1_METHOD: "TLSv1.1",
+            SSL.TLSv1_2_METHOD: "TLSv1.2",
+            SSL.SSLv23_METHOD: ""
+        }
         supported_protocols = []
-        for version in ssl_versions:
-            context = SSL.Context(version)
+        unsupported_protocols = []
+        for num_version in list(ssl_versions.keys()):
+            context = SSL.Context(num_version)
+            version = ssl_versions[num_version]
             try:
                 ssl_socket = create_session_pyopenssl(self.url, self.port, context)
-                version = ssl_socket.get_protocol_version_name()
+                if version == "":
+                    version = ssl_socket.get_protocol_version_name()
                 ssl_socket.close()
                 if version not in supported_protocols:
                     supported_protocols.append(version)
             except SSL.Error:
-                continue
-        return supported_protocols
+                unsupported_protocols.append(version)
+        return supported_protocols, unsupported_protocols
 
     def rate_protocols(self):
         """
         Rate the scanned protocols.
         """
         print('Scanning TLS versions...')
-        supported_protocols = self.scan_protocols()
+        supported_protocols, unsupported_protocols = self.scan_protocols()
         for protocol in supported_protocols:
-            self.versions[protocol] = rate_parameter(PType.protocol, protocol)
+            self.versions[PType.protocols][protocol] = rate_parameter(PType.protocol, protocol)
+        for no_protocol in unsupported_protocols:
+            self.versions[PType.no_protocol][no_protocol] = rate_parameter(PType.no_protocol, no_protocol)
         if not self.versions:
             return
-        self.rating = max(self.versions.values())
+        ratings = list(self.versions[PType.protocols].values()) + list(self.versions[PType.no_protocol].values())
+        self.rating = max(ratings)

@@ -6,6 +6,8 @@ class PType(Enum):
     Enum type class that defines parameter types for cipher suite and certificate parameters.
     """
     protocol = auto()
+    protocols = auto()
+    no_protocol = auto()
     kex_algorithm = auto()
     cert_pub_key_algorithm = auto()
     cert_pub_key_length = auto()
