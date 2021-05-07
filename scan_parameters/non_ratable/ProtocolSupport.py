@@ -38,6 +38,9 @@ class ProtocolSupport:
                     supported_protocols.append(version)
             except SSL.Error:
                 unsupported_protocols.append(version)
+        # Need to do this since there is no explicit option for TLSv1.3
+        if 'TLSv1.3' not in supported_protocols:
+            unsupported_protocols.append('TLSv1.3')
         return supported_protocols, unsupported_protocols
 
     def rate_protocols(self):

@@ -1,7 +1,6 @@
 import json
 
 from scan_parameters.utils import read_json
-from scan_parameters.ratable.PType import PType
 
 
 class TextOutput:
@@ -79,12 +78,12 @@ class TextOutput:
             if key == 'rating':
                 print(f'\t{key}: {self.rating_name(values)}')
                 continue
-            if len(values) > 1:
-                output = []
+            if len(values) > 0:
+                versions = []
                 for k, v in list(values.items()):
-                    output.append(f'\t\t{k}->{v}')
-                values = '\n'.join(output)
-            print(f'\t{self.type_names[key]}:\n{values}')
+                    versions.append(f'\t\t{k}->{v}')
+                values = '\n'.join(versions)
+                print(f'\t{self.type_names[key]}:\n{values}')
 
     @staticmethod
     def print_software(data: dict):
