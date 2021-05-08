@@ -22,14 +22,14 @@ from text_output.TextOutput import TextOutput
 from scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
 
 
-def main():
-    args = parse_options()
+def tls_test(custom_args):
+    args = parse_options(custom_args)
     if '/' in args.url:
         args.url = fix_url(args.url)
     info_report_option(args)
     nmap_discover_option(args)
     output_data = scan_all_ports(args)
-    json_option(args, output_data)
+    return json_option(args, output_data)
 
 
 def vulnerability_scan(address, tests):
@@ -65,8 +65,9 @@ def json_option(args, output_data):
     if args.json is False:
         text_output = TextOutput(json_output_data)
         text_output.text_output()
+        return text_output.output
     elif args.json is None:
-        print(json_output_data)
+        return json_output_data
     else:
         file = open(args.json, 'w')
         file.write(json_output_data)
@@ -120,7 +121,7 @@ def info_report_option(args):
         logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 
-def parse_options():
+def parse_options(custom_args):
     """
     Parse input options.
 
@@ -155,7 +156,10 @@ def parse_options():
                         '''))
     parser.add_argument('-i', '--information', action='store_true', default=False, help='output some information')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
-    args = parser.parse_args()
+    if not custom_args:
+        args = parser.parse_args()
+    else:
+        args = parser.parse_args(custom_args)
     check_test_numbers(args, parser)
     return args
 
@@ -209,4 +213,4 @@ def scan(args, port: int):
 
 
 if __name__ == "__main__":
-    main()
+    print(tls_test([]))

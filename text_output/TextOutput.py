@@ -5,6 +5,7 @@ from scan_parameters.utils import read_json
 
 class TextOutput:
     def __init__(self, data: str):
+        self.output = ''
         self.ratings = read_json('security_levels_names.json')
         self.type_names = read_json('type_names.json')
         self.data = data
@@ -26,69 +27,69 @@ class TextOutput:
             return
         json_data = json.loads(self.data)
         for key, value in list(json_data.items()):
-            print(f'----------------Result for {key}---------------------')
+            self.output += f'----------------Result for {key}---------------------\n'
             self.current_data = value
-            self.print_parameters(self.current_data['parameters'])
-            self.print_supported_versions(self.current_data['protocol_support'])
-            self.print_certificate_info(self.current_data['certificate_info'])
-            self.print_software(self.current_data['web_server_software'])
-            self.print_vulnerabilities(self.current_data['vulnerabilities'])
+            self.output_parameters(self.current_data['parameters'])
+            self.output_supported_versions(self.current_data['protocol_support'])
+            self.output_certificate_info(self.current_data['certificate_info'])
+            self.output_software(self.current_data['web_server_software'])
+            self.output_vulnerabilities(self.current_data['vulnerabilities'])
+        self.output = self.output[:-1]
 
-    def print_parameters(self, data: dict):
+    def output_parameters(self, data: dict):
         """
-        Print cipher suite and cert parameters.
+        Output cipher suite and cert parameters.
 
         :param data: data to print
         """
-        print('Cryptographic parameters:')
+        self.output += 'Cryptographic parameters:\n'
         for key, value in list(data.items()):
             if key == 'rating':
-                print(f'\t{key}: {self.rating_name(value)}')
+                self.output += f'\t{key}: {self.rating_name(value)}\n'
                 continue
             values = list(value.items())[0]
             if values[0] != 'N/A':
-                print(f'\t{self.type_names[key]}: {values[0]}->{self.rating_name(values[1])}')
+                self.output += f'\t{self.type_names[key]}: {values[0]}->{self.rating_name(values[1])}\n'
 
-    def print_certificate_info(self, data: dict):
+    def output_certificate_info(self, data: dict):
         """
-        Print other cert info such as subject/issuer.
+        Output other cert info such as subject/issuer.
 
         :param data: data to print
         """
-        print('Certificate information:')
+        self.output += 'Certificate information:\n'
         for key, value in list(data.items()):
             if len(value) > 0:
                 value = list(map(lambda el: f'\t\t{el}', value))
                 values = '\n'.join(value)
-                to_print = f'\t{self.type_names[key]}: \n{values}'
+                to_print = f'\t{self.type_names[key]}: \n{values}\n'
             elif not value:
                 continue
             else:
-                to_print = f'\t{self.type_names[key]}: {value[0]}'
-            print(to_print)
+                to_print = f'\t{self.type_names[key]}: {value[0]}\n'
+            self.output += to_print
 
-    def print_supported_versions(self, data: dict):
+    def output_supported_versions(self, data: dict):
         """
-        Print supported TLS protocol versions.
+        Output supported TLS protocol versions.
 
         :param data: data to print
         """
-        print('Protocol support:')
+        self.output += 'Protocol support:\n'
         for key, values in list(data.items()):
             if key == 'rating':
-                print(f'\t{key}: {self.rating_name(values)}')
+                self.output += f'\t{key}: {self.rating_name(values)}\n'
                 continue
             if len(values) > 0:
                 versions = []
                 for k, v in list(values.items()):
                     versions.append(f'\t\t{k}->{v}')
                 values = '\n'.join(versions)
-                print(f'\t{self.type_names[key]}:\n{values}')
+                self.output += f'\t{self.type_names[key]}:\n{values}\n'
 
-    @staticmethod
-    def print_software(data: dict):
+    def output_software(self, data: dict):
         """
-        Print web server software.
+        Output web server software.
 
         :param data: data to print
         """
@@ -98,14 +99,13 @@ class TextOutput:
             'http_header': 'Http header',
             'nmap': 'Nmap'
         }
-        print('Web server software:')
+        self.output += 'Web server software:\n'
         for key, value in list(data.items()):
-            print(f'\t{string_map.get(key)}: {value}')
+            self.output += f'\t{string_map.get(key)}: {value}\n'
 
-    @staticmethod
-    def print_vulnerabilities(data: dict):
+    def output_vulnerabilities(self, data: dict):
         """
-        Print scanned vulnerabilities
+        Output scanned vulnerabilities
 
         :param data: data to print
         """
@@ -115,9 +115,9 @@ class TextOutput:
             True: 'Yes',
             False: 'No'
         }
-        print('Scanned vulnerabilities:')
+        self.output += 'Scanned vulnerabilities:\n'
         for key, value in list(data.items()):
-            print(f'\t{key}->{string_map.get(value)}')
+            self.output += f'\t{key}->{string_map.get(value)}\n'
 
     @staticmethod
     def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
