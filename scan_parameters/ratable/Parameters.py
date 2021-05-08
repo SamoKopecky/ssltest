@@ -1,4 +1,4 @@
-from scan_parameters.utils import rate_key_length_parameter, rate_parameter
+from ..utils import rate_key_length_parameter, rate_parameter
 from abc import ABC
 
 

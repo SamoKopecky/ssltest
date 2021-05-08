@@ -58,7 +58,7 @@ def rate_key_length_parameter(algorithm_type: PType, key_len: str, key_len_type:
     # TODO: All of the algorithms are not yet added to the security_levels.json
     levels_str = read_json('security_levels.json')[key_len_type.name]
     if key_len == 'N/A':
-        return 0
+        return '0'
     for idx in range(1, 5):
         levels = levels_str[str(idx)].split(',')
         if algorithm_type in levels:
@@ -66,8 +66,8 @@ def rate_key_length_parameter(algorithm_type: PType, key_len: str, key_len_type:
             operation = levels[levels.index(algorithm_type) + 1]
             function = functions[operation[:2]]
             if function(int(key_len), int(operation[2:])):
-                return idx
-    return 0
+                return str(idx)
+    return '0'
 
 
 def rate_parameter(p_type: PType, parameter: str):
@@ -82,11 +82,11 @@ def rate_parameter(p_type: PType, parameter: str):
     # TODO: All of the algorithms are not yet added to the security_levels.json
     security_levels_json = read_json('security_levels.json')
     if parameter == 'N/A':
-        return 0
+        return '0'
     for idx in range(1, 5):
         if parameter in security_levels_json[p_type.name][str(idx)].split(','):
-            return idx
-    return 0
+            return str(idx)
+    return '0'
 
 
 def pub_key_alg_from_cert(public_key):

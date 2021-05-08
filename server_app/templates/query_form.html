@@ -1,0 +1,16 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+<!doctype html>
+<html>
+<body>
+<form action="" method=post>
+    Url:<input type=text name=url><br>
+    Nmap scan:<input type="checkbox" name="nmap_scan"><br>
+    Nmap discover:<input type="checkbox" name="nmap_discover"><br>
+    Tests (separate with spaces):<input type=text name=tests><br>
+    Ports (separate with spaces):<input type=text name=ports>
+
+    <p><input type=submit value=Send></p>
+</form>
+</body>
+</html>
