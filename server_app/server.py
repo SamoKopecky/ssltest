@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for
 import requests
 import json
 
@@ -9,22 +9,16 @@ app.debug = True
 @app.route('/', methods=['GET', 'POST'])
 def index():
     args = ['-u']
-    switcher = {
+    checkbox_names = {
         'nmap_scan': '-ns',
         'nmap_discover': '-nd'
     }
     if request.method == 'POST':
         url = request.form['url']
-        args.append(f'{url}')
-        args.extend(parse_checkboxes(request.form, switcher))
-        tests = request.form['tests']
-        if tests != '':
-            args.append('-t')
-            args.append(tests)
-        ports = request.form['ports']
-        if ports != '':
-            args.append('-p')
-            args.append(ports)
+        args.append(url)
+        args.extend(parse_checkboxes(checkbox_names))
+        args.extend(parse_list('tests', '-t'))
+        args.extend(parse_list('ports', '-p'))
         return redirect(url_for('result', args=' '.join(args)))
     return render_template('query_form.html')
 
@@ -40,16 +34,25 @@ def result(args=None):
     return render_template('query_result.html', json_response=json_response)
 
 
+def parse_list(long_key, short_key):
+    args = []
+    values = request.form[long_key]
+    if values != '':
+        args.append(short_key)
+        args.append(values)
+    return args
+
+
 def beautify_json(json_response):
     return json_response
 
 
-def parse_checkboxes(request_form, switcher):
+def parse_checkboxes(switcher):
     checked = []
     for value in list(switcher.keys()):
-        if value not in request_form:
+        if value not in request.form:
             continue
-        if request_form[value] == 'on':
+        if request.form[value] == 'on':
             checked.append(switcher[value])
 
     return checked

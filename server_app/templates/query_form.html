@@ -1,15 +1,18 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Query</title>
+</head>
 <body>
 <form action="" method=post>
-    Url:<input type=text name=url><br>
-    Nmap scan:<input type="checkbox" name="nmap_scan"><br>
-    Nmap discover:<input type="checkbox" name="nmap_discover"><br>
-    Tests (separate with spaces):<input type=text name=tests><br>
-    Ports (separate with spaces):<input type=text name=ports>
-
+    <label>Url:<input type=text name=url><br></label>
+    <label>Nmap scan:<input type="checkbox" name="nmap_scan"></label><br>
+    <label>Nmap discover:<input type="checkbox" name="nmap_discover"></label><br>
+    <label>Tests (separate with spaces):<input type=text name=tests></label><br>
+    <label>Ports (separate with spaces):<input type=text name=ports></label>
     <p><input type=submit value=Send></p>
 </form>
 </body>
