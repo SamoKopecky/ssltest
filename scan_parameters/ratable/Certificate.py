@@ -6,8 +6,9 @@ from .PType import PType
 
 class Certificate(Parameters):
 
-    def __init__(self, certificate: x509.Certificate):
+    def __init__(self, certificate: x509.Certificate, cert_verified: bool):
         super().__init__()
+        self.verified = cert_verified
         # Create a dictionary for certificate parameters with PType keys
         # Parameters that can be rated (Signature algorithm, ...)
         self.parameters = {p_type: {} for p_type in PType if p_type.is_certificate and p_type.is_ratable}
@@ -29,6 +30,8 @@ class Certificate(Parameters):
         # Signature algorithm
         sign_algorithm = get_sig_alg_from_oid(self.certificate.signature_algorithm_oid)
         self.parameters[PType.cert_sign_algorithm][sign_algorithm] = 0
+        # Certificate verified
+        self.parameters[PType.cert_verified][str(self.verified)] = 0
         # Other non ratable parameters
         self.non_parameters[PType.cert_version].append(str(self.certificate.version.value))
         self.non_parameters[PType.cert_serial_number].append(str(self.certificate.serial_number))

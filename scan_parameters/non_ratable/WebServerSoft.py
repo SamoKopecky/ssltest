@@ -42,7 +42,8 @@ class WebServerSoft:
         """
         logging.info('Scanning webserver for version using http headers...')
         try:
-            response = requests.head(f'https://{self.url}:{self.port}', timeout=3, headers={'Connection': 'close'})
+            response = requests.head(f'https://{self.url}:{self.port}', timeout=3, headers={'Connection': 'close'},
+                                     verify=False)
             value = response.headers["server"]
         except KeyError:
             value = 'value not found'

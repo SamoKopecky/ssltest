@@ -183,12 +183,12 @@ def scan(args, port: int):
     :return: a single dictionary containing scanned data
     """
     logging.info(f'Scanning for {args.url}:{port}')
-    certificate, cipher_suite, protocol = get_website_info(args.url, port)
+    certificate, cert_verified, cipher_suite, protocol = get_website_info(args.url, port)
 
     cipher_suite = CipherSuite(cipher_suite, protocol)
     cipher_suite.rate()
 
-    certificate = Certificate(certificate)
+    certificate = Certificate(certificate, cert_verified)
     certificate.rate()
 
     protocol_support = ProtocolSupport(args.url, port)

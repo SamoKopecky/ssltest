@@ -57,7 +57,7 @@ class TextOutput:
         """
         print('Certificate information:')
         for key, value in list(data.items()):
-            if len(value) > 1:
+            if len(value) > 0:
                 value = list(map(lambda el: f'\t\t{el}', value))
                 values = '\n'.join(value)
                 to_print = f'\t{self.type_names[key]}: \n{values}'

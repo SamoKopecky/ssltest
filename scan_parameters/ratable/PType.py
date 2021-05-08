@@ -26,6 +26,7 @@ class PType(Enum):
     cert_subject = auto()
     cert_issuer = auto()
     cert_alternative_names = auto()
+    cert_verified = auto()
 
     @property
     def key_pair(self):
@@ -77,7 +78,8 @@ class PType(Enum):
             self.cert_not_valid_after,
             self.cert_subject,
             self.cert_issuer,
-            self.cert_alternative_names
+            self.cert_alternative_names,
+            self.cert_verified
         ]
         return self in certificate_parameters
 
@@ -100,5 +102,6 @@ class PType(Enum):
             self.cert_pub_key_length,
             self.cert_sign_algorithm,
             self.cert_sign_algorithm_hash_function,
+            self.cert_verified
         ]
         return self in rateable_parameters

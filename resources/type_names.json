@@ -19,5 +19,6 @@
   "cert_not_valid_after": "Valid until",
   "cert_subject": "Subject",
   "cert_issuer": "Issuer",
-  "cert_alternative_names": "Alternative names"
+  "cert_alternative_names": "Alternative names",
+  "cert_verified": "Certificate verified"
 }
