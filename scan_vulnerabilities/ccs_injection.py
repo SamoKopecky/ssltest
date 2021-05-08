@@ -63,17 +63,17 @@ def scan(address):
     :param address: tuple of an url and port
     :return: if the server is vulnerable
     """
-    print('Scanning CCS injection vulnerability...')
+    logging.info('Scanning CCS injection vulnerability...')
     timeout = 2
     server_hello, sock = send_client_hello(address, client_hello, timeout)
     if not is_server_hello(server_hello):
-        print('CCS injection scan done.')
+        logging.info('CCS injection scan done.')
         sock.close()
         return False
     sock.send(ccs_message)
     server_response = receive_data(sock, timeout)
     sock.close()
-    print('CCS injection scan done.')
+    logging.info('CCS injection scan done.')
     # No response from server means the CSS message is accepted
     if not server_response:
         return True

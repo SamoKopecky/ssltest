@@ -1,3 +1,5 @@
+import logging
+
 from OpenSSL import SSL
 from ..utils import rate_parameter
 from ..ratable.PType import PType
@@ -47,7 +49,7 @@ class ProtocolSupport:
         """
         Rate the scanned protocols.
         """
-        print('Scanning TLS versions...')
+        logging.info('Scanning TLS versions...')
         supported_protocols, unsupported_protocols = self.scan_protocols()
         for protocol in supported_protocols:
             self.versions[PType.protocols][protocol] = rate_parameter(PType.protocol, protocol)

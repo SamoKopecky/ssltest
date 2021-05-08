@@ -59,11 +59,11 @@ def scan(address):
     :param address:
     :return:
     """
-    print("Scanning Poodle vulnerability...")
+    logging.info("Scanning Poodle vulnerability...")
     server_hello, sock = send_client_hello(address, client_hello, 2)
     # If no server hello is sent the server doesn't support
     # CBC ciphers
     if not is_server_hello(server_hello):
         return False
-    print("Poodle vulnerability scan done.")
+    logging.info("Poodle vulnerability scan done.")
     return True

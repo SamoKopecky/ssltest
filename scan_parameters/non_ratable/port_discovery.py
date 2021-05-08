@@ -15,7 +15,7 @@ def discover_ports(url: str):
     :param url: url to be scanned
     :return: list of usable ports
     """
-    print('Discovering ports...')
+    logging.info('Discovering ports...')
     nmap = nmap3.NmapHostDiscovery()
     # Scan with nmap for all open ports
     logging.debug('Scanning with nmap for all open ports...')

@@ -24,7 +24,7 @@ def get_website_info(url: str, port: int):
         cipher_suite -- negotiated cipher suite
         protocol -- protocol name and version
     """
-    print('Creating session...')
+    logging.info('Creating session...')
     ssl_socket = create_session(url, port)
     cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
     certificate = get_certificate(ssl_socket)
@@ -96,13 +96,14 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
     if url == '192.168.1.220':
         context.check_hostname = False
         context.verify_mode = ssl.VerifyMode.CERT_NONE
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(3)  # in seconds
-    ssl_socket = context.wrap_socket(sock, server_hostname=url)
     sleep = 0
     # Loop until there is a valid response or after 15 seconds
     # because of rate limiting on some servers
     while True:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)  # in seconds
+        #context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        ssl_socket = context.wrap_socket(sock, server_hostname=url)
         try:
             logging.debug(f'connecting... (main connection)')
             ssl_socket.connect((url, port))
@@ -114,5 +115,6 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
         except ConnectionResetError as e:
             raise UnknownConnectionError(e)
         except socket.error as e:
-            sleep = incremental_sleep(sleep, e, 5)
+            ssl_socket.close()
+            sleep = incremental_sleep(sleep, e, 1)
     return ssl_socket

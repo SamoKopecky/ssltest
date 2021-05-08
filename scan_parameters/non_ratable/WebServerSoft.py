@@ -1,3 +1,5 @@
+import logging
+
 import nmap3
 import requests
 
@@ -20,7 +22,7 @@ class WebServerSoft:
         """
         keys = ['product', 'version']
         nmap = nmap3.Nmap()
-        print('Scanning webserver for version with nmap...')
+        logging.info('Scanning webserver for version with nmap...')
         result = nmap.scan_top_ports(self.url, args=f"-sV -p {self.port}")
 
         values = []
@@ -38,7 +40,7 @@ class WebServerSoft:
         """
         Scan web server software from HEAD response header.
         """
-        print('Scanning webserver for version using http headers...')
+        logging.info('Scanning webserver for version using http headers...')
         try:
             response = requests.head(f'https://{self.url}:{self.port}', timeout=3, headers={'Connection': 'close'})
             value = response.headers["server"]

@@ -127,14 +127,14 @@ def fix_url(url: str):
     :param url: hostname address to be checked
     :return: fixed hostname address
     """
-    print('Correcting url...')
+    logging.info('Correcting url...')
     if url[:4] == 'http':
         # Removes http(s):// and anything after TLD (*.com)
         url = re.search('[/]{2}([^/]+)', url).group(1)
     else:
         # Removes anything after TLD (*.com)
         url = re.search('^([^/]+)', url).group(0)
-    print('Corrected url: {}'.format(url))
+    logging.info('Corrected url: {}'.format(url))
     return url
 
 

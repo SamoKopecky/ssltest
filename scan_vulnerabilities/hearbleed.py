@@ -67,17 +67,17 @@ def scan(address):
     :param address: tuple of an url and port
     :return: if the server is vulnerable
     """
-    print('Scanning Heartbleed vulnerability...')
+    logging.info('Scanning Heartbleed vulnerability...')
     timeout = 2
     server_hello, sock = send_client_hello(address, client_hello, timeout)
     if not is_server_hello(server_hello):
         sock.close()
-        print('Heartbeat scan done.')
+        logging.info('Heartbeat scan done.')
         return False
     sock.send(heartbeat_request)
     heartbeat_response = receive_data(sock, timeout)
     sock.close()
-    print('Heartbeat scan done.')
+    logging.info('Heartbeat scan done.')
     # Server ignores heartbeat request
     if not heartbeat_response:
         return False

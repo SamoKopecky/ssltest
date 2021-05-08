@@ -61,11 +61,11 @@ def scan(address):
     :param address: tuple of an url and port
     :return: if the server is vulnerable
     """
-    print("Scanning Renegotiation vulnerability...")
+    logging.info("Scanning Renegotiation vulnerability...")
     timeout = 2
     server_hello, sock = send_client_hello(address, client_hello, timeout)
     sock.close()
-    print("Renegotiation vulnerability scan done.")
+    logging.info("Renegotiation vulnerability scan done.")
     if not is_server_hello(server_hello):
         return False
     # If there is no renegotiation info found it means the server doesn't

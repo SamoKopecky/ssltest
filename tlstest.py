@@ -26,7 +26,7 @@ def main():
     args = parse_options()
     if '/' in args.url:
         args.url = fix_url(args.url)
-    verbose_option(args)
+    info_report_option(args)
     nmap_discover_option(args)
     output_data = scan_all_ports(args)
     json_option(args, output_data)
@@ -62,12 +62,14 @@ def json_option(args, output_data):
     :param output_data: json data to output
     """
     json_output_data = json.dumps(output_data, indent=2)
-    if args.json is not None:
-        file = open('output.json', 'w')
-        file.write(json_output_data)
-    else:
+    if args.json is False:
         text_output = TextOutput(json_output_data)
         text_output.text_output()
+    elif args.json is None:
+        print(json_output_data)
+    else:
+        file = open(args.json, 'w')
+        file.write(json_output_data)
 
 
 def scan_all_ports(args):
@@ -106,15 +108,15 @@ def nmap_discover_option(args):
         args.port.extend(scanned_ports)
 
 
-def verbose_option(args):
+def info_report_option(args):
     """
-    Handle verbose option
+    Handle verbose and information option
 
     :param args: input options
     """
     if args.verbose:
         logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
-    else:
+    elif args.information:
         logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 
@@ -137,6 +139,7 @@ def parse_options():
     parser.add_argument('-p', '--port', default=[443], type=int, nargs='+', metavar='port',
                         help='port or ports (separate with spaces) to scan on (default: %(default)s)')
     parser.add_argument('-j', '--json', action='store', metavar='output_file', required=False,
+                        nargs='?', default=False,
                         help=textwrap.dedent('''\
                         change output to json format, if specified requires
                         output file name as an argument
@@ -150,6 +153,7 @@ def parse_options():
                             3: Insecure renegotiation
                             4: ZombiePOODLE/GOLDENPOODLE
                         '''))
+    parser.add_argument('-i', '--information', action='store_true', default=False, help='output some information')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
     args = parser.parse_args()
     check_test_numbers(args, parser)
@@ -178,7 +182,7 @@ def scan(args, port: int):
     :param port: list of port to be scanned
     :return: a single dictionary containing scanned data
     """
-    print(f'----------------Scanning for {args.url}:{port}---------------------')
+    logging.info(f'Scanning for {args.url}:{port}')
     certificate, cipher_suite, protocol = get_website_info(args.url, port)
 
     cipher_suite = CipherSuite(cipher_suite, protocol)
@@ -195,7 +199,7 @@ def scan(args, port: int):
 
     vulnerabilities = vulnerability_scan((args.url, port), args.test)
 
-    print('Scanning done.')
+    logging.info('Scanning done.')
     return TextOutput.dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
                                    (certificate.parameters, certificate.rating),
                                    (protocol_support.versions, protocol_support.rating),
