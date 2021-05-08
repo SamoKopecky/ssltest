@@ -6,11 +6,11 @@ import logging
 import json
 import textwrap
 import traceback
-import scan_vulnerabilities.hearbleed as heartbleed
-import scan_vulnerabilities.ccs_injection as ccs_injection
-import scan_vulnerabilities.insec_renegotiation as rene
-import scan_vulnerabilities.poodle as poodle
 
+from scan_vulnerabilities import heartbleed
+from scan_vulnerabilities import ccs_injection
+from scan_vulnerabilities import insec_renegotiation as rene
+from scan_vulnerabilities import poodle
 from scan_parameters.ratable.CipherSuite import CipherSuite
 from scan_parameters.ratable.Certificate import Certificate
 from scan_parameters.non_ratable.ProtocolSupport import ProtocolSupport
