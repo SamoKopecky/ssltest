@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./restapi.py &
-flask-run
+python3 ./restapi.py &
+python3 ./server_app/server.py
