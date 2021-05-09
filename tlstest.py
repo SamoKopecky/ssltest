@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+#!/usr/bin/python3
+
 import argparse, sys, logging, json, textwrap, traceback
 
 from scan_vulnerabilities import heartbleed
