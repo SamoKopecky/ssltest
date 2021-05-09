@@ -33,7 +33,7 @@ def translate_keys(obj):
 
 
 def remove_invalid_values(data):
-    for key, value in list(data.items()).copy():
+    for key, value in list(data.items()):
         if type(value) is dict:
             if not data[key]:
                 del data[key]
@@ -52,6 +52,6 @@ def parse_checkboxes(switcher):
     for value in list(switcher.keys()):
         if value not in request.form:
             continue
-        if request.form[value] == 'on':
+        elif request.form[value] == 'on':
             checked.append(switcher[value])
     return checked
