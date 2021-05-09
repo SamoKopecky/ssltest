@@ -1,7 +1,7 @@
-cryptography>=3.2.1
-pyOpenSSL>=20.0.1
-python3-nmap>=1.5.0
-requests>=2.22.0
-urllib3>=1.25.8
+cryptography
+pyOpenSSL
+python3-nmap
+requests
+urllib3
 Flask
 flask-restful

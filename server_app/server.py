@@ -9,15 +9,25 @@ app.debug = True
 @app.route('/', methods=['GET', 'POST'])
 def index():
     args = ['-u']
-    checkbox_names = {
+    other_options = {
         'nmap_scan': '-ns',
         'nmap_discover': '-nd'
+    }
+    tests = {
+        'heartbleed': '1',
+        'ccsinjection': '2',
+        'insecrene': '3',
+        'poodle': '4',
+
     }
     if request.method == 'POST':
         url = request.form['url']
         args.append(url)
-        args.extend(parse_checkboxes(checkbox_names))
-        args.extend(parse_list('tests', '-t'))
+        args.extend(parse_checkboxes(other_options))
+        parsed_tests = parse_checkboxes(tests)
+        if len(parsed_tests) > 0:
+            args.append('-t')
+            args.extend(parsed_tests)
         args.extend(parse_list('ports', '-p'))
         return redirect(url_for('result', args=' '.join(args)))
     return render_template('query_form.html')
@@ -54,5 +64,4 @@ def parse_checkboxes(switcher):
             continue
         if request.form[value] == 'on':
             checked.append(switcher[value])
-
     return checked

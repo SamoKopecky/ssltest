@@ -1,11 +1,6 @@
 #!/usr/bin/python3
 
-import argparse
-import sys
-import logging
-import json
-import textwrap
-import traceback
+import argparse, sys, logging, json, textwrap, traceback
 
 from scan_vulnerabilities import heartbleed
 from scan_vulnerabilities import ccs_injection
@@ -45,7 +40,7 @@ def vulnerability_scan(address, tests):
     scans = []
     switcher = {
         1: (heartbleed.scan, 'Heartbleed'),
-        2: (ccs_injection.scan, 'CSS injection'),
+        2: (ccs_injection.scan, 'CCS injection'),
         3: (rene.scan, 'Insecure renegotiation'),
         4: (poodle.scan, 'ZombiePOODLE/GOLDENPOOLDE')
     }

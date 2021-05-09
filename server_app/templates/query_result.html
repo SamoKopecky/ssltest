@@ -7,23 +7,23 @@
 <body>
 <ul>
     {% for key, value in json_response.items() recursive %}
-    <li>
-        {% if value is mapping %}
-            {{ key }}
-            <ul>{{ loop(value.items()) }}</ul>
-        {% else %}
-            {% if value is iterable and value is not string %}
-                {{ key }} :
-                <ul>
-                {% for l_value in value %}
-                    <li>{{ l_value }}</li>
-                {% endfor %}
-                </ul>
+        <li>
+            {% if value is mapping %}
+                {{ key }}
+                <ul>{{ loop(value.items()) }}</ul>
             {% else %}
-                {{ key }} : {{ value }}
+                {% if value is iterable and value is not string %}
+                    {{ key }} :
+                    <ul>
+                        {% for l_value in value %}
+                            <li>{{ l_value }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    {{ key }} : {{ value }}
+                {% endif %}
             {% endif %}
-        {% endif %}
-    </li>
+        </li>
     {% endfor %}
 </ul>
 </body>
