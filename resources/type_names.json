@@ -20,5 +20,13 @@
   "cert_subject": "Subject",
   "cert_issuer": "Issuer",
   "cert_alternative_names": "Alternative names",
-  "cert_verified": "Certificate verified"
+  "cert_verified": "Certificate verified",
+  "rating": "Final rating",
+  "parameters": "Parameters",
+  "protocol_support": "Protocol support",
+  "web_server_software": "Web server software",
+  "vulnerabilities": "Vulnerabilities",
+  "http_header": "HTTP header",
+  "certificate_info": "Certificate information",
+  "nmap": "Nmap"
 }

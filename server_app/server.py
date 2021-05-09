@@ -1,6 +1,7 @@
+from .utils import *
 from flask import Flask, render_template, request, redirect, url_for
-import requests
 import json
+import requests
 
 app = Flask(__name__)
 app.debug = True
@@ -33,35 +34,13 @@ def index():
     return render_template('query_form.html')
 
 
-@app.route('/result')
-@app.route('/result/<args>')
+@app.route('/result/<args>', methods=['GET', 'POST'])
 def result(args=None):
+    if request.method == 'POST':
+        return redirect(url_for('index'))
     if args is None:
         return ''
-    json_response = requests.get(f'http://localhost:5001/?args={args}')
-    json_response = json.loads(json_response.content)
-    json_response = beautify_json(json_response)
-    return render_template('query_result.html', json_response=json_response)
-
-
-def parse_list(long_key, short_key):
-    args = []
-    values = request.form[long_key]
-    if values != '':
-        args.append(short_key)
-        args.append(values)
-    return args
-
-
-def beautify_json(json_response):
-    return json_response
-
-
-def parse_checkboxes(switcher):
-    checked = []
-    for value in list(switcher.keys()):
-        if value not in request.form:
-            continue
-        if request.form[value] == 'on':
-            checked.append(switcher[value])
-    return checked
+    response = requests.get(f'http://localhost:5001/?args={args}')
+    json_data = json.loads(response.content, object_hook=translate_keys)
+    remove_invalid_values(json_data)
+    return render_template('query_result.html', json_response=json_data)
