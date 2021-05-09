@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import json
 from tlstest import tls_test
 from flask import Flask
