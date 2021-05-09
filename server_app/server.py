@@ -1,4 +1,4 @@
-from .utils import *
+from utils import *
 from flask import Flask, render_template, request, redirect, url_for
 import json
 import requests
@@ -44,3 +44,7 @@ def result(args=None):
     json_data = json.loads(response.content, object_hook=translate_keys)
     remove_invalid_values(json_data)
     return render_template('query_result.html', json_response=json_data)
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
