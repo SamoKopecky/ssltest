@@ -93,11 +93,10 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
     :param port: port
     :return: created secure socket
     """
-    if url == '192.168.1.220':
-        context.check_hostname = False
-        context.verify_mode = ssl.VerifyMode.CERT_NONE
-    sleep = 0
     cert_verified = True
+    context.check_hostname = True
+    context.verify_mode = ssl.VerifyMode.CERT_REQUIRED
+    sleep = 0
     # Loop until there is a valid response or after 15 seconds
     # because of rate limiting on some servers
     while True:
