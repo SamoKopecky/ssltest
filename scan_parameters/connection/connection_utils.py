@@ -69,6 +69,7 @@ def create_session_pyopenssl(url: str, port: int, context: SSL.Context):
     :return: created secure socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(5)  # in seconds
     ssl_socket = SSL.Connection(context, sock)
     sleep = 0
     # Loop until there is a valid response or after 15 seconds
@@ -102,7 +103,7 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
     # because of rate limiting on some servers
     while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(2)  # in seconds
+        sock.settimeout(5)  # in seconds
         # context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         ssl_socket = context.wrap_socket(sock, server_hostname=url)
         try:
