@@ -69,7 +69,6 @@ def create_session_pyopenssl(url: str, port: int, context: SSL.Context):
     :return: created secure socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(5)  # in seconds
     ssl_socket = SSL.Connection(context, sock)
     sleep = 0
     # Loop until there is a valid response or after 15 seconds

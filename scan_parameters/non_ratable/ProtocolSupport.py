@@ -38,7 +38,7 @@ class ProtocolSupport:
                 ssl_socket.close()
                 if version not in supported_protocols:
                     supported_protocols.append(version)
-            except SSL.Error:
+            except SSL.Error as e:
                 unsupported_protocols.append(version)
         # Need to do this since there is no explicit option for TLSv1.3
         if 'TLSv1.3' not in supported_protocols:
