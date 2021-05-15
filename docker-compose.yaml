@@ -1,6 +1,6 @@
 version: '3'
 services:
-        bp_flask_server:
+        flask_server:
                 build:
                         context: .
                 ports:
