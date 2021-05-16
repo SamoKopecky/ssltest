@@ -27,7 +27,7 @@
     - [flask-restful](https://pypi.org/project/Flask-RESTful/)
 - Nmap is required to for some functions, install with `apt install -y nmap`
 - To start the server app with the rest api server run the `start.sh` script
-- To run the script refer to the section at the [start](#Run the standalone script)
+- To run the script refer to the section at the start
 
 ## Create environment using docker
 
@@ -38,6 +38,6 @@
   command:
   `docker exec -it bp_flask_server /bin/bash`
 - The standalone script can be then ran inside the created environment, refer to the section at
-  the [begging](#Run the standalone script) to see how to run the script
+  the begging to see how to run the script
 
 https://www.overleaf.com/read/ggrmdgqqcwvq
