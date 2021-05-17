@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 
-#!/usr/bin/python3
-
-import argparse, sys, logging, json, textwrap, traceback
+import argparse, sys, logging, json, textwrap, traceback, os
 
 from scan_vulnerabilities import heartbleed
 from scan_vulnerabilities import ccs_injection
@@ -17,10 +15,19 @@ from scan_parameters.non_ratable.port_discovery import discover_ports
 from scan_parameters.utils import fix_url
 from text_output.TextOutput import TextOutput
 from scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
+from fix_openssl_config import fix_openssl_config
 
 
-def tls_test(custom_args):
-    args = parse_options(custom_args)
+def tls_test(program_args):
+    args = parse_options(program_args)
+    if args.fix_conf:
+        try:
+            fix_openssl_config()
+        except PermissionError:
+            print("Permission denied can't write to OpenSSL config file", file=sys.stderr)
+            exit(1)
+        sys.argv.remove('-fc')
+        os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
     if '/' in args.url:
         args.url = fix_url(args.url)
     info_report_option(args)
@@ -84,7 +91,7 @@ def scan_all_ports(args):
         except Exception as ex:
             tb = traceback.format_exc()
             logging.debug(tb)
-            print(f'Unexpected exception occurred: {ex}')
+            print(f'Unexpected exception occurred: {ex}', file=sys.stderr)
     return output_data
 
 
@@ -101,7 +108,7 @@ def nmap_discover_option(args):
         except Exception as ex:
             tb = traceback.format_exc()
             logging.debug(tb)
-            print(f'Unexpected exception occurred: {ex}')
+            print(f'Unexpected exception occurred: {ex}', file=sys.stderr)
         scanned_ports = list(filter(lambda port: port not in args.port, scanned_ports))
         args.port.extend(scanned_ports)
 
@@ -118,7 +125,7 @@ def info_report_option(args):
         logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 
-def parse_options(custom_args):
+def parse_options(program_args):
     """
     Parse input options.
 
@@ -151,12 +158,19 @@ def parse_options(custom_args):
                             3: Insecure renegotiation
                             4: ZombiePOODLE/GOLDENPOODLE
                         '''))
+    parser.add_argument('-fc', '--fix-conf', action='store_true', default=False,
+                        help=textwrap.dedent('''\
+                            allow the use of older versions of TLS protocol
+                            (TLSv1 and TLSv1.1) in order to scan server which 
+                            still run on these versions.
+                            !WARNING!: this may rewrite the contents of a 
+                            configuration file located at /etc/ssl/openssl.cnf
+                            backup is recommended
+                            '''))
     parser.add_argument('-i', '--information', action='store_true', default=False, help='output some information')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
-    if not custom_args:
-        args = parser.parse_args()
-    else:
-        args = parser.parse_args(custom_args)
+
+    args = parser.parse_args(program_args)
     check_test_numbers(args, parser)
     return args
 
@@ -169,9 +183,9 @@ def check_test_numbers(args, parser):
         parser.print_usage()
         if len(unknown_tests) > 1:
             unknown_tests = list(map(str, unknown_tests))
-            print(f'Numbers {", ".join(unknown_tests)} are not test numbers.')
+            print(f'Numbers {", ".join(unknown_tests)} are not test numbers.', file=sys.stderr)
         else:
-            print(f'Number {unknown_tests[0]} is not a test number.')
+            print(f'Number {unknown_tests[0]} is not a test number.', file=sys.stderr)
         exit(1)
 
 
@@ -210,4 +224,4 @@ def scan(args, port: int):
 
 
 if __name__ == "__main__":
-    print(tls_test([]))
+    print(tls_test(sys.argv[1:]))
