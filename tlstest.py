@@ -20,6 +20,21 @@ from fix_openssl_config import fix_openssl_config
 
 def tls_test(program_args):
     args = parse_options(program_args)
+    fix_conf_option(args)
+    if '/' in args.url:
+        args.url = fix_url(args.url)
+    info_report_option(args)
+    nmap_discover_option(args)
+    output_data = scan_all_ports(args)
+    return json_option(args, output_data)
+
+
+def fix_conf_option(args):
+    """
+    Fixes the OpenSSL configuration file
+
+    :param args: input options
+    """
     if args.fix_conf:
         try:
             fix_openssl_config()
@@ -27,13 +42,8 @@ def tls_test(program_args):
             print("Permission denied can't write to OpenSSL config file", file=sys.stderr)
             exit(1)
         sys.argv.remove('-fc')
+        # Restarts the program without the fc argument
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
-    if '/' in args.url:
-        args.url = fix_url(args.url)
-    info_report_option(args)
-    nmap_discover_option(args)
-    output_data = scan_all_ports(args)
-    return json_option(args, output_data)
 
 
 def vulnerability_scan(address, tests):
