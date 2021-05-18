@@ -156,8 +156,8 @@ def parse_options(program_args):
     parser.add_argument('-j', '--json', action='store', metavar='output_file', required=False,
                         nargs='?', default=False,
                         help=textwrap.dedent('''\
-                        change output to json format, if specified requires
-                        output file name as an argument
+                        change output to json format, if a file name is specified 
+                        output is written to the given file 
                         '''))
     parser.add_argument('-t', '--test', type=int, metavar='test_num', nargs='+',
                         help=textwrap.dedent('''\
@@ -170,12 +170,12 @@ def parse_options(program_args):
                         '''))
     parser.add_argument('-fc', '--fix-conf', action='store_true', default=False,
                         help=textwrap.dedent('''\
-                            allow the use of older versions of TLS protocol
-                            (TLSv1 and TLSv1.1) in order to scan a server which 
-                            still run on these versions.
-                            !WARNING!: this may rewrite the contents of a 
-                            configuration file located at /etc/ssl/openssl.cnf
-                            backup is recommended, root permission required
+                        allow the use of older versions of TLS protocol
+                        (TLSv1 and TLSv1.1) in order to scan a server which 
+                        still run on these versions.
+                        !WARNING!: this may rewrite the contents of a 
+                        configuration file located at /etc/ssl/openssl.cnf
+                        backup is recommended, root permission required
                             '''))
     parser.add_argument('-i', '--information', action='store_true', default=False, help='output some information')
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
