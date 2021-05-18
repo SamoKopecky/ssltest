@@ -8,7 +8,7 @@
 
 - Run the main file `tlstest.py` with option `-u` to enter the url.
 - Use `-h` or `--help` for more help.
-- Example: `./tlstest.py -u vutbr.cz -p 443`
+- Example: `./tlstest.py -u vutbr.cz`
 
 # Prepare the environment
 
@@ -26,8 +26,8 @@
     - [Flask](https://pypi.org/project/Flask/)
     - [flask-restful](https://pypi.org/project/Flask-RESTful/)
 - Nmap is required to for some functions, install with `apt install -y nmap`
-- To start the server app with the rest api server run the `start.sh` script
-- To run the script refer to the section at the start
+- To start the server app with the rest api server run the `start.sh` script or `script.sh -h` for more information
+- To run the tool script refer to the section at the start
 
 ## Create environment using docker
 
@@ -37,7 +37,7 @@
 - The web app will be automatically deployed, and the environment with required dependencies can be accessed via this
   command:
   `docker exec -it bp_flask_server /bin/bash`
-- The standalone script can be then ran inside the created environment, refer to the section at
-  the begging to see how to run the script
+- The standalone script can be then ran inside the created environment, refer to the section at the begging to see how
+  to run the script
 
 https://www.overleaf.com/read/ggrmdgqqcwvq

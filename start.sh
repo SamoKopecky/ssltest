@@ -7,8 +7,8 @@ while getopts ":hcd" arg; do
       echo "usage: use -h for more information"
       echo
       echo "This script runs the essential python files to deploy"
-      echo "a web server for tlstest tool. Script kill all the created"
-      echo "processes when users enters anything into the script."
+      echo "a web server for tlstest tool. Script kills all the created"
+      echo "processes when user enters anything into the script."
       echo "Termination of child processes may not work if script"
       echo "is ran as root!"
       echo
