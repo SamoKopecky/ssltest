@@ -33,7 +33,7 @@
 
 - To create the environment docker engine ([guide here](https://docs.docker.com/engine/install/)) and docker
   compose ([guide here](https://docs.docker.com/compose/install/)) need to be installed.
-- Create the docker container with this command `docker-compose -up -d` ran in the root project directory
+- Create the docker container with this command `docker-compose up -d` ran in the root project directory
 - The web app will be automatically deployed, and the environment with required dependencies can be accessed via this
   command:
   `docker exec -it bp_flask_server /bin/bash`
