@@ -10,4 +10,4 @@ apt-get install -y nmap
 EXPOSE 5001
 EXPOSE 5000
 
-CMD ["./start.sh", "-d"]
+CMD ["./start.sh", "-d", "-c"]
