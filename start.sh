@@ -1,6 +1,7 @@
 #!/bin/bash
 
-while getopts ":hc" arg; do
+DOCKER=0
+while getopts ":hcd" arg; do
   case ${arg} in
     h)
       echo "usage: use -h for more information"
@@ -18,10 +19,13 @@ while getopts ":hc" arg; do
             still run on these versions.
             !WARNING!: this may rewrite the contents of a
             configuration file located at /etc/ssl/openssl.cnf
-            backup is recommended, root permission required"
+            backup is recommended, root permission required
+        -d  run the script for docker, only use if running in docker"
       exit 0;;
     c)
       python3 fix_openssl_config.py;;
+    d)
+      DOCKER=1;;
     ?)
       echo "usage: use -h for more information"
       exit 1;;
@@ -46,7 +50,12 @@ echo "Storing logs for server app in ${SERVERAPP_LOGFILE} ..."
 
 # Redirect stdout and stderr to a log file
 python3 ./restapi.py >$RESTAPI_LOGFILE 2>&1 &
-python3 ./server_app/server.py >$SERVERAPP_LOGFILE 2>&1 &
+if [ 1 -eq $DOCKER ]; then
+  python3 ./server_app/server.py >$SERVERAPP_LOGFILE 2>&1
+else
+  python3 ./server_app/server.py >$SERVERAPP_LOGFILE 2>&1 &
+  echo "To terminate server processes press enter"
+  read
+fi
 
-echo "To terminate server processes press enter"
-read
+
