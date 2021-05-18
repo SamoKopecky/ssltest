@@ -1,9 +1,12 @@
 FROM python:3
 
 WORKDIR /usr/src/app
+SHELL ["/bin/bash", "-c"]
+RUN rm /usr/bin/python3 && \
+ln -s /usr/local/bin/python3 /usr/bin/python3
 
 COPY . ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 RUN apt-get update && \
 apt-get install -y nmap
 
