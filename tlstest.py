@@ -85,6 +85,7 @@ def json_option(args, output_data):
     else:
         file = open(args.json, 'w')
         file.write(json_output_data)
+        file.close()
 
 
 def scan_all_ports(args):
@@ -234,4 +235,5 @@ def scan(args, port: int):
 
 
 if __name__ == "__main__":
-    print(tls_test(sys.argv[1:]))
+    out = tls_test(sys.argv[1:])
+    if out: print(out)
