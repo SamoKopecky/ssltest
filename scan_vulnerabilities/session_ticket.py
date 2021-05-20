@@ -6,10 +6,10 @@ def construct_client_hello(version):
         # Record protocol
         0x16,  # Content type (Handshake)
         0x03, version,  # Version
-        0x00, 0xcd,  # Length
+        0x00, 0xd1,  # Length
         # Handshake protocol
         0x01,  # Handshake type
-        0x00, 0x00, 0xc9,  # Length
+        0x00, 0x00, 0xcd,  # Length
         0x03, version,  # TLS version
         # Random bytes
         0xf0, 0x36, 0x90, 0x63, 0x5a, 0x8c, 0xea, 0xaf,
@@ -34,7 +34,7 @@ def construct_client_hello(version):
         0x00, 0x35, 0x00, 0x2f, 0x00, 0xff,
         0x01,  # Compression method length
         0x00,  # Compression method
-        0x00, 0x42,  # Extension length
+        0x00, 0x46,  # Extension length
         # Supported groups
         0x00, 0x0a, 0x00, 0x0c, 0x00, 0x0a, 0x00, 0x1d,
         0x00, 0x17, 0x00, 0x1e, 0x00, 0x19, 0x00, 0x18,
@@ -47,43 +47,42 @@ def construct_client_hello(version):
         0x08, 0x05, 0x08, 0x06, 0x04, 0x01, 0x05, 0x01,
         0x06, 0x01, 0x03, 0x03, 0x03, 0x01, 0x03, 0x02,
         0x04, 0x02, 0x05, 0x02, 0x06, 0x02,
+        # Session ticker extension
+        0x00, 0x23, 0x00, 0x00
     ])
     return client_hello
 
 
-ccs_message = bytes([
-    # Record protocol
-    0x14,  # Protocol type (ccs)
-    0x03, 0x03,  # Version
-    0x00, 0x01,  # Length
-    0x01  # CSS message
+session_ticket_extension = bytes([
+    # Session ticker extension
+    0x00, 0x23, 0x00, 0x00
 ])
 
 
 def scan(address, version):
     """
-    Scan the webserver for CSS injection vulnerability (CVE-2014-0224)
+    Scan for session ticker support vulnerability
 
     :param address: tuple of an url and port
     :param version: tls version in bytes
     :return: if the server is vulnerable
     """
     client_hello = construct_client_hello(version)
-    logging.info('Scanning CCS injection vulnerability...')
+    logging.info("Scanning session ticket vulnerability...")
     timeout = 2
     server_hello, sock = send_client_hello(address, client_hello, timeout)
-    if not is_server_hello(server_hello):
-        logging.info('CCS injection scan done.')
-        sock.close()
-        return False
-    sock.send(ccs_message)
-    server_response = receive_data(sock, timeout)
     sock.close()
-    logging.info('CCS injection scan done.')
-    # No response from server means the CSS message is accepted
-    if not server_response:
-        return True
-    # 0x15 stands for alert message type, 0x0a stands for unexpected message
-    if server_response[0] == 0x15 and server_response[6] == 0x0a:
+    logging.info("Session ticket vulnerability scan done.")
+    if not is_server_hello(server_hello):
         return False
-    return True
+    # If there is no session ticket found it means the server doesn't
+    # support session ticket extension
+    session_ticket = server_hello.find(session_ticket_extension)
+    # If the server sends a fatal alert message
+    if server_hello[-2] == 0x02:
+        return False
+    # -1 means no match
+    elif session_ticket == -1:
+        return False
+    else:
+        return True

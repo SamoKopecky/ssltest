@@ -6,6 +6,7 @@ from scan_vulnerabilities import heartbleed
 from scan_vulnerabilities import ccs_injection
 from scan_vulnerabilities import insec_renegotiation as rene
 from scan_vulnerabilities import poodle
+from scan_vulnerabilities import session_ticket
 from scan_parameters.ratable.CipherSuite import CipherSuite
 from scan_parameters.ratable.Certificate import Certificate
 from scan_parameters.non_ratable.ProtocolSupport import ProtocolSupport
@@ -62,7 +63,8 @@ def vulnerability_scan(address, tests, version):
         1: (heartbleed.scan, 'Heartbleed'),
         2: (ccs_injection.scan, 'CCS injection'),
         3: (rene.scan, 'Insecure renegotiation'),
-        4: (poodle.scan, 'ZombiePOODLE/GOLDENPOOLDE')
+        4: (poodle.scan, 'ZombiePOODLE/GOLDENPOOLDE'),
+        5: (session_ticket.scan, 'Session ticket support')
     }
     for test in tests:
         scans.append(switcher.get(test))
@@ -169,6 +171,7 @@ def parse_options(program_args):
                             2: ChangeCipherSpec Injection
                             3: Insecure renegotiation
                             4: ZombiePOODLE/GOLDENPOODLE
+                            5: Session ticket support
                         '''))
     parser.add_argument('-fc', '--fix-conf', action='store_true', default=False,
                         help=textwrap.dedent('''\
@@ -190,7 +193,7 @@ def parse_options(program_args):
 def check_test_numbers(args, parser):
     if not args.test:
         return
-    unknown_tests = list(filter(lambda test: test not in [1, 2, 3, 4], args.test))
+    unknown_tests = list(filter(lambda test: test not in [1, 2, 3, 4, 5], args.test))
     if unknown_tests:
         parser.print_usage()
         if len(unknown_tests) > 1:
