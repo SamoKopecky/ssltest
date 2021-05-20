@@ -12,6 +12,7 @@ from scan_parameters.non_ratable.ProtocolSupport import ProtocolSupport
 from scan_parameters.non_ratable.WebServerSoft import WebServerSoft
 from scan_parameters.connection.connection_utils import get_website_info
 from scan_parameters.non_ratable.port_discovery import discover_ports
+from scan_parameters.ratable.PType import PType
 from scan_parameters.utils import fix_url
 from text_output.TextOutput import TextOutput
 from scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
@@ -46,7 +47,7 @@ def fix_conf_option(args):
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
 
 
-def vulnerability_scan(address, tests):
+def vulnerability_scan(address, tests, version):
     """
     Forwards the appropriate tests to multithreading function
 
@@ -65,7 +66,7 @@ def vulnerability_scan(address, tests):
     }
     for test in tests:
         scans.append(switcher.get(test))
-    return scan_vulnerabilities(scans, address)
+    return scan_vulnerabilities(scans, address, version)
 
 
 def json_option(args, output_data):
@@ -223,7 +224,8 @@ def scan(args, port: int):
     versions = WebServerSoft(args.url, port, args.nmap_scan)
     versions.scan_server_software()
 
-    vulnerabilities = vulnerability_scan((args.url, port), args.test)
+    main_version = list(cipher_suite.parameters[PType.protocol].keys())[0]
+    vulnerabilities = vulnerability_scan((args.url, port), args.test, main_version)
 
     logging.info('Scanning done.')
     return TextOutput.dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
