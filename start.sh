@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 DOCKER=0
 while getopts ":hcd" arg; do
   case ${arg} in
@@ -34,6 +35,10 @@ done
 
 # Trap exit signals to termite child processes
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+
+# Change to the directory of the script so that other
+# scripts can be ran
+cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null 
 
 LOGDIR="./logs"
 RESTAPI_LOGFILE="${LOGDIR}/restapi.log"
