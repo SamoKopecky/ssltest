@@ -18,7 +18,9 @@ def index():
         'ccsinjection': '2',
         'insecrene': '3',
         'poodle': '4',
-
+        'sessionticket': '5',
+        'crime': '6',
+        'rc4support': '7',
     }
     if request.method == 'POST':
         url = request.form['url']

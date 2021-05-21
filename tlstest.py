@@ -176,8 +176,8 @@ def parse_options(program_args):
                             3: Insecure renegotiation
                             4: ZombiePOODLE/GOLDENPOODLE
                             5: Session ticket support
-                            5: CRIME
-                            5: RC4 support
+                            6: CRIME
+                            7: RC4 support
                         '''))
     parser.add_argument('-fc', '--fix-conf', action='store_true', default=False,
                         help=textwrap.dedent('''\
