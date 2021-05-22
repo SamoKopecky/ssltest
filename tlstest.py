@@ -65,7 +65,7 @@ def vulnerability_scan(address, tests, version):
         1: (heartbleed.scan, 'Heartbleed'),
         2: (ccs_injection.scan, 'CCS injection'),
         3: (rene.scan, 'Insecure renegotiation'),
-        4: (poodle.scan, 'ZombiePOODLE/GOLDENPOOLDE'),
+        4: (poodle.scan, 'ZombiePOODLE/GOLDENDOOLDE'),
         5: (session_ticket.scan, 'Session ticket support'),
         6: (crime.scan, 'CRIME'),
         7: (rc4_support.scan, 'RC4 support'),
@@ -174,7 +174,7 @@ def parse_options(program_args):
                             1: Heartbleed
                             2: ChangeCipherSpec Injection
                             3: Insecure renegotiation
-                            4: ZombiePOODLE/GOLDENPOODLE
+                            4: ZombiePOODLE/GOLDENDOODLE
                             5: Session ticket support
                             6: CRIME
                             7: RC4 support

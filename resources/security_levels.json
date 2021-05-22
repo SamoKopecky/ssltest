@@ -15,7 +15,7 @@
     "1": "AES",
     "2": "",
     "3": "TDEA,2DES,3DES",
-    "4": "SKIPJACK"
+    "4": "SKIPJACK, RC4"
   },
   "sym_enc_algorithm_key_length": {
     "1": "AES,>=128",

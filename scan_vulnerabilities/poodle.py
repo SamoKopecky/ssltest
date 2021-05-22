@@ -1,4 +1,8 @@
+import OpenSSL.SSL
+
 from .utils import *
+from OpenSSL import SSL
+from time import sleep
 
 
 def construct_client_hello(version):
@@ -55,6 +59,20 @@ def construct_client_hello(version):
     return client_hello
 
 
+def build_data(data):
+    data_bytes = bytes([
+        0x17,  # Content type (data)
+        0x03, 0x03,  # Version
+        0x00, 0x20,  # Length
+        # Data (32 bytes)
+        0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, data,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    ])
+    return data_bytes
+
+
 def scan(address, version):
     """
     Not finished yet, just analyzing if the web server supports
@@ -70,5 +88,27 @@ def scan(address, version):
     # CBC ciphers
     if not is_server_hello(server_hello):
         return False
+    sock.close()
+    unsafe_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ssl_socket = SSL.Connection(SSL.Context(SSL.SSLv23_METHOD), unsafe_sock)
+    ssl_socket.connect(address)
+    ssl_socket.do_handshake()
+    for i in range(256):
+        try:
+            unsafe_sock.send(build_data(i))
+            ssl_socket.read(2048)
+        # Server didn't send an alert
+        except OpenSSL.SSL.ZeroReturnError:
+            continue
+        # Server sent an alert
+        except SSL.Error as e:
+            if e.args[0][0][2] == 'sslv3 alert bad record mac':
+                continue
+            # If there is an alert and its not bad record mac
+            else:
+                return True
+        # Server broke connection
+        except BrokenPipeError:
+            return False
     logging.info("Poodle vulnerability scan done.")
-    return True
+    return False
