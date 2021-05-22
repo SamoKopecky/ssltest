@@ -10,35 +10,35 @@
 </head>
 <body>
 <ul class="list-group">
-    {% for key, value in json_response.items() recursive %}
-        {% if value is mapping %}
+{% for key, value in json_response.items() recursive %}
+    {% if value is mapping %}
+        <li class="list-group-item">
+        {{ key }}
+        <ul class="list-group">{{ loop(value.items()) }}</ul>
+    {% else %}
+        {% if value is iterable and (value is not string) %}
             <li class="list-group-item">
-                {{ key }}
-                <ul class="list-group">{{ loop(value.items()) }}</ul>
-                {% else %}
-                {% if value is iterable and (value is not string) %}
-                    <li class="list-group-item">
-                        {{ key }}
-                        <ul class="list-group list-group-flush">
-                            {% for l_value in value %}
-                                <li class="list-group-item">{{ l_value }}</li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        {% if value == '1' %}
-                            <li class="list-group-item list-group-item-success">
-                                {% elif value == '2' %}
-                            <li class="list-group-item list-group-item-warning">
-                                {% elif value == '4' or value == '3' %}
-                            <li class="list-group-item list-group-item-danger">
-                                {% else %}
-                            <li class="list-group-item">
-                        {% endif %}
-                    {{ key }}->{{ value }}
-                {% endif %}
+            {{ key }}
+            <ul class="list-group list-group-flush">
+            {% for l_value in value %}
+                <li class="list-group-item">{{ l_value }}</li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            {% if value == '1' %}
+                <li class="list-group-item list-group-item-success">
+            {% elif value == '2' %}
+                <li class="list-group-item list-group-item-warning">
+            {% elif value == '4' or value == '3' %}
+                <li class="list-group-item list-group-item-danger">
+            {% else %}
+                <li class="list-group-item">
+            {% endif %}
+            {{ key }}->{{ value }}
         {% endif %}
-    </li>
-    {% endfor %}
+    {% endif %}
+</li>
+{% endfor %}
 </ul>
 <form action="" method=post>
     <button type="submit" class="btn btn-primary">Go back</button>
