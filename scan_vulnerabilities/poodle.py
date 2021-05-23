@@ -98,8 +98,11 @@ def scan(address, version):
             unsafe_sock.send(build_data(i))
             ssl_socket.read(2048)
         # Server didn't send an alert
-        except OpenSSL.SSL.ZeroReturnError:
+        except (SSL.ZeroReturnError, SSL.SysCallError):
             continue
+        # Server broke connection
+        except BrokenPipeError:
+            return False
         # Server sent an alert
         except SSL.Error as e:
             if e.args[0][0][2] == 'sslv3 alert bad record mac':
@@ -107,8 +110,8 @@ def scan(address, version):
             # If there is an alert and its not bad record mac
             else:
                 return True
-        # Server broke connection
-        except BrokenPipeError:
-            return False
+        # Unknown exception
+        except Exception as e:
+            raise e
     logging.info("Poodle vulnerability scan done.")
     return False
