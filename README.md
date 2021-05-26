@@ -3,6 +3,7 @@
 - This repository contains:
     - The standalone script that can be run in a console
     - Web server app that allows to use the script with a GUI (if hosted locally on this [url](http://localhost:5000))
+- File `resources/security_levels.json` can be edited to change the parameter rating values
 
 # Run the standalone script
 

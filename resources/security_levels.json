@@ -20,14 +20,14 @@
   "sym_enc_algorithm_key_length": {
     "1": "AES,>=128",
     "2": "",
-    "3": "",
-    "4": "AES,<<128"
+    "3": "3DES,>=168,2DES,>=112,TDEA,>=168",
+    "4": "AES,<<128,3DES,<<168,2DES,<<112,TDEA,<<168,RC4,>=0"
   },
   "sym_enc_algorithm_block_mode": {
     "1": "GCM,CCM",
     "2": "CBC",
     "3": "",
-    "4": ""
+    "4": "ECB"
   },
   "sym_ecn_algorithm_block_mode_number": {
     "1": "",
@@ -36,7 +36,7 @@
     "4": ""
   },
   "hash_function": {
-    "1": "SHA223,SHA256,SHA384",
+    "1": "SHA223,SHA256,SHA384,SHA512",
     "2": "SHA,SHA1",
     "3": "",
     "4": "MD5"
@@ -60,7 +60,7 @@
     "4": "TLSv1.2"
   },
   "cert_sign_algorithm_hash_function": {
-    "1": "SHA223,SHA256,SHA384",
+    "1": "SHA223,SHA256,SHA384,SHA512",
     "2": "SHA,SHA1",
     "3": "",
     "4": "MD5"

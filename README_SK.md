@@ -3,6 +3,7 @@
 - Tento repozitár obsahuje:
     - Samostatný skript, ktorý je možné spustiť v konzoli
     - Aplikácia webového servera, ktorá umožňuje používať skript s GUI (ak je hostovaný lokálne na tejto [url](http://localhost:5000))
+- Súbor `resources/security_levels.json` je môžné editovať ak je potreba zmeniť bezpečnostné hodnoty parametrov
 
 # Spustenie samostatného skriptu
 
