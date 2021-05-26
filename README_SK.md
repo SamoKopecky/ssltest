@@ -2,7 +2,7 @@
 
 - Tento repozitár obsahuje:
     - Samostatný skript, ktorý je možné spustiť v konzoli
-    - Aplikácia webového servera, ktorá umožňuje používať skript s GUI (ak je hostovaný lokálne na tejto [url](http: // localhost: 5000))
+    - Aplikácia webového servera, ktorá umožňuje používať skript s GUI (ak je hostovaný lokálne na tejto ([url](http: // localhost: 5000))
 
 # Spustenie samostatného skriptu
 
