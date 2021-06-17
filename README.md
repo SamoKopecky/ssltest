@@ -41,4 +41,3 @@
 - The standalone script can be then ran inside the created environment, refer to the section at the begging to see how
   to run the script
 
-https://www.overleaf.com/read/ggrmdgqqcwvq

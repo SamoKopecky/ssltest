@@ -38,5 +38,3 @@
 - Webová aplikácie bude automaticky spustená a prostredie s potrebnými závislostami je prístupné pomocou príkazu `docker exec -it bp_flask_server /bin/bash`
 - Samostatný skript je možné spustiť vo vytvorenom prostredí, spustenie skriptu je popísane na začiatku
 
-https://www.overleaf.com/read/ggrmdgqqcwvq
-
