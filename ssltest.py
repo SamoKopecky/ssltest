@@ -21,6 +21,16 @@ from text_output.TextOutput import TextOutput
 from scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
 from fix_openssl_config import fix_openssl_config
 
+tests_switcher = {
+    1: (heartbleed.scan, 'Heartbleed'),
+    2: (ccs_injection.scan, 'CCS injection'),
+    3: (rene.scan, 'Insecure renegotiation'),
+    4: (poodle.scan, 'ZombiePOODLE/GOLDENDOOLDE'),
+    5: (session_ticket.scan, 'Session ticket support'),
+    6: (crime.scan, 'CRIME'),
+    7: (rc4_support.scan, 'RC4 support')
+}
+
 
 def tls_test(program_args):
     args = parse_options(program_args)
@@ -61,17 +71,8 @@ def vulnerability_scan(address, tests, version):
     if not tests:
         return {}
     scans = []
-    switcher = {
-        1: (heartbleed.scan, 'Heartbleed'),
-        2: (ccs_injection.scan, 'CCS injection'),
-        3: (rene.scan, 'Insecure renegotiation'),
-        4: (poodle.scan, 'ZombiePOODLE/GOLDENDOOLDE'),
-        5: (session_ticket.scan, 'Session ticket support'),
-        6: (crime.scan, 'CRIME'),
-        7: (rc4_support.scan, 'RC4 support'),
-    }
     for test in tests:
-        scans.append(switcher.get(test))
+        scans.append(tests_switcher.get(test))
     return scan_vulnerabilities(scans, address, version)
 
 
@@ -149,6 +150,12 @@ def parse_options(program_args):
 
     :return: object of parsed arguments
     """
+    tests_help = 'test the server for a specified vulnerability\npossible vulnerabilities (separate with spaces):\n'
+    for key, value in tests_switcher.items():
+        test_number = key
+        test_desc = value[1]
+        tests_help += f'{" " * 4}{test_number}: {test_desc}\n'
+
     parser = argparse.ArgumentParser(
         usage='use -h or --help for more information',
         description='Script that scans a webservers cryptographic parameters and vulnerabilities',
@@ -168,17 +175,7 @@ def parse_options(program_args):
                         output is written to the given file 
                         '''))
     parser.add_argument('-t', '--test', type=int, metavar='test_num', nargs='+',
-                        help=textwrap.dedent('''\
-                        test the server for a specified vulnerability
-                        possible vulnerabilities (separate with spaces):
-                            1: Heartbleed
-                            2: ChangeCipherSpec Injection
-                            3: Insecure renegotiation
-                            4: ZombiePOODLE/GOLDENDOODLE
-                            5: Session ticket support
-                            6: CRIME
-                            7: RC4 support
-                        '''))
+                        help=textwrap.dedent(tests_help))
     parser.add_argument('-fc', '--fix-conf', action='store_true', default=False,
                         help=textwrap.dedent('''\
                         allow the use of older versions of TLS protocol
@@ -199,7 +196,8 @@ def parse_options(program_args):
 def check_test_numbers(args, parser):
     if not args.test:
         return
-    unknown_tests = list(filter(lambda test: test not in [1, 2, 3, 4, 5, 6, 7], args.test))
+    test_numbers = [test for test in tests_switcher.keys()]
+    unknown_tests = list(filter(lambda test: test not in test_numbers, args.test))
     if unknown_tests:
         parser.print_usage()
         if len(unknown_tests) > 1:

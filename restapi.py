@@ -1,5 +1,5 @@
 import json
-from tlstest import tls_test
+from ssltest import tls_test
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 
