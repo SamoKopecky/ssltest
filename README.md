@@ -7,9 +7,9 @@
 
 # Run the standalone script
 
-- Run the main file `tlstest.py` with option `-u` to enter the url.
+- Run the main file `ssltest.py` with option `-u` to enter the url.
 - Use `-h` or `--help` for more help.
-- Example: `./tlstest.py -u vutbr.cz`
+- Example: `./ssltest.py -u vutbr.cz`
 
 # Prepare the environment
 

@@ -1,4 +1,4 @@
-from .utils import *
+from ..utils import *
 
 renegotiation_extension = bytes([
     0xff, 0x01, 0x00, 0x01, 0x00

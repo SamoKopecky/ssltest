@@ -1,8 +1,5 @@
-import OpenSSL.SSL
-
-from .utils import *
+from ..utils import *
 from OpenSSL import SSL
-from time import sleep
 
 
 def construct_client_hello(version):

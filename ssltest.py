@@ -2,13 +2,13 @@
 
 import argparse, sys, logging, json, textwrap, traceback, os
 
-from scan_vulnerabilities import heartbleed
-from scan_vulnerabilities import ccs_injection
-from scan_vulnerabilities import insec_renegotiation as rene
-from scan_vulnerabilities import poodle
-from scan_vulnerabilities import session_ticket
-from scan_vulnerabilities import crime
-from scan_vulnerabilities import rc4_support
+from scan_vulnerabilities.tests import heartbleed
+from scan_vulnerabilities.tests import ccs_injection
+from scan_vulnerabilities.tests import insec_renegotiation as rene
+from scan_vulnerabilities.tests import poodle
+from scan_vulnerabilities.tests import session_ticket
+from scan_vulnerabilities.tests import crime
+from scan_vulnerabilities.tests import rc4_support
 from scan_parameters.ratable.CipherSuite import CipherSuite
 from scan_parameters.ratable.Certificate import Certificate
 from scan_parameters.non_ratable.ProtocolSupport import ProtocolSupport
@@ -64,15 +64,16 @@ def vulnerability_scan(address, tests, version):
     """
     Forwards the appropriate tests to multithreading function
 
+    :param version: ssl protocol version
     :param address: tuple of an url and port
     :param tests: input option for tests
     :return: dictionary of scanned results
     """
+    # if no -t argument is present
     if not tests:
-        return {}
-    scans = []
-    for test in tests:
-        scans.append(tests_switcher.get(test))
+        scans = [value for value in tests_switcher.values()]
+    else:
+        scans = [tests_switcher.get(test) for test in tests]
     return scan_vulnerabilities(scans, address, version)
 
 
@@ -150,11 +151,13 @@ def parse_options(program_args):
 
     :return: object of parsed arguments
     """
-    tests_help = 'test the server for a specified vulnerability\npossible vulnerabilities (separate with spaces):\n'
+    tests_help = 'test the server for a specified vulnerability' \
+                 '\npossible vulnerabilities (separate with spaces):\n'
     for key, value in tests_switcher.items():
         test_number = key
         test_desc = value[1]
         tests_help += f'{" " * 4}{test_number}: {test_desc}\n'
+    tests_help += 'if this argument isn\'t specified all tests will be ran'
 
     parser = argparse.ArgumentParser(
         usage='use -h or --help for more information',
@@ -189,17 +192,24 @@ def parse_options(program_args):
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
 
     args = parser.parse_args(program_args)
-    check_test_numbers(args, parser)
+    check_test_numbers(args.test, parser.usage)
     return args
 
 
-def check_test_numbers(args, parser):
-    if not args.test:
+def check_test_numbers(tests, usage):
+    """
+    Check if the tests numbers are actually tests
+    
+    :param tests: test argument
+    :param usage: usage string
+    :return: 
+    """
+    if not tests:
         return
     test_numbers = [test for test in tests_switcher.keys()]
-    unknown_tests = list(filter(lambda test: test not in test_numbers, args.test))
+    unknown_tests = list(filter(lambda test: test not in test_numbers, tests))
     if unknown_tests:
-        parser.print_usage()
+        print(f'usage: {usage}')
         if len(unknown_tests) > 1:
             unknown_tests = list(map(str, unknown_tests))
             print(f'Numbers {", ".join(unknown_tests)} are not test numbers.', file=sys.stderr)
