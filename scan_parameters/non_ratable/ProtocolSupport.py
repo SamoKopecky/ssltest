@@ -23,7 +23,7 @@ class ProtocolSupport:
         """
         logging.info('Scanning TLS versions...')
         ssl_versions = {
-            SSL.TLSv1_METHOD: "TLSv1",
+            SSL.TLSv1_METHOD: "TLSv1.0",
             SSL.TLSv1_1_METHOD: "TLSv1.1",
             SSL.TLSv1_2_METHOD: "TLSv1.2",
             SSL.SSLv23_METHOD: ""

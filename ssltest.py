@@ -72,6 +72,8 @@ def vulnerability_scan(address, tests, version):
     # if no -t argument is present
     if not tests:
         scans = [value for value in tests_switcher.values()]
+    elif tests[0] == 0:
+        return {}
     else:
         scans = [tests_switcher.get(test) for test in tests]
     return scan_vulnerabilities(scans, address, version)
@@ -151,13 +153,14 @@ def parse_options(program_args):
 
     :return: object of parsed arguments
     """
-    tests_help = 'test the server for a specified vulnerability' \
-                 '\npossible vulnerabilities (separate with spaces):\n'
+    tests_help = 'test the server for a specified vulnerability\n' \
+                 'possible vulnerabilities (separate with spaces):\n'
     for key, value in tests_switcher.items():
         test_number = key
         test_desc = value[1]
         tests_help += f'{" " * 4}{test_number}: {test_desc}\n'
-    tests_help += 'if this argument isn\'t specified all tests will be ran'
+    tests_help += 'if this argument isn\'t specified all tests will be ran\n' \
+                  'if 0 is given as a test number no tests will be ran'
 
     parser = argparse.ArgumentParser(
         usage='use -h or --help for more information',
@@ -204,7 +207,7 @@ def check_test_numbers(tests, usage):
     :param usage: usage string
     :return: 
     """
-    if not tests:
+    if not tests or tests[0] == 0:
         return
     test_numbers = [test for test in tests_switcher.keys()]
     unknown_tests = list(filter(lambda test: test not in test_numbers, tests))
