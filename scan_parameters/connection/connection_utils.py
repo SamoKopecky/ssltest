@@ -102,7 +102,6 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
     while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(5)  # in seconds
-        # context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         ssl_socket = context.wrap_socket(sock, server_hostname=url)
         try:
             logging.debug(f'connecting... (main connection)')

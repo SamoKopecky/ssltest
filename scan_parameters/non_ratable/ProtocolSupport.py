@@ -4,6 +4,7 @@ from OpenSSL import SSL
 from ..utils import rate_parameter
 from ..ratable.PType import PType
 from ..connection.connection_utils import create_session_pyopenssl
+from scan_vulnerabilities.tests import sslv3
 
 
 class ProtocolSupport:
@@ -20,6 +21,7 @@ class ProtocolSupport:
 
         :return: list of the supported protocols.
         """
+        logging.info('Scanning TLS versions...')
         ssl_versions = {
             SSL.TLSv1_METHOD: "TLSv1",
             SSL.TLSv1_1_METHOD: "TLSv1.1",
@@ -43,14 +45,18 @@ class ProtocolSupport:
         # Need to do this since there is no explicit option for TLSv1.3
         if 'TLSv1.3' not in supported_protocols:
             unsupported_protocols.append('TLSv1.3')
+        # SSLv3 scanning
+        result = sslv3.scan((self.url, self.port))
+        if result:
+            supported_protocols.append("SSLv3")
+        else:
+            unsupported_protocols.append("SSLv3")
         return supported_protocols, unsupported_protocols
 
-    def rate_protocols(self):
+    def rate_protocols(self, supported_protocols, unsupported_protocols):
         """
         Rate the scanned protocols.
         """
-        logging.info('Scanning TLS versions...')
-        supported_protocols, unsupported_protocols = self.scan_protocols()
         for protocol in supported_protocols:
             self.versions[PType.protocols][protocol] = rate_parameter(PType.protocol, protocol)
         for no_protocol in unsupported_protocols:

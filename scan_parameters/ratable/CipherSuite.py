@@ -53,8 +53,3 @@ class CipherSuite(Parameters):
         self.parameters[PType.protocol] = {self.protocol: 0}
         if self.protocol == 'TLSv1.3':
             self.parameters[PType.kex_algorithm] = {'ECDHE': 0}
-
-    def rate(self):
-        self.parse_cipher_suite()
-        self.parse_protocol_version()
-        self.rate_cipher_suite()

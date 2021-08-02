@@ -230,17 +230,22 @@ def scan(args, port: int):
     certificate, cert_verified, cipher_suite, protocol = get_website_info(args.url, port)
 
     cipher_suite = CipherSuite(cipher_suite, protocol)
-    cipher_suite.rate()
+    cipher_suite.parse_cipher_suite()
+    cipher_suite.parse_protocol_version()
+    cipher_suite.rate_cipher_suite()
 
     certificate = Certificate(certificate, cert_verified)
-    certificate.rate()
+    certificate.parse_certificate()
+    certificate.rate_certificate()
 
     protocol_support = ProtocolSupport(args.url, port)
-    protocol_support.rate_protocols()
+    supported_protocols, unsupported_protocols = protocol_support.scan_protocols()
+    protocol_support.rate_protocols(supported_protocols, unsupported_protocols)
 
     versions = WebServerSoft(args.url, port, args.nmap_scan)
     versions.scan_server_software()
 
+    # Get the version the initial connection was made on
     main_version = list(cipher_suite.parameters[PType.protocol].keys())[0]
     vulnerabilities = vulnerability_scan((args.url, port), args.test, main_version)
 
