@@ -54,15 +54,18 @@ class ProtocolSupport:
             supported_protocols.append("SSLv3")
         else:
             unsupported_protocols.append("SSLv3")
-        return supported_protocols, unsupported_protocols
+        for protocol in supported_protocols:
+            self.versions[PType.protocols][protocol] = 'N/A'
+        for no_protocol in unsupported_protocols:
+            self.versions[PType.no_protocol][no_protocol] = 'N/A'
 
-    def rate_protocols(self, supported_protocols, unsupported_protocols):
+    def rate_protocols(self):
         """
         Rate the scanned protocols.
         """
-        for protocol in supported_protocols:
+        for protocol in list(self.versions[PType.protocols].keys()):
             self.versions[PType.protocols][protocol] = rate_parameter(PType.protocol, protocol)
-        for no_protocol in unsupported_protocols:
+        for no_protocol in list(self.versions[PType.no_protocol].keys()):
             self.versions[PType.no_protocol][no_protocol] = rate_parameter(PType.no_protocol, no_protocol)
         if not self.versions:
             return

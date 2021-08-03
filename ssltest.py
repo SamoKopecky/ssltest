@@ -243,8 +243,8 @@ def scan(args, port: int):
     certificate.rate_certificate()
 
     protocol_support = ProtocolSupport(args.url, port)
-    supported_protocols, unsupported_protocols = protocol_support.scan_protocols()
-    protocol_support.rate_protocols(supported_protocols, unsupported_protocols)
+    protocol_support.scan_protocols()
+    protocol_support.rate_protocols()
 
     versions = WebServerSoft(args.url, port, args.nmap_scan)
     versions.scan_server_software()
