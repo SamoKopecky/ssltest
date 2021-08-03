@@ -1,7 +1,9 @@
 from .utils import read_json, hex_to_int
 
+from OpenSSL.crypto import X509
+from OpenSSL.crypto import verify
 from scan_vulnerabilities.utils import *
-from cryptography.x509 import load_pem_x509_certificate, load_der_x509_certificate
+from cryptography.x509 import load_der_x509_certificate
 
 
 class SSLv3:

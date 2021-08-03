@@ -59,10 +59,7 @@ class WebServerSoft:
         """
         Call the required functions to scan the webserver software.
         """
-        scans = []
-        # for testing purposes TODO: delete later
-        if self.url != '192.168.1.220':
-            scans.append(self.scan_software_http)
+        scans = [self.scan_software_http]
         if self.scan_nmap:
             scans.append(self.scan_software_nmap)
         for scan in scans:

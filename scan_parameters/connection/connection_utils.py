@@ -35,6 +35,7 @@ def get_website_info(url: str, port: int):
         sslv3 = SSLv3(url, port)
         sslv3.parse_cipher_suite()
         sslv3.parse_certificate()
+        sslv3.verify_cert()
         cipher_suite = sslv3.cipher_suite
         certificate = sslv3.certificate
         cert_verified = sslv3.cert_verified
