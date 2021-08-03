@@ -4,7 +4,7 @@ from OpenSSL import SSL
 from ..utils import rate_parameter
 from ..ratable.PType import PType
 from ..connection.connection_utils import create_session_pyopenssl
-from scan_vulnerabilities.tests import sslv3
+from ssl_scan.SSLv3 import SSLv3
 
 
 class ProtocolSupport:
@@ -23,10 +23,10 @@ class ProtocolSupport:
         """
         logging.info('Scanning TLS versions...')
         ssl_versions = {
-            SSL.TLSv1_METHOD: "TLSv1.0",
-            SSL.TLSv1_1_METHOD: "TLSv1.1",
-            SSL.TLSv1_2_METHOD: "TLSv1.2",
-            SSL.SSLv23_METHOD: ""
+            SSL.TLSv1_METHOD: 'TLSv1.0',
+            SSL.TLSv1_1_METHOD: 'TLSv1.1',
+            SSL.TLSv1_2_METHOD: 'TLSv1.2',
+            SSL.SSLv23_METHOD: 'unknown'
         }
         supported_protocols = []
         unsupported_protocols = []
@@ -35,8 +35,10 @@ class ProtocolSupport:
             version = ssl_versions[num_version]
             try:
                 ssl_socket = create_session_pyopenssl(self.url, self.port, context)
-                if version == "":
+                if version == 'unknown':
                     version = ssl_socket.get_protocol_version_name()
+                    if version == 'TLSv1':
+                        version += '.0'
                 ssl_socket.close()
                 if version not in supported_protocols:
                     supported_protocols.append(version)
@@ -46,7 +48,8 @@ class ProtocolSupport:
         if 'TLSv1.3' not in supported_protocols:
             unsupported_protocols.append('TLSv1.3')
         # SSLv3 scanning
-        result = sslv3.scan((self.url, self.port))
+        sslv3 = SSLv3(self.url, self.port)
+        result = sslv3.scan_sslv3_version()
         if result:
             supported_protocols.append("SSLv3")
         else:

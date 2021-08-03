@@ -9,6 +9,7 @@ from ..utils import convert_openssh_to_iana, incremental_sleep
 from ..exceptions.UnknownConnectionError import UnknownConnectionError
 from ..exceptions.ConnectionTimeoutError import ConnectionTimeoutError
 from ..exceptions.DNSError import DNSError
+from ssl_scan.SSLv3 import SSLv3
 
 
 def get_website_info(url: str, port: int):
@@ -25,10 +26,20 @@ def get_website_info(url: str, port: int):
         protocol -- protocol name and version
     """
     logging.info('Creating session...')
-    ssl_socket, cert_verified = create_session(url, port)
-    cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
-    certificate = get_certificate(ssl_socket)
-    ssl_socket.close()
+    try:
+        ssl_socket, cert_verified = create_session(url, port)
+        cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
+        certificate = get_certificate(ssl_socket)
+        ssl_socket.close()
+    except ssl.SSLError:
+        sslv3 = SSLv3(url, port)
+        sslv3.parse_cipher_suite()
+        sslv3.parse_certificate()
+        cipher_suite = sslv3.cipher_suite
+        certificate = sslv3.certificate
+        cert_verified = sslv3.cert_verified
+        protocol = sslv3.protocol
+
     return certificate, cert_verified, cipher_suite, protocol
 
 
