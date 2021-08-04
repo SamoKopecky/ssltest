@@ -7,7 +7,7 @@ class TextOutput:
     def __init__(self, data: str):
         self.output = ''
         self.ratings = read_json('security_levels_names.json')
-        self.type_names = read_json('type_names.json')
+        self.type_names = read_json('english_strings.json')
         self.data = data
         self.current_data = {}
 
@@ -83,7 +83,7 @@ class TextOutput:
             if len(values) > 0:
                 versions = []
                 for k, v in list(values.items()):
-                    versions.append(f'\t\t{k}->{v}')
+                    versions.append(f'\t\t{k}->{self.ratings[v]}')
                 values = '\n'.join(versions)
                 self.output += f'\t{self.type_names[key]}:\n{values}\n'
 

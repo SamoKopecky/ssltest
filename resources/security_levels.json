@@ -49,12 +49,12 @@
   },
   "protocol": {
     "1": "TLSv1.3,TLSv1.2",
-    "2": "TLSv1.1,TLSv1",
+    "2": "TLSv1.1,TLSv1.0",
     "3": "",
     "4": "SSLv3,SSLv2"
   },
   "no_protocol": {
-    "1": "SSLv3,SSLv2,TLSv1,TLSv1.1",
+    "1": "SSLv3,SSLv2,TLSv1.0,TLSv1.1",
     "2": "TLSv1.3",
     "3": "",
     "4": "TLSv1.2"

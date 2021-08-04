@@ -2,13 +2,14 @@
 
 import argparse, sys, logging, json, textwrap, traceback, os
 
-from scan_vulnerabilities import heartbleed
-from scan_vulnerabilities import ccs_injection
-from scan_vulnerabilities import insec_renegotiation as rene
-from scan_vulnerabilities import poodle
-from scan_vulnerabilities import session_ticket
-from scan_vulnerabilities import crime
-from scan_vulnerabilities import rc4_support
+from scan_vulnerabilities.tests import heartbleed
+from scan_vulnerabilities.tests import ccs_injection
+from scan_vulnerabilities.tests import insec_renegotiation as rene
+from scan_vulnerabilities.tests import poodle
+from scan_vulnerabilities.tests import session_ticket
+from scan_vulnerabilities.tests import crime
+from scan_vulnerabilities.tests import rc4_support
+from ssl_scan.SSLv3 import SSLv3
 from scan_parameters.ratable.CipherSuite import CipherSuite
 from scan_parameters.ratable.Certificate import Certificate
 from scan_parameters.non_ratable.ProtocolSupport import ProtocolSupport
@@ -20,6 +21,16 @@ from scan_parameters.utils import fix_url
 from text_output.TextOutput import TextOutput
 from scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
 from fix_openssl_config import fix_openssl_config
+
+tests_switcher = {
+    1: (heartbleed.scan, 'Heartbleed'),
+    2: (ccs_injection.scan, 'CCS injection'),
+    3: (rene.scan, 'Insecure renegotiation'),
+    4: (poodle.scan, 'ZombiePOODLE/GOLDENDOOLDE'),
+    5: (session_ticket.scan, 'Session ticket support'),
+    6: (crime.scan, 'CRIME'),
+    7: (rc4_support.scan, 'RC4 support')
+}
 
 
 def tls_test(program_args):
@@ -54,24 +65,18 @@ def vulnerability_scan(address, tests, version):
     """
     Forwards the appropriate tests to multithreading function
 
+    :param version: ssl protocol version
     :param address: tuple of an url and port
     :param tests: input option for tests
     :return: dictionary of scanned results
     """
+    # if no -t argument is present
     if not tests:
+        scans = [value for value in tests_switcher.values()]
+    elif 0 in tests:
         return {}
-    scans = []
-    switcher = {
-        1: (heartbleed.scan, 'Heartbleed'),
-        2: (ccs_injection.scan, 'CCS injection'),
-        3: (rene.scan, 'Insecure renegotiation'),
-        4: (poodle.scan, 'ZombiePOODLE/GOLDENDOOLDE'),
-        5: (session_ticket.scan, 'Session ticket support'),
-        6: (crime.scan, 'CRIME'),
-        7: (rc4_support.scan, 'RC4 support'),
-    }
-    for test in tests:
-        scans.append(switcher.get(test))
+    else:
+        scans = [tests_switcher.get(test) for test in tests]
     return scan_vulnerabilities(scans, address, version)
 
 
@@ -149,6 +154,15 @@ def parse_options(program_args):
 
     :return: object of parsed arguments
     """
+    tests_help = 'test the server for a specified vulnerability\n' \
+                 'possible vulnerabilities (separate with spaces):\n'
+    for key, value in tests_switcher.items():
+        test_number = key
+        test_desc = value[1]
+        tests_help += f'{" " * 4}{test_number}: {test_desc}\n'
+    tests_help += 'if this argument isn\'t specified all tests will be ran\n' \
+                  'if 0 is given as a test number no tests will be ran'
+
     parser = argparse.ArgumentParser(
         usage='use -h or --help for more information',
         description='Script that scans a webservers cryptographic parameters and vulnerabilities',
@@ -168,17 +182,7 @@ def parse_options(program_args):
                         output is written to the given file 
                         '''))
     parser.add_argument('-t', '--test', type=int, metavar='test_num', nargs='+',
-                        help=textwrap.dedent('''\
-                        test the server for a specified vulnerability
-                        possible vulnerabilities (separate with spaces):
-                            1: Heartbleed
-                            2: ChangeCipherSpec Injection
-                            3: Insecure renegotiation
-                            4: ZombiePOODLE/GOLDENDOODLE
-                            5: Session ticket support
-                            6: CRIME
-                            7: RC4 support
-                        '''))
+                        help=textwrap.dedent(tests_help))
     parser.add_argument('-fc', '--fix-conf', action='store_true', default=False,
                         help=textwrap.dedent('''\
                         allow the use of older versions of TLS protocol
@@ -192,16 +196,24 @@ def parse_options(program_args):
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
 
     args = parser.parse_args(program_args)
-    check_test_numbers(args, parser)
+    check_test_numbers(args.test, parser.usage)
     return args
 
 
-def check_test_numbers(args, parser):
-    if not args.test:
+def check_test_numbers(tests, usage):
+    """
+    Check if the tests numbers are actually tests
+    
+    :param tests: test argument
+    :param usage: usage string
+    :return: 
+    """
+    if not tests or 0 in tests:
         return
-    unknown_tests = list(filter(lambda test: test not in [1, 2, 3, 4, 5, 6, 7], args.test))
+    test_numbers = [test for test in tests_switcher.keys()]
+    unknown_tests = list(filter(lambda test: test not in test_numbers, tests))
     if unknown_tests:
-        parser.print_usage()
+        print(f'usage: {usage}')
         if len(unknown_tests) > 1:
             unknown_tests = list(map(str, unknown_tests))
             print(f'Numbers {", ".join(unknown_tests)} are not test numbers.', file=sys.stderr)
@@ -222,17 +234,22 @@ def scan(args, port: int):
     certificate, cert_verified, cipher_suite, protocol = get_website_info(args.url, port)
 
     cipher_suite = CipherSuite(cipher_suite, protocol)
-    cipher_suite.rate()
+    cipher_suite.parse_cipher_suite()
+    cipher_suite.parse_protocol_version()
+    cipher_suite.rate_cipher_suite()
 
     certificate = Certificate(certificate, cert_verified)
-    certificate.rate()
+    certificate.parse_certificate()
+    certificate.rate_certificate()
 
     protocol_support = ProtocolSupport(args.url, port)
+    protocol_support.scan_protocols()
     protocol_support.rate_protocols()
 
     versions = WebServerSoft(args.url, port, args.nmap_scan)
     versions.scan_server_software()
 
+    # Get the version the initial connection was made on
     main_version = list(cipher_suite.parameters[PType.protocol].keys())[0]
     vulnerabilities = vulnerability_scan((args.url, port), args.test, main_version)
 

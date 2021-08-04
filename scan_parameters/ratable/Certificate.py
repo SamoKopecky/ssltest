@@ -73,7 +73,3 @@ class Certificate(Parameters):
         rateable_parameters = list(self.parameters.keys())
         key_types = [PType.cert_pub_key_length]
         self.rate_parameters(rateable_parameters, key_types)
-
-    def rate(self):
-        self.parse_certificate()
-        self.rate_certificate()
