@@ -7,7 +7,7 @@
                                  |_|
 ```
 
-# scriptname
+# SSLTest
 
 ## Installation
 
