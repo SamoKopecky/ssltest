@@ -1,4 +1,4 @@
-from ..utils import read_json
+from ...utils import read_json
 from .Parameters import Parameters
 from .PType import PType
 

@@ -1,6 +1,6 @@
 import json
+from ..utils import read_json
 
-from scan_parameters.utils import read_json
 
 
 class TextOutput:

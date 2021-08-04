@@ -1,15 +1,16 @@
-import ssl
-import socket
 import logging
+import socket
+import ssl
 
 from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-from ..utils import convert_openssh_to_iana, incremental_sleep
-from ..exceptions.UnknownConnectionError import UnknownConnectionError
+
 from ..exceptions.ConnectionTimeoutError import ConnectionTimeoutError
 from ..exceptions.DNSError import DNSError
-from ssl_scan.SSLv3 import SSLv3
+from ..exceptions.UnknownConnectionError import UnknownConnectionError
+from ..utils import convert_openssh_to_iana, incremental_sleep
+from ...ssl_scan.SSLv3 import SSLv3
 
 
 def get_website_info(url: str, port: int):

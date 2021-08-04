@@ -1,26 +1,23 @@
-#!/usr/bin/python3
-
 import argparse, sys, logging, json, textwrap, traceback, os
 
-from scan_vulnerabilities.tests import heartbleed
-from scan_vulnerabilities.tests import ccs_injection
-from scan_vulnerabilities.tests import insec_renegotiation as rene
-from scan_vulnerabilities.tests import poodle
-from scan_vulnerabilities.tests import session_ticket
-from scan_vulnerabilities.tests import crime
-from scan_vulnerabilities.tests import rc4_support
-from ssl_scan.SSLv3 import SSLv3
-from scan_parameters.ratable.CipherSuite import CipherSuite
-from scan_parameters.ratable.Certificate import Certificate
-from scan_parameters.non_ratable.ProtocolSupport import ProtocolSupport
-from scan_parameters.non_ratable.WebServerSoft import WebServerSoft
-from scan_parameters.connection.connection_utils import get_website_info
-from scan_parameters.non_ratable.port_discovery import discover_ports
-from scan_parameters.ratable.PType import PType
-from scan_parameters.utils import fix_url
-from text_output.TextOutput import TextOutput
-from scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
-from fix_openssl_config import fix_openssl_config
+from .scan_vulnerabilities.tests import heartbleed
+from .scan_vulnerabilities.tests import ccs_injection
+from .scan_vulnerabilities.tests import insec_renegotiation as rene
+from .scan_vulnerabilities.tests import poodle
+from .scan_vulnerabilities.tests import session_ticket
+from .scan_vulnerabilities.tests import crime
+from .scan_vulnerabilities.tests import rc4_support
+from .scan_parameters.ratable.CipherSuite import CipherSuite
+from .scan_parameters.ratable.Certificate import Certificate
+from .scan_parameters.non_ratable.ProtocolSupport import ProtocolSupport
+from .scan_parameters.non_ratable.WebServerSoft import WebServerSoft
+from .scan_parameters.connection.connection_utils import get_website_info
+from .scan_parameters.non_ratable.port_discovery import discover_ports
+from .scan_parameters.ratable.PType import PType
+from .scan_parameters.utils import fix_url
+from .text_output.TextOutput import TextOutput
+from .scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
+from .fix_openssl_config import fix_openssl_config
 
 tests_switcher = {
     1: (heartbleed.scan, 'Heartbleed'),
@@ -33,8 +30,8 @@ tests_switcher = {
 }
 
 
-def tls_test(program_args):
-    args = parse_options(program_args)
+def tls_test(args):
+    # args = parse_options(program_args)
     fix_conf_option(args)
     if '/' in args.url:
         args.url = fix_url(args.url)
@@ -142,16 +139,15 @@ def info_report_option(args):
 
     :param args: input options
     """
-    if args.verbose:
+    if args.debug:
         logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
-    elif args.information:
+    elif args.info:
         logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 
 def parse_options(program_args):
     """
     Parse input options.
-
     :return: object of parsed arguments
     """
     tests_help = 'test the server for a specified vulnerability\n' \
@@ -196,30 +192,28 @@ def parse_options(program_args):
     parser.add_argument('-v', '--verbose', action='store_true', default=False, help='output more information')
 
     args = parser.parse_args(program_args)
-    check_test_numbers(args.test, parser.usage)
     return args
 
 
-def check_test_numbers(tests, usage):
+def check_test_numbers(tests):
     """
     Check if the tests numbers are actually tests
-    
+
     :param tests: test argument
-    :param usage: usage string
-    :return: 
+    :param print_usage: usage string
+    :return:
     """
     if not tests or 0 in tests:
         return
     test_numbers = [test for test in tests_switcher.keys()]
     unknown_tests = list(filter(lambda test: test not in test_numbers, tests))
     if unknown_tests:
-        print(f'usage: {usage}')
         if len(unknown_tests) > 1:
             unknown_tests = list(map(str, unknown_tests))
             print(f'Numbers {", ".join(unknown_tests)} are not test numbers.', file=sys.stderr)
         else:
             print(f'Number {unknown_tests[0]} is not a test number.', file=sys.stderr)
-        exit(1)
+        sys.exit(1)
 
 
 def scan(args, port: int):
@@ -262,6 +256,7 @@ def scan(args, port: int):
                                    port, args.url)
 
 
-if __name__ == "__main__":
-    out = tls_test(sys.argv[1:])
+def start(args):
+    check_test_numbers(args.test)
+    out = tls_test(args)
     if out: print(out)

@@ -1,8 +1,5 @@
 from .utils import read_json, hex_to_int
-
-from OpenSSL.crypto import X509
-from OpenSSL.crypto import verify
-from scan_vulnerabilities.utils import *
+from ..scan_vulnerabilities.utils import send_client_hello
 from cryptography.x509 import load_der_x509_certificate
 
 

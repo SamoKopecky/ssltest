@@ -8,6 +8,7 @@ from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
 from .exceptions.NoIanaPairFound import NoIanaPairFound
 from .ratable.PType import PType
+from ..utils import read_json
 
 
 def convert_openssh_to_iana(search_term: str):
@@ -23,20 +24,6 @@ def convert_openssh_to_iana(search_term: str):
         if json_data[row] == search_term:
             return row
     raise NoIanaPairFound()
-
-
-def read_json(file_name: str):
-    """
-    Read a json file and return its content.
-
-    :param file_name: json file name
-    :return: json data in python objects
-    """
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    file = open(f'{root_dir}/../resources/{file_name}', 'r')
-    json_data = json.loads(file.read())
-    file.close()
-    return json_data
 
 
 def rate_key_length_parameter(algorithm_type: PType, key_len: str, key_len_type: PType):

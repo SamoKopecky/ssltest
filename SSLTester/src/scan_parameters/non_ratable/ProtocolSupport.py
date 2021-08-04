@@ -4,7 +4,7 @@ from OpenSSL import SSL
 from ..utils import rate_parameter
 from ..ratable.PType import PType
 from ..connection.connection_utils import create_session_pyopenssl
-from ssl_scan.SSLv3 import SSLv3
+from ...ssl_scan.SSLv3 import SSLv3
 
 
 class ProtocolSupport:

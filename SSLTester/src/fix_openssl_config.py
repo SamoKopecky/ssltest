@@ -22,7 +22,7 @@ def fix_openssl_config():
         append[1] = True
 
     if append[0] or append[1]:
-        correct_config_file = open('resources/correct_openssl_conf.txt', 'r')
+        correct_config_file = open('../../resources/correct_openssl_conf.txt', 'r')
         correct_config = correct_config_file.read()
         with open(config_file_name, 'w') as f:
             f.seek(0, 0)
