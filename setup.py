@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="SSLTester",
+    name="SSLTest",
     description="",
     version="0.0.1",
     author="Penterep",
@@ -16,6 +16,6 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     install_requires=["ptlibs", ""],
-    entry_points={'console_scripts': ['scriptname = SSLTester.SSLTester:main']},
+    entry_points={'console_scripts': ['scriptname = SSLTest.SSLTest:main']},
     include_package_data=True
 )

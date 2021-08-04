@@ -9,11 +9,11 @@ import sys
 from src.start_script import start
 
 
-class SSLTester:
+class SSLTest:
     def __init__(self, args):
         self.args = args
         self.ptjsonlib = ptjsonlib.ptjsonlib(self.args.json)
-        self.json_no = self.ptjsonlib.add_json("SSLTester")
+        self.json_no = self.ptjsonlib.add_json("SSLTest")
         self.use_json = self.args.json
 
     def run(self):
@@ -25,11 +25,11 @@ def get_help():
     return [
         {"description": ["Script that scans a webservers cryptographic parameters and vulnerabilities"]},
         {"usage": [
-            "SSLTester.py -u url <-h> <-ns> <-nd> <-p port <port ...>> <-j <output_file>> <-t test_num <test_num ...>>"
+            "SSLTest.py -u url <-h> <-ns> <-nd> <-p port <port ...>> <-j <output_file>> <-t test_num <test_num ...>>"
             " <-fc> <-i> <-v>"
         ]},
         {"usage_example": [
-            "SSLTester.py -u github.com -t 1 2",
+            "SSLTest.py -u github.com -t 1 2",
         ]},
         {"options": [
             ["-u", "--url", "<url>", "Url to scan, required option"],
@@ -68,9 +68,9 @@ def parse_args():
 
 def main():
     global SCRIPTNAME
-    SCRIPTNAME = "SSLTester"
+    SCRIPTNAME = "SSLTest"
     args = parse_args()
-    script = SSLTester(args)
+    script = SSLTest(args)
     script.run()
 
 

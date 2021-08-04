@@ -12,14 +12,14 @@
 ## Installation
 
 ```
-$ git clone SSLTester
-$ cd SSLTester && sudo pip install .
+$ git clone SSLTest
+$ cd SSLTest && sudo pip install .
 ```
 
 ## Installation (ptmanager) 
 
 ```
-$ sudo ptmanager -ut SSLTester
+$ sudo ptmanager -ut SSLTest
 ```
 
 ## Options
