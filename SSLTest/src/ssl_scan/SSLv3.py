@@ -1,6 +1,17 @@
-from .utils import read_json, hex_to_int
-from ..scan_vulnerabilities.utils import send_client_hello
+from ..utils import read_json, communicate_data_return_sock
 from cryptography.x509 import load_der_x509_certificate
+
+
+def hex_to_int(hex_num: list):
+    result = '0x'
+    # {}:02x:
+    # {}: -- value
+    # 0 -- padding with zeros
+    # 2 -- number digits
+    # x -- hex format
+    for num in hex_num:
+        result += f'{num:02x}'
+    return int(result, 16)
 
 
 class SSLv3:
@@ -44,7 +55,7 @@ class SSLv3:
             0x01,  # Compression methods length
             0x00  # Compression methods
         ])
-        self.response, _ = send_client_hello(self.address, self.client_hello, self.timeout)
+        self.response, _ = communicate_data_return_sock(self.address, self.client_hello, self.timeout, "SSLv3 scan")
 
     def scan_sslv3_version(self):
         # Test if the response is Content type Alert (0x15)

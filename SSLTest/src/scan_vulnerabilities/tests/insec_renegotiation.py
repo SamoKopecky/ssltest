@@ -1,4 +1,7 @@
-from ..utils import *
+import logging
+
+from ..utils import is_server_hello
+from ...utils import communicate_data_return_sock
 
 renegotiation_extension = bytes([
     0xff, 0x01, 0x00, 0x01, 0x00
@@ -68,7 +71,7 @@ def scan(address, version):
     client_hello = construct_client_hello(version)
     logging.info("Scanning Renegotiation vulnerability...")
     timeout = 2
-    server_hello, sock = send_client_hello(address, client_hello, timeout)
+    server_hello, sock = communicate_data_return_sock(address, client_hello, timeout)
     sock.close()
     logging.info("Renegotiation vulnerability scan done.")
     if not is_server_hello(server_hello):

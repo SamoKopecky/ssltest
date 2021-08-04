@@ -1,4 +1,7 @@
-from ..utils import *
+import logging
+
+from ..utils import is_server_hello
+from ...utils import communicate_data_return_sock, receive_data
 
 
 def construct_client_hello(version):
@@ -69,7 +72,7 @@ def scan(address, version):
     client_hello = construct_client_hello(version)
     logging.info('Scanning CCS injection vulnerability...')
     timeout = 2
-    server_hello, sock = send_client_hello(address, client_hello, timeout)
+    server_hello, sock = communicate_data_return_sock(address, client_hello, timeout)
     if not is_server_hello(server_hello):
         logging.info('CCS injection scan done.')
         sock.close()

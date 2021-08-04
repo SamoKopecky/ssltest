@@ -1,5 +1,10 @@
-from ..utils import *
+import logging
+import socket
+
 from OpenSSL import SSL
+
+from ..utils import is_server_hello
+from ...utils import communicate_data_return_sock
 
 
 def construct_client_hello(version):
@@ -80,7 +85,7 @@ def scan(address, version):
     """
     client_hello = construct_client_hello(version)
     logging.info("Scanning Poodle vulnerability...")
-    server_hello, sock = send_client_hello(address, client_hello, 2)
+    server_hello, sock = communicate_data_return_sock(address, client_hello, 2)
     # If no server hello is sent the server doesn't support
     # CBC ciphers
     if not is_server_hello(server_hello):
