@@ -1,5 +1,6 @@
-from ..utils import read_json, communicate_data_return_sock
 from cryptography.x509 import load_der_x509_certificate
+
+from ...utils import read_json, communicate_data_return_sock
 
 
 def hex_to_int(hex_num: list):

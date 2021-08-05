@@ -2,7 +2,6 @@ import json
 from ..utils import read_json
 
 
-
 class TextOutput:
     def __init__(self, data: str):
         self.output = ''
@@ -19,7 +18,7 @@ class TextOutput:
         """
         return self.ratings[str(rating)]
 
-    def text_output(self):
+    def get_formatted_text(self):
         """
         Call all other text output functions for each port and url.
         """
@@ -118,44 +117,3 @@ class TextOutput:
         self.output += 'Scanned vulnerabilities:\n'
         for key, value in list(data.items()):
             self.output += f'\t{key}->{string_map.get(value)}\n'
-
-    @staticmethod
-    def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
-                     certificate_non_parameters, software, vulnerabilities, port, url):
-        """
-        Dump web server parameters to a single dict.
-
-        :param cipher_suite: tuple containing parameters and the worst rating
-        :param certificate_parameters: tuple containing parameters and the worst rating
-        :param certificate_non_parameters: certificate parameters such as subject/issuer
-        :param protocol_support: dictionary of supported tls protocols
-        :param software: web server software
-        :param port: scanned port
-        :param url: scanned url
-        :param vulnerabilities: scanned vulnerabilities
-        :return: dictionary
-        """
-        dump = {}
-
-        # Parameters
-        worst_rating = max([cipher_suite[1], certificate_parameters[1]])
-        parameters = {key.name: value for key, value in cipher_suite[0].items()}
-        parameters.update({key.name: value for key, value in certificate_parameters[0].items()})
-        parameters.update({'rating': worst_rating})
-
-        # Non ratable cert info
-        certificate_info = {key.name: value for key, value in certificate_non_parameters.items()}
-
-        # Protocol support
-        protocols = {}
-        keys = {key.name: value for key, value in protocol_support[0].items()}
-        for key, value in list(keys.items()):
-            protocols[key] = value
-        protocols.update({'rating': protocol_support[1]})
-
-        dump.update({'parameters': parameters})
-        dump.update({'certificate_info': certificate_info})
-        dump.update({'protocol_support': protocols})
-        dump.update({'web_server_software': software})
-        dump.update({'vulnerabilities': vulnerabilities})
-        return {f'{url}:{port}': dump}

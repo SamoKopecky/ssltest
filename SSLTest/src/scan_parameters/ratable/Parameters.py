@@ -1,5 +1,6 @@
-from ..utils import rate_key_length_parameter, rate_parameter
 from abc import ABC
+
+from ..utils import rate_key_length_parameter, rate_parameter
 
 
 class Parameters(ABC):

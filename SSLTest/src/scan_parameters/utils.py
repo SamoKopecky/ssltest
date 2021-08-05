@@ -1,11 +1,10 @@
-import json
 import logging
 import re
-import os
 import time
 
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
+
 from .exceptions.NoIanaPairFound import NoIanaPairFound
 from .ratable.PType import PType
 from ..utils import read_json

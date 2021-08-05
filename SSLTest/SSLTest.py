@@ -4,7 +4,6 @@ __version__ = "0.0.1"
 
 import argparse
 import sys
-import textwrap
 
 from ptlibs import ptjsonlib, ptmisclib
 
@@ -19,7 +18,7 @@ class SSLTest:
         self.use_json = self.args.json
 
     def run(self):
-        run(self.args, )
+        run(self.args)
         ptmisclib.ptprint(ptmisclib.out_if(self.ptjsonlib.get_all_json(), "", self.use_json))
 
 

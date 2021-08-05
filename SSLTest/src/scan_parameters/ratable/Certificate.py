@@ -1,7 +1,8 @@
 from cryptography import x509
-from ..utils import pub_key_alg_from_cert, get_sig_alg_from_oid
+
 from .Parameters import Parameters
 from .PType import PType
+from ..utils import pub_key_alg_from_cert, get_sig_alg_from_oid
 
 
 class Certificate(Parameters):

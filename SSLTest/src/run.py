@@ -5,8 +5,8 @@ import sys
 import traceback
 
 from .fix_openssl_config import fix_openssl_config
-from .scan_parameters.connection.connection_utils import get_website_info
-from .scan_parameters.non_ratable.ProtocolSupport import ProtocolSupport
+from .scan_parameters.connections.connection_utils import get_website_info
+from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
 from .scan_parameters.non_ratable.WebServerSoft import WebServerSoft
 from .scan_parameters.non_ratable.port_discovery import discover_ports
 from .scan_parameters.ratable.Certificate import Certificate
@@ -83,7 +83,7 @@ def json_option(args, output_data):
     json_output_data = json.dumps(output_data, indent=2)
     if args.json is False:
         text_output = TextOutput(json_output_data)
-        text_output.text_output()
+        text_output.get_formatted_text()
         return text_output.output
     elif args.json is None:
         return json_output_data
@@ -141,6 +141,47 @@ def info_report_option(args):
         logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 
+def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
+                 certificate_non_parameters, software, vulnerabilities, port, url):
+    """
+    Dump web server parameters to a single dict.
+
+    :param cipher_suite: tuple containing parameters and the worst rating
+    :param certificate_parameters: tuple containing parameters and the worst rating
+    :param certificate_non_parameters: certificate parameters such as subject/issuer
+    :param protocol_support: dictionary of supported tls protocols
+    :param software: web server software
+    :param port: scanned port
+    :param url: scanned url
+    :param vulnerabilities: scanned vulnerabilities
+    :return: dictionary
+    """
+    dump = {}
+
+    # Parameters
+    worst_rating = max([cipher_suite[1], certificate_parameters[1]])
+    parameters = {key.name: value for key, value in cipher_suite[0].items()}
+    parameters.update({key.name: value for key, value in certificate_parameters[0].items()})
+    parameters.update({'rating': worst_rating})
+
+    # Non ratable cert info
+    certificate_info = {key.name: value for key, value in certificate_non_parameters.items()}
+
+    # Protocol support
+    protocols = {}
+    keys = {key.name: value for key, value in protocol_support[0].items()}
+    for key, value in list(keys.items()):
+        protocols[key] = value
+    protocols.update({'rating': protocol_support[1]})
+
+    dump.update({'parameters': parameters})
+    dump.update({'certificate_info': certificate_info})
+    dump.update({'protocol_support': protocols})
+    dump.update({'web_server_software': software})
+    dump.update({'vulnerabilities': vulnerabilities})
+    return {f'{url}:{port}': dump}
+
+
 def scan(args, port: int):
     """
     Call other scanning functions for a specific url and port
@@ -173,12 +214,11 @@ def scan(args, port: int):
     vulnerabilities = vulnerability_scan((args.url, port), args.test, main_version)
 
     logging.info('Scanning done.')
-    return TextOutput.dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
-                                   (certificate.parameters, certificate.rating),
-                                   (protocol_support.versions, protocol_support.rating),
-                                   certificate.non_parameters,
-                                   versions.versions, vulnerabilities,
-                                   port, args.url)
+    return dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
+                        (certificate.parameters, certificate.rating),
+                        (protocol_support.versions, protocol_support.rating),
+                        certificate.non_parameters, versions.versions, vulnerabilities,
+                        port, args.url)
 
 
 def run(args):

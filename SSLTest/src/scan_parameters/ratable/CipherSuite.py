@@ -1,6 +1,6 @@
-from ...utils import read_json
 from .Parameters import Parameters
 from .PType import PType
+from ...utils import read_json
 
 
 class CipherSuite(Parameters):
