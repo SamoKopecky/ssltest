@@ -91,6 +91,7 @@ def json_option(args, output_data):
         file = open(args.json, 'w')
         file.write(json_output_data)
         file.close()
+        print(f"Output writen to {args.json}", file=sys.stderr)
 
 
 def scan_all_ports(args):

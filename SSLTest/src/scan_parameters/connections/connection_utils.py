@@ -7,6 +7,7 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
 from .SSLv3 import SSLv3
+from .SSLv2 import SSLv2
 from ..exceptions.ConnectionTimeoutError import ConnectionTimeoutError
 from ..exceptions.DNSError import DNSError
 from ..exceptions.UnknownConnectionError import UnknownConnectionError

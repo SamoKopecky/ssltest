@@ -1,5 +1,6 @@
 from cryptography.x509 import load_der_x509_certificate
 
+from .SSLvX import SSLvX
 from ...utils import read_json, communicate_data_return_sock
 
 
@@ -15,14 +16,10 @@ def hex_to_int(hex_num: list):
     return int(result, 16)
 
 
-class SSLv3:
+class SSLv3(SSLvX):
     def __init__(self, url, port):
-        self.address = (url, port)
+        super().__init__(url, port)
         self.protocol = 'SSLv3'
-        self.cipher_suite = None
-        self.certificate = None
-        self.cert_verified = None
-        self.timeout = 2
         self.client_hello = bytes([
             # Record protocol
             0x16,  # Content type (Handshake)
@@ -58,7 +55,7 @@ class SSLv3:
         ])
         self.response, _ = communicate_data_return_sock(self.address, self.client_hello, self.timeout, "SSLv3 scan")
 
-    def scan_sslv3_version(self):
+    def scan_version_support(self):
         # Test if the response is Content type Alert (0x15)
         # and test if the alert message is handshake failure (0x28)
         if self.response[0] == 0x15 and self.response[6] == 0x28:

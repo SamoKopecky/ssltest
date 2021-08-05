@@ -43,7 +43,7 @@ def get_help():
     return [
         {"description": ["Script that scans a webservers cryptographic parameters and vulnerabilities"]},
         {"usage": [get_usage()]},
-        {"usage_example": [f"{SCRIPTNAME}.py -u github.com -t 1 2"]},
+        {"usage_example": [f"{SCRIPTNAME}.py -u https://example.com -t 1 2"]},
         {"options": [
             ["-u", "--url", "<url>", "Url to scan, required option"],
             ["-p", "--port", "", "Port or ports (separate with spaces) to scan on (default: [443])"],
@@ -51,8 +51,8 @@ def get_help():
                                  "given file"],
             ["-t", "--test", "", get_tests_help()],
             ["-fc", "--fix-conf", "", "Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) in order to"
-                                      " scan a server which still run on these versions. !WARNING!: this may rewrite"
-                                      " the contents of a configuration file located at /etc/ssl/openssl.cnf"],
+                                      "\n scan a server which still run on these versions. !WARNING!: this may rewrite"
+                                      "\n the contents of a configuration file located at /etc/ssl/openssl.cnf"],
             ["-ns", "--nmap-scan", "", "Use nmap to scan the server version"],
             ["-nd", "--nmap-discover", "", "Use nmap to discover web server ports"],
             ["-i", "--info", "", "Output some internal information about the script functions"],
