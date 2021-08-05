@@ -30,7 +30,7 @@ class SSLv2(SSLvX):
             return False
         # Test if the response is Content type Alert (0x15)
         # and test if alert message is protocol version (0x46)
-        elif self.response[0] == 0x15 and self.response[6] == 0x46:
+        elif self.response[0] == 0x15 and (self.response[6] == 0x28 or self.response[6] == 0x46):
             return False
         # Test if the handshake message type is server hello
         elif self.response[2] == 0x04:

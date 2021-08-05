@@ -58,7 +58,8 @@ class SSLv3(SSLvX):
     def scan_version_support(self):
         # Test if the response is Content type Alert (0x15)
         # and test if the alert message is handshake failure (0x28)
-        if self.response[0] == 0x15 and self.response[6] == 0x28:
+        # or protocol version alert (0x46)
+        if self.response[0] == 0x15 and (self.response[6] == 0x28 or self.response[6] == 0x46):
             return False
         return True
 
