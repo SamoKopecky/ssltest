@@ -56,12 +56,16 @@ class SSLv3(SSLvX):
         self.response, _ = communicate_data_return_sock(self.address, self.client_hello, self.timeout, "SSLv3 scan")
 
     def scan_version_support(self):
+        if len(self.response) == 0:
+            return False
         # Test if the response is Content type Alert (0x15)
         # and test if the alert message is handshake failure (0x28)
         # or protocol version alert (0x46)
-        if self.response[0] == 0x15 and (self.response[6] == 0x28 or self.response[6] == 0x46):
+        elif self.response[0] == 0x15 and (self.response[6] == 0x28 or self.response[6] == 0x46):
             return False
-        return True
+        elif self.response[0] == 0x16 and self.response[5] == 0x02:
+            return True
+        return False
 
     def parse_cipher_suite(self):
         cipher_suites = read_json('iana_cipher_suites.json')

@@ -26,6 +26,7 @@ from .text_output.TextOutput import TextOutput
 
 def get_tests_switcher():
     return {
+        0: (None, 'No test'),
         1: (heartbleed.scan, 'Heartbleed'),
         2: (ccs_injection.scan, 'CCS injection'),
         3: (rene.scan, 'Insecure renegotiation'),
@@ -65,7 +66,8 @@ def vulnerability_scan(address, tests, version):
     tests_switcher = get_tests_switcher()
     # if no -t argument is present
     if not tests:
-        scans = [value for value in tests_switcher.values()]
+        # Remove test at 0th index
+        scans = [value for value in list(tests_switcher.values())[1:]]
     elif 0 in tests:
         return {}
     else:
@@ -192,7 +194,13 @@ def scan(args, port: int):
     :return: a single dictionary containing scanned data
     """
     logging.info(f'Scanning for {args.url}:{port}')
-    certificate, cert_verified, cipher_suite, protocol = get_website_info(args.url, port)
+
+    protocol_support = ProtocolSupport(args.url, port)
+    protocol_support.scan_protocols()
+    protocol_support.rate_protocols()
+
+    certificate, cert_verified, cipher_suite, protocol = get_website_info(args.url, port,
+                                                                          protocol_support.supported_protocols)
 
     cipher_suite = CipherSuite(cipher_suite, protocol)
     cipher_suite.parse_cipher_suite()
@@ -202,10 +210,6 @@ def scan(args, port: int):
     certificate = Certificate(certificate, cert_verified)
     certificate.parse_certificate()
     certificate.rate_certificate()
-
-    protocol_support = ProtocolSupport(args.url, port)
-    protocol_support.scan_protocols()
-    protocol_support.rate_protocols()
 
     versions = WebServerSoft(args.url, port, args.nmap_scan)
     versions.scan_server_software()

@@ -10,16 +10,16 @@ from .SSLv3 import SSLv3
 from .SSLv2 import SSLv2
 from ..exceptions.ConnectionTimeoutError import ConnectionTimeoutError
 from ..exceptions.DNSError import DNSError
-from ..exceptions.UnknownConnectionError import UnknownConnectionError
 from ..utils import convert_openssh_to_iana, incremental_sleep
 
 
-def get_website_info(url: str, port: int):
+def get_website_info(url: str, port: int, supported_protocols):
     """
     Gather objects to be used in rating a web server.
 
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
+    :param supported_protocols:
     :param port: port to scan on
     :param url: url of the webserver
     :return:
@@ -33,7 +33,7 @@ def get_website_info(url: str, port: int):
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
-    except ssl.SSLError:
+    except (ssl.SSLError, ConnectionResetError) as e:
         sslv3 = SSLv3(url, port)
         sslv3.parse_cipher_suite()
         sslv3.parse_certificate()
@@ -129,8 +129,6 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
             raise ConnectionTimeoutError()
         except socket.gaierror:
             raise DNSError()
-        except ConnectionResetError as e:
-            raise UnknownConnectionError(e)
         except socket.error as e:
             ssl_socket.close()
             sleep = incremental_sleep(sleep, e, 1)
