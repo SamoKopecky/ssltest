@@ -52,7 +52,7 @@ def receive_data(sock, timeout, debug_source=None):
                 begin = time()
             else:
                 sleep(0.1)
-        except socket.timeout:
+        except (socket.timeout, ConnectionResetError):
             pass
     return bytes(all_data)
 
