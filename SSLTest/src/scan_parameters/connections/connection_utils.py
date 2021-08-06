@@ -83,6 +83,7 @@ def create_session_pyopenssl(url: str, port: int, context: SSL.Context):
     :return: created secure socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    context.set_cipher_list(b'ALL')
     ssl_socket = SSL.Connection(context, sock)
     sleep = 0
     # Loop until there is a valid response or after 15 seconds
@@ -110,6 +111,7 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
     cert_verified = True
     context.check_hostname = True
     context.verify_mode = ssl.VerifyMode.CERT_REQUIRED
+    context.set_ciphers('ALL')
     sleep = 0
     # Loop until there is a valid response or after 15 seconds
     # because of rate limiting on some servers
