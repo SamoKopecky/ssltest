@@ -15,13 +15,13 @@
     "1": "AES",
     "2": "",
     "3": "TDEA,2DES,3DES",
-    "4": "SKIPJACK, RC4"
+    "4": "SKIPJACK,RC4,DES"
   },
   "sym_enc_algorithm_key_length": {
     "1": "AES,>=128",
     "2": "",
     "3": "3DES,>=168,2DES,>=112,TDEA,>=168",
-    "4": "AES,<<128,3DES,<<168,2DES,<<112,TDEA,<<168,RC4,>=0"
+    "4": "AES,<<128,3DES,<<168,2DES,<<112,TDEA,<<168,RC4,>=0,DES,>=0"
   },
   "sym_enc_algorithm_block_mode": {
     "1": "GCM,CCM",

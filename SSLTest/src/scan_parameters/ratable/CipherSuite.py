@@ -22,7 +22,8 @@ class CipherSuite(Parameters):
         """
         json_data = read_json('cipher_parameters.json')
         raw_parameters = self.cipher_suite.split('_')
-        raw_parameters.remove('TLS')
+        if 'TLS' in raw_parameters:
+            raw_parameters.remove('TLS')
         parameter_types = list(self.parameters.keys())
         # For each parameter iterate through each enum value until a match is found
         for p_raw in raw_parameters:
@@ -53,3 +54,5 @@ class CipherSuite(Parameters):
         self.parameters[PType.protocol] = {self.protocol: 0}
         if self.protocol == 'TLSv1.3':
             self.parameters[PType.kex_algorithm] = {'ECDHE': 0}
+        if self.protocol == 'TLSv1':
+            self.parameters[PType.protocol] = {'TLSv1.0': self.parameters[PType.protocol]['TLSv1']}

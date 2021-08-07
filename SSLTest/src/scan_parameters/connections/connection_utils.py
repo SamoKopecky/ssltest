@@ -34,14 +34,21 @@ def get_website_info(url: str, port: int, supported_protocols):
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
     except (ssl.SSLError, ConnectionResetError) as e:
-        sslv3 = SSLv3(url, port)
-        sslv3.parse_cipher_suite()
-        sslv3.parse_certificate()
-        sslv3.verify_cert()
-        cipher_suite = sslv3.cipher_suite
-        certificate = sslv3.certificate
-        cert_verified = sslv3.cert_verified
-        protocol = sslv3.protocol
+        ssl_protocols = [
+            SSLv3(url, port),
+            SSLv2(url, port)
+        ]
+        chosen_protocol = ssl_protocols[0]
+        if ['SSLv2'] == supported_protocols:
+            chosen_protocol = ssl_protocols[1]
+        chosen_protocol.send_client_hello()
+        chosen_protocol.parse_cipher_suite()
+        chosen_protocol.parse_certificate()
+        chosen_protocol.verify_cert()
+        cipher_suite = chosen_protocol.cipher_suite
+        certificate = chosen_protocol.certificate
+        cert_verified = chosen_protocol.cert_verified
+        protocol = chosen_protocol.protocol
 
     return certificate, cert_verified, cipher_suite, protocol
 
@@ -83,6 +90,7 @@ def create_session_pyopenssl(url: str, port: int, context: SSL.Context):
     :return: created secure socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # sock.settimeout(5)
     context.set_cipher_list(b'ALL')
     ssl_socket = SSL.Connection(context, sock)
     sleep = 0

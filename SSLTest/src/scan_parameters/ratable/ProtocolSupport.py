@@ -40,6 +40,7 @@ class ProtocolSupport:
             SSLv2(self.url, self.port)
         ]
         for ssl_version in ssl_versions:
+            ssl_version.send_client_hello()
             result = ssl_version.scan_version_support()
             if result:
                 self.supported_protocols.append(ssl_version.protocol)

@@ -3,19 +3,7 @@ import ssl
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
-from ...utils import read_json, communicate_data_return_sock
-
-
-def hex_to_int(hex_num: list):
-    result = '0x'
-    # {}:02x:
-    # {}: -- value
-    # 0 -- padding with zeros
-    # 2 -- number digits
-    # x -- hex format
-    for num in hex_num:
-        result += f'{num:02x}'
-    return int(result, 16)
+from ...utils import read_json
 
 
 class SSLv3(SSLvX):
@@ -63,7 +51,6 @@ class SSLv3(SSLvX):
             0x01,  # Compression methods length
             0x00  # Compression methods
         ])
-        self.response, _ = communicate_data_return_sock(self.address, self.client_hello, self.timeout, "SSLv3 scan")
 
     def scan_version_support(self):
         if len(self.response) == 0:
@@ -91,14 +78,14 @@ class SSLv3(SSLvX):
         if len(self.response) == 0:
             return
         # Length is always at the same place in server_hello (idx 3, 4)
-        server_hello_len = hex_to_int([self.response[3], self.response[4]])
+        server_hello_len = SSLvX.hex_to_int([self.response[3], self.response[4]])
         # +4 -- Length index in server_hello
         record_protocol_certificate_begin_idx = server_hello_len + 4 + 1
         # +5 -- Certificate index in record layer
         handshake_certificate_idx = record_protocol_certificate_begin_idx + 5
         # +7 -- Certificate length index in handshake protocol: certificate
         certificate_len_idx = handshake_certificate_idx + 7
-        certificate_len = hex_to_int([
+        certificate_len = SSLvX.hex_to_int([
             self.response[certificate_len_idx],
             self.response[certificate_len_idx + 1],
             self.response[certificate_len_idx + 2]

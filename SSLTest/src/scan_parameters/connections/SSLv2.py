@@ -1,5 +1,6 @@
+from cryptography.x509 import load_der_x509_certificate
+
 from .SSLvX import SSLvX
-from ...utils import communicate_data_return_sock
 
 
 class SSLv2(SSLvX):
@@ -22,7 +23,6 @@ class SSLv2(SSLvX):
             0xdc, 0x83, 0x85, 0x49, 0x87, 0xdf, 0x42, 0xad,
             0x84, 0x90, 0x51, 0x90, 0x00, 0x14, 0x33, 0xf6
         ])
-        self.response, _ = communicate_data_return_sock(self.address, self.client_hello, self.timeout, "SSLv2 scan")
 
     def scan_version_support(self):
         # No response to SSLv2 client hello
@@ -36,3 +36,20 @@ class SSLv2(SSLvX):
         elif self.response[2] == 0x04:
             return True
         return False
+
+    def parse_cipher_suite(self):
+        # TODO: temporary, change if multiple cipher suites rating is implemented
+        # One of the SSLv2 Cipher suites since the client is choosing the cipher suite
+        self.cipher_suite = 'DES_64_CBC_WITH_MD5'
+
+    def parse_certificate(self):
+        print(self.response[13])
+        certificate_length = SSLvX.hex_to_int([
+            self.response[7],
+            self.response[8]
+        ])
+        certificate_in_bytes = self.response[13:certificate_length + 13]
+        self.certificate = load_der_x509_certificate(certificate_in_bytes)
+
+    def verify_cert(self):
+        self.cert_verified = False
