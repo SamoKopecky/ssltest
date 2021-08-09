@@ -52,7 +52,7 @@ class WebServerSoft:
                 requests.exceptions.ConnectionError,
                 requests.exceptions.Timeout,
                 requests.exceptions.ReadTimeout):
-            value = 'unable to connect'
+            value = 'unable to connect (try scanning with nmap)'
         self.versions["http_header"] = value
 
     def scan_server_software(self):

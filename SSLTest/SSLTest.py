@@ -35,7 +35,7 @@ def get_tests_help():
 
 def get_help():
     return [
-        {"description": ["Script that scans a webservers cryptographic parameters and vulnerabilities"]},
+        {"description": ["Script that scans web servers cryptographic parameters and vulnerabilities "]},
         {"usage": [f"{SCRIPTNAME}.py <options>"]},
         {"usage_example": [f"{SCRIPTNAME}.py -u https://example.com -t 1 2"]},
         {"options": [
