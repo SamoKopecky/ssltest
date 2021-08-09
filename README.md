@@ -1,34 +1,79 @@
-# Overview
+```
+ ____            _                        _____           _     
+|  _ \ ___ _ __ | |_ ___ _ __ ___ _ __   |_   _|__   ___ | |___ 
+| |_) / _ \ '_ \| __/ _ \ '__/ _ \ '_ \    | |/ _ \ / _ \| / __|
+|  __/  __/ | | | ||  __/ | |  __/ |_) |   | | (_) | (_) | \__ \
+|_|   \___|_| |_|\__\___|_|  \___| .__/    |_|\___/ \___/|_|___/
+                                 |_|
+```
 
-- A standalone script that can be run in a console
-- File `resources/security_levels.json` can be edited to change the parameter rating values
+# SSLTest
+Script that scans web servers cryptographic parameters and vulnerabilities 
 
-# Run the script
+## Installation
 
-- Run the main file `ssltest.py` with option `-u` to enter the url.
-- Use `-h` or `--help` for more help.
-- Example: `./ssltest.py -u vutbr.cz`
+```
+$ git clone SSLTest
+$ cd SSLTest && sudo pip install .
+```
 
-## Prepare hosting OS environment
+## Installation (ptmanager) 
 
-- If you are going to run the script these dependencies are required
-- To install required python packages use `pip3 install -r requirements.txt` command which installs:
-    - [cryptography](https://pypi.org/project/cryptography/)
-    - [pyopenssl](https://pypi.org/project/pyOpenSSL/)
-    - [python3-nmap](https://pypi.org/project/python3-nmap/)
-    - [requests](https://pypi.org/project/requests/)
-    - [urllib3](https://pypi.org/project/urllib3/)
-    - [Flask](https://pypi.org/project/Flask/)
-    - [flask-restful](https://pypi.org/project/Flask-RESTful/)
-- Nmap is required to for some functions, install with `apt install -y nmap`
-- To run the tool script refer to the section at the start
+```
+$ sudo ptmanager -ut SSLTest
+```
 
-## Supported vulnerability tests
+## Options
+```
+-u   --url            <url>  Url to scan, required option
+-p   --port                  Port or ports (separate with spaces) to scan on (default: [443])
+-j   --json                  change output to json format, if a file name is specified output is 
+                             written to the given file
+-t   --test                  test the server for a specified vulnerability
+                             possible vulnerabilities (separate with spaces):
+                                0: No test
+                                1: Heartbleed
+                                2: CCS injection
+                                3: Insecure renegotiation
+                                4: ZombiePOODLE/GOLDENDOOLDE
+                                5: Session ticket support
+                                6: CRIME
+                                7: RC4 support
+                             if this argument isn't specified all tests will be ran
+-fc  --fix-conf              Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) 
+                             in order to scan a server which still run on these versions. 
+                             !WARNING!: this may rewrite the contents of a configuration file 
+                             located at /etc/ssl/openssl.cnf
+-ns  --nmap-scan             Use nmap to scan the server version
+-nd  --nmap-discover         Use nmap to discover web server ports
+-i   --info                  Output some internal information about the script functions
+-d   --debug                 Output debug information
+-v   --version               Show script version and exit
+-h   --help                  Show this help message and exit
+```
 
-- Heartbleed
-- CCS Injection
-- Insecure renegotiation
-- ZombiePOODLE/GOLDENDOODLE
-- Session ticker support
-- CRIME
-- RC4 Support
+## Usage examples
+```
+$ SSLTest.py -u https://example.com -t 1 2
+```
+
+## Version History
+
+* 0.0.1
+
+## Licence
+
+Copyright (c) 2020 HACKER Consulting s.r.o.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
