@@ -25,31 +25,31 @@ $ sudo ptmanager -ut SSLTest
 
 ## Options
 ```
--u   --url            <url>  Url to scan, required option
--p   --port                  Port or ports (separate with spaces) to scan on (default: [443])
--j   --json                  change output to json format, if a file name is specified output is 
+-u  --url       <url>        Url to scan, required option
+-p  --port      <port ...>   Port or ports (separate with spaces) to scan on (default: [443])
+-j  --json      <file>       change output to json format, if a file name is specified output is 
                              written to the given file
--t   --test                  test the server for a specified vulnerability
+-t  --test      <number ...> test the server for a specified vulnerability
                              possible vulnerabilities (separate with spaces):
-                                0: No test
-                                1: Heartbleed
-                                2: CCS injection
-                                3: Insecure renegotiation
-                                4: ZombiePOODLE/GOLDENDOOLDE
-                                5: Session ticket support
-                                6: CRIME
-                                7: RC4 support
+                               0: No test
+                               1: Heartbleed
+                               2: CCS injection
+                               3: Insecure renegotiation
+                               4: ZombiePOODLE/GOLDENDOOLDE
+                               5: Session ticket support
+                               6: CRIME
+                               7: RC4 support
                              if this argument isn't specified all tests will be ran
--fc  --fix-conf              Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) 
+-fc --fix-conf               Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) 
                              in order to scan a server which still run on these versions. 
                              !WARNING!: this may rewrite the contents of a configuration file 
                              located at /etc/ssl/openssl.cnf
--ns  --nmap-scan             Use nmap to scan the server version
--nd  --nmap-discover         Use nmap to discover web server ports
--i   --info                  Output some internal information about the script functions
--d   --debug                 Output debug information
--v   --version               Show script version and exit
--h   --help                  Show this help message and exit
+-ns --nmap-scan              Use nmap to scan the server version
+-nd --nmap-discover          Use nmap to discover web server ports
+-i  --info                   Output some internal information about the script functions
+-d  --debug                  Output debug information
+-v  --version                Show script version and exit
+-h  --help                   Show this help message and exit
 ```
 
 ## Usage examples

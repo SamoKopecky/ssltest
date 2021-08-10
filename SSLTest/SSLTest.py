@@ -40,10 +40,10 @@ def get_help():
         {"usage_example": [f"{SCRIPTNAME}.py -u https://example.com -t 1 2"]},
         {"options": [
             ["-u", "--url", "<url>", "Url to scan, required option"],
-            ["-p", "--port", "", "Port or ports (separate with spaces) to scan on (default: [443])"],
-            ["-j", "--json", "", "change output to json format, if a file name is specified output is written to the "
-                                 "given file"],
-            ["-t", "--test", "", get_tests_help()],
+            ["-p", "--port", "<port ...>", "Port or ports (separate with spaces) to scan on (default: [443])"],
+            ["-j", "--json", "<file>",
+             "change output to json format, if a file name is specified output is written to the given file"],
+            ["-t", "--test", "<number ...>", get_tests_help()],
             ["-fc", "--fix-conf", "", "Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) in order to"
                                       "\n scan a server which still run on these versions. !WARNING!: this may rewrite"
                                       "\n the contents of a configuration file located at /etc/ssl/openssl.cnf"],
@@ -81,7 +81,8 @@ def parse_args():
         sys.exit(0)
     args = parser.parse_args()
     check_test_option(args.test)
-    ptmisclib.print_banner(SCRIPTNAME, __version__, args.json)
+    if '-j' not in sys.argv:
+        ptmisclib.print_banner(SCRIPTNAME, __version__, args.json)
     return args
 
 
