@@ -13,19 +13,20 @@ from ..exceptions.DNSError import DNSError
 from ..utils import convert_openssh_to_iana, incremental_sleep
 
 
-def get_website_info(url: str, port: int, supported_protocols):
+def get_website_info(url, port, supported_protocols):
     """
-    Gather objects to be used in rating a web server.
+    Gather objects required to rate a web server
 
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
-    :param supported_protocols:
-    :param port: port to scan on
-    :param url: url of the webserver
+    :param int port: Port to scan on
+    :param str url: Url of the webserver
+    :param list supported_protocols: Supported SSL/TLS protocol versions
     :return:
-        certificate -- used certificate to verify the server
-        cipher_suite -- negotiated cipher suite
-        protocol -- protocol name and version
+        certificate -- Used certificate to verify the server
+        cert_verified -- Is certificate verified
+        cipher_suite -- Negotiated cipher suite
+        protocol -- Protocol name and version
     """
     logging.info('Creating session...')
     try:
@@ -53,12 +54,12 @@ def get_website_info(url: str, port: int, supported_protocols):
     return certificate, cert_verified, cipher_suite, protocol
 
 
-def get_certificate(ssl_socket: ssl.SSLSocket):
+def get_certificate(ssl_socket):
     """
-    Gather a certificate in a der binary format.
+    Gather a certificate in the DER binary format
 
-    :param ssl_socket: secured socket
-    :return: gathered certificate
+    :param ssl.SSLSocket ssl_socket: Established socket
+    :return: Gathered certificate
     """
     certificate_pem = bytes(ssl_socket.getpeercert(binary_form=True))
     return x509.load_der_x509_certificate(certificate_pem, default_backend())
@@ -66,10 +67,10 @@ def get_certificate(ssl_socket: ssl.SSLSocket):
 
 def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     """
-    Gather the cipher suite and the protocol from the ssl_socket.
+    Gather the cipher suite and the protocol from the ssl_socket
 
-    :param ssl_socket: secure socket
-    :return: negotiated cipher suite and the protocol
+    :param ssl.SSLSocket ssl_socket: Established socket
+    :return: Negotiated cipher suite and SSL/TLS protocol
     """
     cipher_suite = ssl_socket.cipher()[0]
     if '-' in cipher_suite:
@@ -77,17 +78,17 @@ def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     return cipher_suite, ssl_socket.version()
 
 
-def create_session_pyopenssl(url: str, port: int, context: SSL.Context):
+def create_session_pyopenssl(url, port, context: SSL.Context):
     """
-    Create a secure connection to any server on any port with a defined context.
+    Create a secure connection to any server on any port with a defined context
 
     This function creates a secure connection with pyopenssl lib. Original ssl lib
     doesn't work with older TLS versions on some OpenSSL implementations and thus
     the program can't scan for all supported versions.
-    :param url: url of the website
-    :param context: ssl context
-    :param port: port
-    :return: created secure socket
+    :param str url: Url of the website
+    :param int port: Port to create the connection on
+    :param SSL.Context context: pyopenssl SSL context
+    :return: Created secure socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # sock.settimeout(5)
@@ -106,15 +107,14 @@ def create_session_pyopenssl(url: str, port: int, context: SSL.Context):
     return ssl_socket
 
 
-def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_default_context()):
+def create_session(url: str, port: int, context=ssl.create_default_context()):
     """
     Create a secure connection to any server on any port with a defined context
-    on a specific timeout.
 
-    :param url: url of the website
-    :param context: ssl context
-    :param port: port
-    :return: created secure socket
+    :param str url: Url of the website
+    :param int port: Port to create the connection on
+    :param ssl.SSLContext context: ssl context
+    :return: Created secure socket
     """
     cert_verified = True
     context.check_hostname = True
@@ -141,5 +141,5 @@ def create_session(url: str, port: int, context: ssl.SSLContext = ssl.create_def
             raise DNSError()
         except socket.error as e:
             ssl_socket.close()
-            sleep = incremental_sleep(sleep, e, 1)
+            sleep = incremental_sleep(sleep, e, 5)
     return ssl_socket, cert_verified

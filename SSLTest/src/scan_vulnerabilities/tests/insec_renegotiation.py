@@ -9,6 +9,13 @@ renegotiation_extension = bytes([
 
 
 def construct_client_hello(version):
+    """
+    Construct the client hello for the specific vulnerability
+
+    :param int version: SSL/TLS version
+    :return: client hello
+    :rtype: bytes
+    """
     client_hello = bytes([
         # Record protocol
         0x16,  # Content type (Handshake)

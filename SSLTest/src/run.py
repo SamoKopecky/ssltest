@@ -25,6 +25,12 @@ from .text_output.TextOutput import TextOutput
 
 
 def get_tests_switcher():
+    """
+    Provides all the available tests switcher
+
+    :return: All available tests
+    :rtype: dict
+    """
     return {
         0: (None, 'No test'),
         1: (heartbleed.scan, 'Heartbleed'),
@@ -41,7 +47,7 @@ def fix_conf_option(args):
     """
     Fixes the OpenSSL configuration file
 
-    :param args: input options
+    :param Namespace args: Parsed input arguments
     """
     if args.fix_conf:
         try:
@@ -56,12 +62,13 @@ def fix_conf_option(args):
 
 def vulnerability_scan(address, tests, version):
     """
-    Forwards the appropriate tests to multithreading function
+    Forward the appropriate tests to multithreading function
 
-    :param version: ssl protocol version
-    :param address: tuple of an url and port
-    :param tests: input option for tests
-    :return: dictionary of scanned results
+    :param tuple address: Url and port
+    :param list tests: Test numbers
+    :param str version: SSL/TLS protocol version
+    :return: Test results
+    :rtype: dict
     """
     tests_switcher = get_tests_switcher()
     # if no -t argument is present
@@ -75,12 +82,12 @@ def vulnerability_scan(address, tests, version):
     return scan_vulnerabilities(scans, address, version)
 
 
-def json_option(args, output_data):
+def output_option(args, output_data):
     """
     Handle output depending on the input options
 
-    :param args: input options
-    :param output_data: json data to output
+    :param Namespace args: Parsed input arguments
+    :param dict output_data: Collected data from scanning/testing
     """
     json_output_data = json.dumps(output_data, indent=2)
     if args.json is False:
@@ -100,8 +107,9 @@ def scan_all_ports(args):
     """
     Call scan function for each port
 
-    :param args: input options
-    :return: dictionary of scanned data
+    :param Namespace args: Parsed input arguments
+    :return: Scanned data
+    :rtype: dict
     """
     output_data = {}
     for port in args.port:
@@ -116,9 +124,9 @@ def scan_all_ports(args):
 
 def nmap_discover_option(args):
     """
-    Discover usable ports
+    Handle discover ports option
 
-    :param args: input options
+    :param Namespace args: Parsed input arguments
     """
     scanned_ports = []
     if args.nmap_discover:
@@ -134,9 +142,9 @@ def nmap_discover_option(args):
 
 def info_report_option(args):
     """
-    Handle verbose and information option
+    Handle the debug and information options
 
-    :param args: input options
+    :param Namespace args: Parsed input arguments
     """
     if args.debug:
         logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -147,17 +155,18 @@ def info_report_option(args):
 def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
                  certificate_non_parameters, software, vulnerabilities, port, url):
     """
-    Dump web server parameters to a single dict.
+    Dump web server parameters to a single dictionary
 
-    :param cipher_suite: tuple containing parameters and the worst rating
-    :param certificate_parameters: tuple containing parameters and the worst rating
-    :param certificate_non_parameters: certificate parameters such as subject/issuer
-    :param protocol_support: dictionary of supported tls protocols
-    :param software: web server software
-    :param port: scanned port
-    :param url: scanned url
-    :param vulnerabilities: scanned vulnerabilities
-    :return: dictionary
+    :param tuple cipher_suite: Rated cipher suite parameters and the worst rating
+    :param tuple certificate_parameters: Rated certificate parameters and the worst rating
+    :param tuple protocol_support: Supported SSL/TLS protocols
+    :param dict certificate_non_parameters: Not ratable certificate parameters such as subject/issuer
+    :param dict software: Web server software which hosts the website
+    :param dict vulnerabilities: Results from vulnerability tests
+    :param int port: Scanned port
+    :param str url: Scanned url
+    :return: All of the arguments
+    :rtype: dict
     """
     dump = {}
 
@@ -185,13 +194,14 @@ def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
     return {f'{url}:{port}': dump}
 
 
-def scan(args, port: int):
+def scan(args, port):
     """
-    Call other scanning functions for a specific url and port
+    Call scanning/testing functions for a specific url and port
 
-    :param args: parsed arguments
-    :param port: list of port to be scanned
-    :return: a single dictionary containing scanned data
+    :param Namespace args: Parsed input arguments
+    :param int port: Port to be scanned
+    :return: Single dictionary containing scanned data
+    :rtype: dict
     """
     logging.info(f'Scanning for {args.url}:{port}')
 
@@ -199,8 +209,9 @@ def scan(args, port: int):
     protocol_support.scan_protocols()
     protocol_support.rate_protocols()
 
-    certificate, cert_verified, cipher_suite, protocol = get_website_info(args.url, port,
-                                                                          protocol_support.supported_protocols)
+    certificate, cert_verified, cipher_suite, protocol = get_website_info(
+        args.url, port, protocol_support.supported_protocols
+    )
 
     cipher_suite = CipherSuite(cipher_suite, protocol)
     cipher_suite.parse_cipher_suite()
@@ -227,11 +238,16 @@ def scan(args, port: int):
 
 
 def run(args):
+    """
+    Call other functions to run the script
+
+    :param Namespace args: Parsed input arguments
+    """
     fix_conf_option(args)
     if '/' in args.url:
         args.url = fix_url(args.url)
     info_report_option(args)
     nmap_discover_option(args)
     output_data = scan_all_ports(args)
-    out = json_option(args, output_data)
+    out = output_option(args, output_data)
     if out: print(out)

@@ -14,7 +14,7 @@ class CipherSuite(Parameters):
 
     def parse_cipher_suite(self):
         """
-        Parse used cipher suite into python readable objects.
+        Parse used cipher suite into python readable objects
 
         The cipher suite is split into each parameter and then sorted
         to categories with the help of a json file. Categories are
@@ -39,7 +39,7 @@ class CipherSuite(Parameters):
 
     def rate_cipher_suite(self):
         """
-        Rate all cipher suite parameters.
+        Rate all cipher suite parameters
         """
         rateable_parameters = list(self.parameters.keys())
         key_types = [PType.sym_enc_algorithm_key_length, PType.sym_ecn_algorithm_block_mode_number]
@@ -47,9 +47,7 @@ class CipherSuite(Parameters):
 
     def parse_protocol_version(self):
         """
-        Read the protocol version and apply special edge cases.
-
-        Might add more.
+        Read the protocol version and apply special edge cases
         """
         self.parameters[PType.protocol] = {self.protocol: 0}
         if self.protocol == 'TLSv1.3':

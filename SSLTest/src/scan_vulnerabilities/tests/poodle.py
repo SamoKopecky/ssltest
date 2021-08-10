@@ -8,6 +8,13 @@ from ...utils import communicate_data_return_sock
 
 
 def construct_client_hello(version):
+    """
+    Construct the client hello for the specific vulnerability
+
+    :param int version: SSL/TLS version
+    :return: client hello
+    :rtype: bytes
+    """
     client_hello = bytes([
         # Record protocol
         0x16,  # Content type (Handshake)
@@ -77,11 +84,12 @@ def build_data(data):
 
 def scan(address, version):
     """
-    Not finished yet, just analyzing if the web server supports
-    any CBC ciphers
-    :param address: tuple of an url and port
-    :param version: tls version in bytes
-    :return: if the server is vulnerable
+    Scan for poodle vulnerability
+
+    :param tuple address: Url and port
+    :param int version: SSL/TLS version
+    :return: Whether the server is vulnerable
+    :rtype: bool
     """
     client_hello = construct_client_hello(version)
     logging.info("Scanning Poodle vulnerability...")

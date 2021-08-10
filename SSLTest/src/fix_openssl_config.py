@@ -4,6 +4,13 @@ import os
 
 
 def fix_openssl_config():
+    """
+    Edit the OpenSSL config file
+
+    Edit either the MinProtocol value in the openssl.cnf file or the CipherString
+    value or insert booth of them with a prefix from the correct_openssl_conf.txt
+    template file
+    """
     config_file_name = '/etc/ssl/openssl.cnf'
     config_file = open(config_file_name, 'r')
     config_content = config_file.read()
@@ -39,14 +46,31 @@ def fix_openssl_config():
 
 
 def find_in_row(to_find, row_start, content):
+    """
+    Find a string in a row and return it until the end of the line
+
+    :param str to_find: String to find
+    :param str row_start: String representing the search start
+    :param str content: Content to search through
+    :return: Found string and the other content of the line
+    :rtype: str
+    """
     index = content.index(row_start)
-    version_index = content.find(to_find, index + len(row_start), content.find('\n', index))
-    return content[version_index:content.find('\n', index)]
+    end_of_line = content.find('\n', index)
+    to_find_index = content.find(to_find, index + len(row_start), end_of_line)
+    return content[to_find_index:end_of_line]
 
 
-def replace_string(file_name, string, replace_with):
+def replace_string(file_name, to_replace, replace_with):
+    """
+    Replace a string in a file
+
+    :param str file_name: Name of the file
+    :param str to_replace: String to replace
+    :param str replace_with: String to replace with
+    """
     file_r = open(file_name, 'r')
-    content = file_r.read().replace(string, replace_with)
+    content = file_r.read().replace(to_replace, replace_with)
     file_w = open(file_name, 'w')
     file_w.write(content)
     file_w.flush()

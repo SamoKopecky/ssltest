@@ -7,12 +7,13 @@ import socket
 from time import sleep, time
 
 
-def read_json(file_name: str):
+def read_json(file_name):
     """
-    Read a json file and return its content.
+    Read a json file and return its content
 
-    :param file_name: json file name
-    :return: json data in python objects
+    :param str file_name: Json file name
+    :return: Json data in python objects
+    :rtype: dict
     """
     root_dir = os.path.dirname(os.path.abspath(__file__))
     file = open(f'{root_dir}/../../resources/{file_name}', 'r')
@@ -23,12 +24,13 @@ def read_json(file_name: str):
 
 def receive_data(sock, timeout, debug_source=None):
     """
-    Receive data in chunks
+    Receive network data in chunks
 
-    :param debug_source:
-    :param sock: socket to receive from
-    :param timeout: timeout in seconds
-    :return: array of bytes of received data
+    :param sock: Socket to receive from
+    :param int timeout: Timeout in seconds
+    :param str debug_source: Description of the debug source
+    :return: Array of bytes of received data
+    :rtype: bytes
     """
     if debug_source is None:
         stack = inspect.stack()
@@ -59,14 +61,14 @@ def receive_data(sock, timeout, debug_source=None):
 
 def communicate_data_return_sock(address, client_hello, timeout, debug_source=None):
     """
-    Send client client_hello to the server and catch the
-    response
+    Send client client_hello to the server and catch the response
 
-    :param debug_source:
-    :param address: tuple of an url and port
-    :param client_hello: client_hello data in bytes
-    :param timeout: timeout in seconds
-    :return: created socket and received response
+    :param tuple address: Tuple of an url and port
+    :param bytes client_hello: client_hello data in bytes
+    :param int timeout: Timeout in seconds
+    :param str debug_source: Description of the debug source
+    :return: Created socket and received response
+    :rtype: bytes or socket
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(timeout)

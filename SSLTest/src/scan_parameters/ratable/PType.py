@@ -2,9 +2,6 @@ from enum import Enum, auto
 
 
 class PType(Enum):
-    """
-    Enum type class that defines parameter types for cipher suite and certificate parameters.
-    """
     protocol = auto()
     protocols = auto()
     no_protocol = auto()
@@ -31,9 +28,10 @@ class PType(Enum):
     @property
     def key_pair(self):
         """
-        Define the algorithm to which the algorithm length belongs to.
+        Define the algorithm to which the algorithm length belongs to
 
         :return: algorithm type
+        :rtype: PType
         """
         pairs = {
             self.sym_enc_algorithm_key_length: self.sym_enc_algorithm,
@@ -45,9 +43,10 @@ class PType(Enum):
     @property
     def is_cipher_suite(self):
         """
-        Define which parameters are parsable from cipher suites.
+        Define which parameters are parsable from cipher suites
 
         :return: true if a parameter is parsable
+        :rtype: PType
         """
         cipher_suite_parameters = [
             self.kex_algorithm,
@@ -63,9 +62,10 @@ class PType(Enum):
     @property
     def is_certificate(self):
         """
-        Define which parameters are parsable from a certificate.
+        Define which parameters are parsable from a certificate
 
         :return: true if a parameter is parsable
+        :rtype: PType
         """
         certificate_parameters = [
             self.cert_pub_key_algorithm,
@@ -86,9 +86,10 @@ class PType(Enum):
     @property
     def is_ratable(self):
         """
-        Define which parameter can be rated.
+        Define which parameter can be rated
 
         :return: true if a parameter can be rated
+        :rtype: PType
         """
         rateable_parameters = [
             self.kex_algorithm,

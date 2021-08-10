@@ -10,17 +10,20 @@ class TextOutput:
         self.data = data
         self.current_data = {}
 
-    def rating_name(self, rating: int):
+    def rating_name(self, rating):
         """
-        Convert int to string using a json file.
+        Get the rating name according to the rating number
 
-        :param rating: rating value to be converted to string
+        Method made for better reading of code bellow
+        :param int rating: Rating value to be converted to string
+        :return: The rating string
+        :rtype: str
         """
         return self.ratings[str(rating)]
 
     def get_formatted_text(self):
         """
-        Call all other text output functions for each port and url.
+        Call all other text output functions for each port and url
         """
         if not self.data:
             return
@@ -28,18 +31,18 @@ class TextOutput:
         for key, value in list(json_data.items()):
             self.output += f'----------------Result for {key}---------------------\n'
             self.current_data = value
-            self.output_parameters(self.current_data['parameters'])
-            self.output_supported_versions(self.current_data['protocol_support'])
-            self.output_certificate_info(self.current_data['certificate_info'])
-            self.output_software(self.current_data['web_server_software'])
-            self.output_vulnerabilities(self.current_data['vulnerabilities'])
+            self.format_parameters(self.current_data['parameters'])
+            self.format_supported_versions(self.current_data['protocol_support'])
+            self.format_certificate_info(self.current_data['certificate_info'])
+            self.format_software(self.current_data['web_server_software'])
+            self.format_vulnerabilities(self.current_data['vulnerabilities'])
         self.output = self.output[:-1]
 
-    def output_parameters(self, data: dict):
+    def format_parameters(self, data):
         """
-        Output cipher suite and cert parameters.
+        Format the cipher suite and certificate parameters
 
-        :param data: data to print
+        :param dict data: Data to format
         """
         self.output += 'Cryptographic parameters:\n'
         for key, value in list(data.items()):
@@ -50,11 +53,11 @@ class TextOutput:
             if values[0] != 'N/A':
                 self.output += f'\t{self.type_names[key]}: {values[0]}->{self.rating_name(values[1])}\n'
 
-    def output_certificate_info(self, data: dict):
+    def format_certificate_info(self, data):
         """
-        Output other cert info such as subject/issuer.
+        Format other certificate info such as subject/issuer
 
-        :param data: data to print
+        :param dict data: Data to format
         """
         self.output += 'Certificate information:\n'
         for key, value in list(data.items()):
@@ -68,11 +71,11 @@ class TextOutput:
                 to_print = f'\t{self.type_names[key]}: {value[0]}\n'
             self.output += to_print
 
-    def output_supported_versions(self, data: dict):
+    def format_supported_versions(self, data):
         """
-        Output supported TLS protocol versions.
+        Format supported SSL/TLS protocol versions
 
-        :param data: data to print
+        :param dict data: Data to format
         """
         self.output += 'Protocol support:\n'
         for key, values in list(data.items()):
@@ -86,11 +89,11 @@ class TextOutput:
                 values = '\n'.join(versions)
                 self.output += f'\t{self.type_names[key]}:\n{values}\n'
 
-    def output_software(self, data: dict):
+    def format_software(self, data):
         """
-        Output web server software.
+        Format web server software
 
-        :param data: data to print
+        :param dict data: Data to format
         """
         if not data:
             return
@@ -102,11 +105,11 @@ class TextOutput:
         for key, value in list(data.items()):
             self.output += f'\t{string_map.get(key)}: {value}\n'
 
-    def output_vulnerabilities(self, data: dict):
+    def format_vulnerabilities(self, data):
         """
-        Output scanned vulnerabilities
+        Format scanned vulnerabilities
 
-        :param data: data to print
+        :param dict data: Data to format
         """
         if not data:
             return

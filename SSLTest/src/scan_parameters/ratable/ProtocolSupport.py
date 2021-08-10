@@ -21,11 +21,10 @@ class ProtocolSupport:
 
     def scan_protocols(self):
         """
-        Test for all possible TLS versions which the server supports.
+        Test for all possible SSL/TLS versions which the server supports
 
-        :return: list of the supported protocols.
+        Convert protocol versions to dict with PType to get them ready for rating
         """
-
         logging.info('Scanning SSL/TLS versions...')
         self.scan_tls_protocols()
         self.scan_ssl_protocols()
@@ -35,6 +34,9 @@ class ProtocolSupport:
             self.versions[PType.no_protocol][no_protocol] = 'N/A'
 
     def scan_ssl_protocols(self):
+        """
+        Test for all possible SSL versions which the server supports
+        """
         ssl_versions = [
             SSLv3(self.url, self.port),
             SSLv2(self.url, self.port)
@@ -48,6 +50,9 @@ class ProtocolSupport:
                 self.unsupported_protocols.append(ssl_version.protocol)
 
     def scan_tls_protocols(self):
+        """
+        Test for all possible TLS versions which the server supports
+        """
         ssl_versions = {
             SSL.TLSv1_METHOD: 'TLSv1.0',
             SSL.TLSv1_1_METHOD: 'TLSv1.1',
@@ -76,7 +81,7 @@ class ProtocolSupport:
 
     def rate_protocols(self):
         """
-        Rate the scanned protocols.
+        Rate the scanned protocols
         """
         for protocol in list(self.versions[PType.protocols].keys()):
             self.versions[PType.protocols][protocol] = rate_parameter(PType.protocol, protocol)

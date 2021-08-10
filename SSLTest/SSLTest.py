@@ -87,12 +87,6 @@ def parse_args():
 
 
 def check_test_option(tests):
-    """
-    Check if the tests numbers are actually tests
-
-    :param tests: test argument
-    :return:
-    """
     if not tests:
         return
     tests_switcher = get_tests_switcher()

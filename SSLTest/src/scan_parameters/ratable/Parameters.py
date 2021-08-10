@@ -8,9 +8,12 @@ class Parameters(ABC):
         self.parameters = {}
         self.rating = 0
 
-    def rate_parameters(self, rateable_parameters: list, key_types: list):
+    def rate_parameters(self, rateable_parameters, key_types):
         """
-        Rate the parameters from the ratable_parameters list.
+        Rate given parameters of PType class
+
+        :param list rateable_parameters: Parameters to be rated
+        :param list key_types: Key type parameters to be rated
         """
         for p_type in rateable_parameters:
             parameter = self.key(self.parameters[p_type])
@@ -23,11 +26,14 @@ class Parameters(ABC):
                 continue
             # normal parameters
             self.parameters[p_type][parameter] = rate_parameter(p_type, parameter)
-        self.rating = self.get_max_rating()
+        self.rating = self.get_worst_rating()
 
-    def get_max_rating(self):
+    def get_worst_rating(self):
         """
-        Return the worse rating from all of the parameters.
+        Return the worse rating from all of the parameters
+
+        :return: Worst rating
+        :rtype: int
         """
         values = []
         for dicts in self.parameters.values():
@@ -36,5 +42,11 @@ class Parameters(ABC):
         return max(values)
 
     @staticmethod
-    def key(dictionary: dict):
+    def key(dictionary):
+        """
+        Get the first key of an dictionary
+
+        :param dict dictionary: Dictionary to get the key from
+        :return: First key
+        """
         return next(iter(dictionary))

@@ -5,6 +5,13 @@ from ...utils import communicate_data_return_sock
 
 
 def construct_client_hello(version):
+    """
+    Construct the client hello for the specific vulnerability
+
+    :param int version: SSL/TLS version
+    :return: client hello
+    :rtype: bytes
+    """
     client_hello = bytes([
         # Record protocol
         0x16,  # Content type (Handshake)
@@ -56,9 +63,10 @@ def scan(address, version):
     """
     Scan for CRIME vulnerability (CVE-2012-4929)
 
-    :param address: tuple of an url and port
-    :param version: tls version in bytes
-    :return: if the server is vulnerable
+    :param tuple address: Url and port
+    :param int version: SSL/TLS version
+    :return: Whether the server is vulnerable
+    :rtype: bool
     """
     client_hello = construct_client_hello(version)
     logging.info("Scanning CRIME vulnerability...")

@@ -8,12 +8,13 @@ from ..utils import incremental_sleep
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def discover_ports(url: str):
+def discover_ports(url):
     """
-    Scan a web server for all available https ports.
+    Scan a web server for all available https ports
 
-    :param url: url to be scanned
-    :return: list of usable ports
+    :param str url: Url to be scanned
+    :return: Usable ports
+    :rtype: list
     """
     logging.info('Discovering ports...')
     nmap = nmap3.NmapHostDiscovery()

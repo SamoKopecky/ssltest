@@ -19,7 +19,7 @@ class Certificate(Parameters):
 
     def parse_certificate(self):
         """
-        Parse information from a certificate and into a dictionary.
+        Parse information from a certificate and into a dictionary
         """
         # Public key algorithm
         self.parameters[PType.cert_pub_key_algorithm][pub_key_alg_from_cert(self.certificate.public_key())] = 0
@@ -44,9 +44,10 @@ class Certificate(Parameters):
 
     def parse_alternative_names(self):
         """
-        Parse the alternative names from the certificate extensions.
+        Parse the alternative names from the certificate extensions
 
-        :return: list of alternative names
+        :return: Alternative names
+        :rtype: list
         """
         try:
             extension = self.certificate.extensions.get_extension_for_class(x509.SubjectAlternativeName)
@@ -55,12 +56,13 @@ class Certificate(Parameters):
         return extension.value.get_values_for_type(x509.DNSName)
 
     @staticmethod
-    def parse_name(name: x509.Certificate.__name__):
+    def parse_name(name):
         """
-        Parse subject and issuer information and return as list.
+        Parse subject and issuer information and return as list
 
-        :param name: objects that is parsed
-        :return:
+        :param x509.Certificate.__name__ name: objects that is parsed
+        :return: Parsed subject or issuer
+        :rtype: list
         """
         name_info = []
         for attribute in name:
@@ -69,7 +71,7 @@ class Certificate(Parameters):
 
     def rate_certificate(self):
         """
-        Rate all valid certificate parameters.
+        Rate all valid certificate parameters
         """
         rateable_parameters = list(self.parameters.keys())
         key_types = [PType.cert_pub_key_length]

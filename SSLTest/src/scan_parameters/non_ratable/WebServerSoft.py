@@ -15,10 +15,10 @@ class WebServerSoft:
 
     def scan_software_nmap(self):
         """
-        Get the web server software with nmap wrapper.
+        Get the web server software with nmap wrapper
 
-        Scans for all valid key values in the result and appends
-        them together.
+        Scan for all valid key values in the result and append
+        them together
         """
         keys = ['product', 'version']
         nmap = nmap3.Nmap()
@@ -38,7 +38,7 @@ class WebServerSoft:
 
     def scan_software_http(self):
         """
-        Scan web server software from HEAD response header.
+        Scan web server software from HEAD response header
         """
         logging.info('Scanning webserver for version using http headers...')
         try:
@@ -57,7 +57,7 @@ class WebServerSoft:
 
     def scan_server_software(self):
         """
-        Call the required functions to scan the webserver software.
+        Call the required functions to scan the webserver software
         """
         scans = [self.scan_software_http]
         if self.scan_nmap:
