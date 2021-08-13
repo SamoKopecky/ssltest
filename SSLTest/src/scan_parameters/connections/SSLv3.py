@@ -1,5 +1,3 @@
-import ssl
-
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
@@ -68,7 +66,7 @@ class SSLv3(SSLvX):
         if len(self.response) == 0:
             return
         cipher_suites = read_json('iana_cipher_suites.json')
-        sess_id_len_idx = 43  # Always fixed
+        sess_id_len_idx = 43  # Always fixed index
         cipher_suite_idx = self.response[sess_id_len_idx] + sess_id_len_idx + 1
         cipher_suites_bytes = f'0x{self.response[cipher_suite_idx]:X},' \
                               f'0x{self.response[cipher_suite_idx + 1]:X}'
@@ -84,15 +82,26 @@ class SSLv3(SSLvX):
         # +5 -- Certificate index in record layer
         handshake_certificate_idx = record_protocol_certificate_begin_idx + 5
         # +7 -- Certificate length index in handshake protocol: certificate
-        certificate_len_idx = handshake_certificate_idx + 7
-        certificate_len = SSLvX.hex_to_int([
-            self.response[certificate_len_idx],
-            self.response[certificate_len_idx + 1],
-            self.response[certificate_len_idx + 2]
+        certificates_len_idx = handshake_certificate_idx + 4
+        certificates_len = SSLvX.hex_to_int([
+            self.response[certificates_len_idx],
+            self.response[certificates_len_idx + 1],
+            self.response[certificates_len_idx + 2]
         ])
-        certificate_idx = certificate_len_idx + 3
-        certificate_in_bytes = self.response[certificate_idx:certificate_len + certificate_idx]
-        self.certificate = load_der_x509_certificate(certificate_in_bytes)
-
-    def verify_cert(self):
-        self.cert_verified = False
+        offset = 0
+        length_bytes = 3
+        certificate_len_idx = certificates_len_idx + length_bytes
+        # Loop until all certificate bytes are read
+        while certificates_len != 0:
+            certificate_len_idx += offset
+            certificate_len = SSLvX.hex_to_int([
+                self.response[certificate_len_idx],
+                self.response[certificate_len_idx + 1],
+                self.response[certificate_len_idx + 2]
+            ])
+            certificate_idx = certificate_len_idx + length_bytes
+            offset = certificate_len + length_bytes
+            # Read bytes
+            certificates_len -= (certificate_len + length_bytes)
+            certificate_in_bytes = self.response[certificate_idx:certificate_len + certificate_idx]
+            self.certificates.append(load_der_x509_certificate(certificate_in_bytes))

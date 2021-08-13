@@ -43,13 +43,9 @@ class SSLv2(SSLvX):
         self.cipher_suite = 'DES_64_CBC_WITH_MD5'
 
     def parse_certificate(self):
-        print(self.response[13])
         certificate_length = SSLvX.hex_to_int([
             self.response[7],
             self.response[8]
         ])
         certificate_in_bytes = self.response[13:certificate_length + 13]
-        self.certificate = load_der_x509_certificate(certificate_in_bytes)
-
-    def verify_cert(self):
-        self.cert_verified = False
+        self.certificates.append(load_der_x509_certificate(certificate_in_bytes))

@@ -23,7 +23,7 @@ class SSLTest:
 
 
 def get_tests_help():
-    tests_help = 'test the server for a specified vulnerability\n' \
+    tests_help = 'test the server for a specified vulnerability' \
                  'possible vulnerabilities (separate with spaces):\n'
     for key, value in get_tests_switcher().items():
         test_number = key
@@ -40,13 +40,13 @@ def get_help():
         {"usage_example": [f"{SCRIPTNAME}.py -u https://example.com -t 1 2"]},
         {"options": [
             ["-u", "--url", "<url>", "Url to scan, required option"],
-            ["-p", "--port", "<port ...>", "Port or ports (separate with spaces) to scan on (default: [443])"],
+            ["-p", "--port", "<port ...>", "Port or ports (separate with spaces) to scan on (default: 443)"],
             ["-j", "--json", "<file>",
              "change output to json format, if a file name is specified output is written to the given file"],
             ["-t", "--test", "<number ...>", get_tests_help()],
             ["-fc", "--fix-conf", "", "Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) in order to"
-                                      "\n scan a server which still run on these versions. !WARNING!: this may rewrite"
-                                      "\n the contents of a configuration file located at /etc/ssl/openssl.cnf"],
+                                      "scan a server which still run on these versions. !WARNING!: this may rewrite"
+                                      "the contents of a configuration file located at /etc/ssl/openssl.cnf"],
             ["-ns", "--nmap-scan", "", "Use nmap to scan the server version"],
             ["-nd", "--nmap-discover", "", "Use nmap to discover web server ports"],
             ["-i", "--info", "", "Output some internal information about the script functions"],

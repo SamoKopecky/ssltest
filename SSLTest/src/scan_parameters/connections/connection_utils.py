@@ -47,7 +47,7 @@ def get_website_info(url, port, supported_protocols):
         chosen_protocol.parse_certificate()
         chosen_protocol.verify_cert()
         cipher_suite = chosen_protocol.cipher_suite
-        certificate = chosen_protocol.certificate
+        certificate = chosen_protocol.certificates[0]
         cert_verified = chosen_protocol.cert_verified
         protocol = chosen_protocol.protocol
 
@@ -139,7 +139,9 @@ def create_session(url: str, port: int, context=ssl.create_default_context()):
             raise ConnectionTimeoutError()
         except socket.gaierror:
             raise DNSError()
+        except ssl.SSLError:
+            raise ssl.SSLError
         except socket.error as e:
             ssl_socket.close()
-            sleep = incremental_sleep(sleep, e, 5)
+            sleep = incremental_sleep(sleep, e, 1)
     return ssl_socket, cert_verified
