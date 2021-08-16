@@ -2,14 +2,11 @@ import logging
 import socket
 import ssl
 
-from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
 from .SSLv3 import SSLv3
 from .SSLv2 import SSLv2
-from ..exceptions.ConnectionTimeoutError import ConnectionTimeoutError
-from ..exceptions.DNSError import DNSError
 from ..utils import convert_openssh_to_iana, incremental_sleep
 
 
@@ -30,7 +27,7 @@ def get_website_info(url, port, supported_protocols):
     """
     logging.info('Creating session...')
     try:
-        ssl_socket, cert_verified = create_session(url, port)
+        ssl_socket, cert_verified = create_session(url, port, True)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
@@ -78,54 +75,27 @@ def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     return cipher_suite, ssl_socket.version()
 
 
-def create_session_pyopenssl(url, port, context: SSL.Context):
-    """
-    Create a secure connection to any server on any port with a defined context
-
-    This function creates a secure connection with pyopenssl lib. Original ssl lib
-    doesn't work with older TLS versions on some OpenSSL implementations and thus
-    the program can't scan for all supported versions.
-    :param str url: Url of the website
-    :param int port: Port to create the connection on
-    :param SSL.Context context: pyopenssl SSL context
-    :return: Created secure socket
-    """
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # sock.settimeout(5)
-    context.set_cipher_list(b'ALL')
-    ssl_socket = SSL.Connection(context, sock)
-    sleep = 0
-    # Loop until there is a valid response or after 15 seconds
-    while True:
-        try:
-            logging.debug(f'connecting... (tls version scanning)')
-            ssl_socket.connect((url, port))
-            break
-        except OSError as e:
-            sleep = incremental_sleep(sleep, e, 5)
-    ssl_socket.do_handshake()
-    return ssl_socket
-
-
-def create_session(url: str, port: int, context=ssl.create_default_context()):
+def create_session(url, port, verify_cert, context=ssl.SSLContext()):
     """
     Create a secure connection to any server on any port with a defined context
 
     :param str url: Url of the website
     :param int port: Port to create the connection on
+    :param bool verify_cert: Whether to verify the certificate or not
     :param ssl.SSLContext context: ssl context
     :return: Created secure socket
     """
     cert_verified = True
-    context.check_hostname = True
-    context.verify_mode = ssl.VerifyMode.CERT_REQUIRED
+    if verify_cert:
+        context.check_hostname = True
+        context.verify_mode = ssl.VerifyMode.CERT_REQUIRED
     context.set_ciphers('ALL')
     sleep = 0
     # Loop until there is a valid response or after 15 seconds
     # because of rate limiting on some servers
     while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(5)  # in seconds
+        sock.settimeout(3)  # in seconds
         ssl_socket = context.wrap_socket(sock, server_hostname=url)
         try:
             logging.debug(f'connecting... (main connection)')
@@ -136,12 +106,10 @@ def create_session(url: str, port: int, context=ssl.create_default_context()):
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
         except socket.timeout:
-            raise ConnectionTimeoutError()
+            raise Exception('Connection timeout')
         except socket.gaierror:
-            raise DNSError()
-        except ssl.SSLError:
-            raise ssl.SSLError
+            raise Exception('DNS record not found')
         except socket.error as e:
             ssl_socket.close()
-            sleep = incremental_sleep(sleep, e, 1)
+            sleep = incremental_sleep(sleep, e, 2)
     return ssl_socket, cert_verified

@@ -5,7 +5,6 @@ import time
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
 
-from .exceptions.NoIanaPairFound import NoIanaPairFound
 from .ratable.PType import PType
 from ..utils import read_json
 
@@ -23,7 +22,7 @@ def convert_openssh_to_iana(search_term):
     for row in json_data:
         if json_data[row] == search_term:
             return row
-    raise NoIanaPairFound()
+    raise Exception('No iana pair found')
 
 
 def rate_key_length_parameter(algorithm_type, key_len, key_len_type):
@@ -143,7 +142,7 @@ def incremental_sleep(sleep_dur, exception, max_timeout_dur):
     :rtype: int
     """
     if sleep_dur >= max_timeout_dur:
-        logging.debug('raise unknown connection error')
+        logging.debug('timed out')
         raise exception
     logging.debug('increasing sleep duration')
     sleep_dur += 1

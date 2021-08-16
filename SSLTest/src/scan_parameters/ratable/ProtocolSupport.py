@@ -1,9 +1,9 @@
 import logging
-
-from OpenSSL import SSL
+import ssl
+import socket
 
 from .PType import PType
-from ..connections.connection_utils import create_session_pyopenssl
+from ..connections.connection_utils import create_session
 from ..utils import rate_parameter
 from ..connections.SSLv3 import SSLv3
 from ..connections.SSLv2 import SSLv2
@@ -54,30 +54,22 @@ class ProtocolSupport:
         Test for all possible TLS versions which the server supports
         """
         ssl_versions = {
-            SSL.TLSv1_METHOD: 'TLSv1.0',
-            SSL.TLSv1_1_METHOD: 'TLSv1.1',
-            SSL.TLSv1_2_METHOD: 'TLSv1.2',
-            SSL.SSLv23_METHOD: 'unknown'
+            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3: 'TLSv1.0',
+            ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3: 'TLSv1.1',
+            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_3: 'TLSv1.2',
+            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1: 'TLSv1.3'
         }
-        for num_version in list(ssl_versions.keys()):
-            context = SSL.Context(num_version)
-            version = ssl_versions[num_version]
+        for version, str_version in ssl_versions.items():
+            context = ssl.SSLContext()
+            context.options = ssl.OP_ALL
+            context.options |= version
             try:
-                ssl_socket = create_session_pyopenssl(self.url, self.port, context)
-                if version == 'unknown':
-                    version = ssl_socket.get_protocol_version_name()
-                    if version == 'TLSv1':
-                        version += '.0'
+                ssl_socket, _ = create_session(self.url, self.port, False, context)
                 ssl_socket.close()
-                if version not in self.supported_protocols:
-                    self.supported_protocols.append(version)
-            except SSL.Error as e:
-                if version == 'unknown':
-                    continue
-                self.unsupported_protocols.append(version)
-        # Need to do this since there is no explicit option for TLSv1.3
-        if 'TLSv1.3' not in self.supported_protocols:
-            self.unsupported_protocols.append('TLSv1.3')
+                if str_version not in self.supported_protocols:
+                    self.supported_protocols.append(str_version)
+            except socket.error:
+                self.unsupported_protocols.append(str_version)
 
     def rate_protocols(self):
         """
