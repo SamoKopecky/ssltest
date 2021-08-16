@@ -25,7 +25,7 @@ def get_website_info(url, port, supported_protocols):
         cipher_suite -- Negotiated cipher suite
         protocol -- Protocol name and version
     """
-    logging.info('Creating session...')
+    logging.info('Creating main session...')
     try:
         ssl_socket, cert_verified = create_session(url, port, True)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
@@ -91,25 +91,34 @@ def create_session(url, port, verify_cert, context=ssl.SSLContext()):
         context.verify_mode = ssl.VerifyMode.CERT_REQUIRED
     context.set_ciphers('ALL')
     sleep = 0
-    # Loop until there is a valid response or after 15 seconds
+    # Loop until there is a valid response or after a timeout
     # because of rate limiting on some servers
     while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(3)  # in seconds
         ssl_socket = context.wrap_socket(sock, server_hostname=url)
         try:
-            logging.debug(f'connecting... (main connection)')
+            logging.debug(f'connecting...')
             ssl_socket.connect((url, port))
             break
         except ssl.SSLCertVerificationError:
+            # If cert is was unverified, connect again without verifying
             cert_verified = False
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
         except socket.timeout:
-            raise Exception('Connection timeout')
+            logging.debug('connection timeout...')
+            sleep = incremental_sleep(sleep, Exception('Connection timeout'), 3)
         except socket.gaierror:
             raise Exception('DNS record not found')
         except socket.error as e:
             ssl_socket.close()
-            sleep = incremental_sleep(sleep, e, 2)
+            error_str = e.args[1]
+            # Protocol not supported, no need to sleep
+            if '[SSL: UNSUPPORTED_PROTOCOL]' in error_str or \
+                    '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]' in error_str:
+                logging.debug('protocol unsupported...')
+                raise e
+            logging.debug('error occurred...')
+            sleep = incremental_sleep(sleep, e, 3)
     return ssl_socket, cert_verified

@@ -42,6 +42,7 @@ class ProtocolSupport:
             SSLv2(self.url, self.port)
         ]
         for ssl_version in ssl_versions:
+            logging.debug(f'scanning for {ssl_version.protocol}...')
             ssl_version.send_client_hello()
             result = ssl_version.scan_version_support()
             if result:
@@ -60,14 +61,14 @@ class ProtocolSupport:
             ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1: 'TLSv1.3'
         }
         for version, str_version in ssl_versions.items():
+            logging.debug(f'scanning for {str_version}...')
             context = ssl.SSLContext()
             context.options = ssl.OP_ALL
             context.options |= version
             try:
                 ssl_socket, _ = create_session(self.url, self.port, False, context)
                 ssl_socket.close()
-                if str_version not in self.supported_protocols:
-                    self.supported_protocols.append(str_version)
+                self.supported_protocols.append(str_version)
             except socket.error:
                 self.unsupported_protocols.append(str_version)
 
