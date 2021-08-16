@@ -1,9 +1,11 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 __version__ = "0.0.1"
 
 import argparse
 import sys
+import subprocess
+import os
 
 from ptlibs import ptjsonlib, ptmisclib
 
@@ -80,10 +82,26 @@ def parse_args():
         print_help()
         sys.exit(0)
     args = parser.parse_args()
+    fix_conf_option(args)
     check_test_option(args.test)
     if '-j' not in sys.argv:
         ptmisclib.print_banner(SCRIPTNAME, __version__, args.json)
     return args
+
+
+def fix_conf_option(args):
+    """
+    Fixes the OpenSSL configuration file
+
+    :param Namespace args: Parsed input arguments
+    """
+    if args.fix_conf:
+        return_code = subprocess.run(['sudo', './src/fix_openssl_config.py']).returncode
+        if return_code == 1:
+            exit(1)
+        sys.argv.remove('-fc')
+        # Restarts the program without the fc argument
+        os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
 
 
 def check_test_option(tests):

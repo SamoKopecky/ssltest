@@ -1,10 +1,8 @@
 import json
 import logging
-import os
 import sys
 import traceback
 
-from .fix_openssl_config import fix_openssl_config
 from .scan_parameters.connections.connection_utils import get_website_info
 from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
 from .scan_parameters.non_ratable.WebServerSoft import WebServerSoft
@@ -41,23 +39,6 @@ def get_tests_switcher():
         6: (crime.scan, 'CRIME'),
         7: (rc4_support.scan, 'RC4 support')
     }
-
-
-def fix_conf_option(args):
-    """
-    Fixes the OpenSSL configuration file
-
-    :param Namespace args: Parsed input arguments
-    """
-    if args.fix_conf:
-        try:
-            fix_openssl_config()
-        except PermissionError:
-            print("Permission denied can't write to OpenSSL config file", file=sys.stderr)
-            exit(1)
-        sys.argv.remove('-fc')
-        # Restarts the program without the fc argument
-        os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
 
 
 def vulnerability_scan(address, tests, version):
@@ -243,7 +224,6 @@ def run(args):
 
     :param Namespace args: Parsed input arguments
     """
-    fix_conf_option(args)
     if '/' in args.url:
         args.url = fix_url(args.url)
     info_report_option(args)
