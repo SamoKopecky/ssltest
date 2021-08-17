@@ -44,11 +44,13 @@ def get_help():
             ["-u", "--url", "<url>", "Url to scan, required option"],
             ["-p", "--port", "<port ...>", "Port or ports (separate with spaces) to scan on (default: 443)"],
             ["-j", "--json", "<file>",
-             "change output to json format, if a file name is specified output is written to the given file"],
+             "Change output to json format, if a file name is specified output is written to the given file"],
             ["-t", "--test", "<number ...>", get_tests_help()],
             ["-fc", "--fix-conf", "", "Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) in order to"
                                       "scan a server which still run on these versions. !WARNING!: this may rewrite"
-                                      "the contents of a configuration file located at /etc/ssl/openssl.cnf"],
+                                      "the contents of a configuration file located at /etc/ssl/openssl.cnf"
+                                      " Password can be piped to stdin or entered when prompted at the start of the"
+                                      " script if no pipe is present"],
             ["-ns", "--nmap-scan", "", "Use nmap to scan the server version"],
             ["-nd", "--nmap-discover", "", "Use nmap to discover web server ports"],
             ["-i", "--info", "", "Output some internal information about the script functions"],
@@ -96,7 +98,12 @@ def fix_conf_option(args):
     :param Namespace args: Parsed input arguments
     """
     if args.fix_conf:
-        return_code = subprocess.run(['sudo', './src/fix_openssl_config.py']).returncode
+        if sys.stdin.isatty():
+            return_code = subprocess.run(
+                ['sudo', '-k', '-p', '[sudo] password for %H to fix config file: ', './src/fix_openssl_config.py']
+            ).returncode
+        else:
+            return_code = subprocess.run(['sudo', '-k', '-S', '-p', '', './src/fix_openssl_config.py']).returncode
         if return_code == 1:
             exit(1)
         sys.argv.remove('-fc')
