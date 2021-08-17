@@ -2,7 +2,7 @@
   "kex_algorithm": "DH,DHE,ECDH,ECDHE,SRP,ECCPWD,GOSTR341112,RSA",
   "cert_pub_key_algorithm": "anon,KRB5,PSK,DSS",
   "sym_enc_algorithm": "RC4,RC2,IDEA,DES40,DES,3DES,AES,CAMELLIA,SEED,SM4,SM3,ARIA,KUZNYECHIK,MAGMA,CHACHA20",
-  "sym_enc_algorithm_key_length": "40,64,128,256",
+  "sym_enc_algorithm_key_length": "40,64,128,192,256",
   "sym_enc_algorithm_block_mode": "CBC,EDE,GCM,CCM,CTR",
   "sym_ecn_algorithm_block_mode_number": "8",
   "hash_function": "MD5,SHA,SHA256,SHA384",

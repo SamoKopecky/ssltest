@@ -120,5 +120,5 @@ def create_session(url, port, verify_cert, context=ssl.SSLContext()):
                 logging.debug('protocol unsupported...')
                 raise e
             logging.debug('error occurred...')
-            sleep = incremental_sleep(sleep, e, 3)
+            sleep = incremental_sleep(sleep, e, 1)
     return ssl_socket, cert_verified

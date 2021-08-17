@@ -21,6 +21,8 @@ from .scan_vulnerabilities.tests import rc4_support
 from .scan_vulnerabilities.tests import session_ticket
 from .text_output.TextOutput import TextOutput
 
+from .scan_parameters.connections.SSLv2 import SSLv2
+
 
 def get_tests_switcher():
     """
@@ -224,6 +226,9 @@ def run(args):
 
     :param Namespace args: Parsed input arguments
     """
+    # sslv2 = SSLv2('192.168.1.220', 443)
+    # sslv2.send_client_hello()
+    # sslv2.parse_cipher_suite()
     if '/' in args.url:
         args.url = fix_url(args.url)
     info_report_option(args)

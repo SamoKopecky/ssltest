@@ -1,6 +1,9 @@
+import random
+
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
+from ...utils import read_json
 
 
 class SSLv2(SSLvX):
@@ -38,9 +41,23 @@ class SSLv2(SSLvX):
         return False
 
     def parse_cipher_suite(self):
-        # TODO: temporary, change if multiple cipher suites rating is implemented
-        # One of the SSLv2 Cipher suites since the client is choosing the cipher suite
-        self.cipher_suite = 'DES_64_CBC_WITH_MD5'
+        # TODO: Add EDE3 and EXPORT 40 to cipher suite parsing
+        # TODO: Display all of avaliable cipher suites when implemented
+        cipher_suites = read_json('cipher_suites_sslv2.json')
+        certificate_len = SSLvX.hex_to_int([self.response[7], self.response[8]])
+        cipher_spec_len = SSLvX.hex_to_int([self.response[9], self.response[10]])
+        cipher_spec_begin_idx = 11 + 2 + certificate_len
+        server_cipher_suites = []
+        for idx in range(cipher_spec_begin_idx, cipher_spec_begin_idx + cipher_spec_len, 3):
+            server_cipher_suites.append(
+                cipher_suites[
+                    f'{SSLv2.int_to_hex_str(self.response[idx])},'
+                    f'{SSLv2.int_to_hex_str(self.response[idx + 1])},'
+                    f'{SSLv2.int_to_hex_str(self.response[idx + 2])}'
+                ]
+            )
+        random_number = int(random.randint(0, len(server_cipher_suites) - 1))
+        self.cipher_suite = server_cipher_suites[random_number]
 
     def parse_certificate(self):
         certificate_length = SSLvX.hex_to_int([
@@ -49,3 +66,7 @@ class SSLv2(SSLvX):
         ])
         certificate_in_bytes = self.response[13:certificate_length + 13]
         self.certificates.append(load_der_x509_certificate(certificate_in_bytes))
+
+    @staticmethod
+    def int_to_hex_str(number):
+        return f'0x{number:02X}'
