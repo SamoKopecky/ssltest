@@ -14,14 +14,20 @@
   "sym_enc_algorithm": {
     "1": "AES",
     "2": "",
-    "3": "TDEA,2DES,3DES",
-    "4": "SKIPJACK,RC4,DES"
+    "3": "DES,IDEA",
+    "4": "SKIPJACK,RC4,RC2"
+  },
+  "sym_enc_algorithm_mod": {
+    "1": "",
+    "2": "",
+    "3": "EDE3",
+    "4": "EXPORT40"
   },
   "sym_enc_algorithm_key_length": {
     "1": "AES,>=128",
     "2": "",
-    "3": "3DES,>=168,2DES,>=112,TDEA,>=168",
-    "4": "AES,<<128,3DES,<<168,2DES,<<112,TDEA,<<168,RC4,>=0,DES,>=0"
+    "3": "DES,>=192,IDEA,>=128",
+    "4": "AES,<<128,RC4,>=0,DES,<<192,RC2,>=0"
   },
   "sym_enc_algorithm_block_mode": {
     "1": "GCM,CCM",

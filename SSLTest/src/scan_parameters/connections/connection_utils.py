@@ -27,11 +27,13 @@ def get_website_info(url, port, supported_protocols):
     """
     logging.info('Creating main session...')
     try:
+        logging.debug('Connecting with TLS...')
         ssl_socket, cert_verified = create_session(url, port, True)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
-    except (ssl.SSLError, ConnectionResetError) as e:
+    except (ssl.SSLError, ConnectionResetError):
+        logging.debug('Connecting with SSL...')
         ssl_protocols = [
             SSLv3(url, port),
             SSLv2(url, port)

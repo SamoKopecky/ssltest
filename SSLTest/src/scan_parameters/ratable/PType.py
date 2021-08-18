@@ -9,6 +9,7 @@ class PType(Enum):
     cert_pub_key_algorithm = auto()
     cert_pub_key_length = auto()
     sym_enc_algorithm = auto()
+    sym_enc_algorithm_mod = auto()
     sym_enc_algorithm_key_length = auto()
     sym_enc_algorithm_block_mode = auto()
     sym_ecn_algorithm_block_mode_number = auto()
@@ -51,6 +52,7 @@ class PType(Enum):
         cipher_suite_parameters = [
             self.kex_algorithm,
             self.sym_enc_algorithm,
+            self.sym_enc_algorithm_mod,
             self.sym_enc_algorithm_key_length,
             self.sym_enc_algorithm_block_mode,
             self.sym_ecn_algorithm_block_mode_number,
@@ -94,6 +96,7 @@ class PType(Enum):
         rateable_parameters = [
             self.kex_algorithm,
             self.sym_enc_algorithm,
+            self.sym_enc_algorithm_mod,
             self.sym_enc_algorithm_key_length,
             self.sym_enc_algorithm_block_mode,
             self.sym_ecn_algorithm_block_mode_number,

@@ -41,8 +41,6 @@ class SSLv2(SSLvX):
         return False
 
     def parse_cipher_suite(self):
-        # TODO: Add EDE3 and EXPORT 40 to cipher suite parsing
-        # TODO: Display all of avaliable cipher suites when implemented
         cipher_suites = read_json('cipher_suites_sslv2.json')
         certificate_len = SSLvX.hex_to_int([self.response[7], self.response[8]])
         cipher_spec_len = SSLvX.hex_to_int([self.response[9], self.response[10]])
