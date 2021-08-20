@@ -59,13 +59,15 @@ def construct_client_hello(version):
     return client_hello
 
 
-ccs_message = bytes([
-    # Record protocol
-    0x14,  # Protocol type (ccs)
-    0x03, 0x03,  # Version
-    0x00, 0x01,  # Length
-    0x01  # CSS message
-])
+def construct_ccs_message(version):
+    ccs_message = bytes([
+        # Record protocol
+        0x14,  # Protocol type (ccs)
+        0x03, version,  # Version
+        0x00, 0x01,  # Length
+        0x01  # CSS message
+    ])
+    return ccs_message
 
 
 def scan(address, version):
@@ -77,15 +79,17 @@ def scan(address, version):
     :return: Whether the server is vulnerable
     :rtype: bool
     """
+    if version == 0x04:
+        logging.info('CCS injection scan done.')
+        return False
     client_hello = construct_client_hello(version)
-    logging.info('Scanning CCS injection vulnerability...')
     timeout = 2
     server_hello, sock = communicate_data_return_sock(address, client_hello, timeout)
     if not is_server_hello(server_hello):
         logging.info('CCS injection scan done.')
         sock.close()
         return False
-    sock.send(ccs_message)
+    sock.send(construct_ccs_message(version))
     server_response = receive_data(sock, timeout)
     sock.close()
     logging.info('CCS injection scan done.')

@@ -50,7 +50,7 @@ class CipherSuite(Parameters):
         Read the protocol version and apply special edge cases
         """
         self.parameters[PType.protocol] = {self.protocol: 0}
+        if self.protocol == 'TLSv1':
+            self.parameters[PType.protocol] = {'TLSv1.0': 0}
         if self.protocol == 'TLSv1.3':
             self.parameters[PType.kex_algorithm] = {'ECDHE': 0}
-        if self.protocol == 'TLSv1':
-            self.parameters[PType.protocol] = {'TLSv1.0': self.parameters[PType.protocol]['TLSv1']}

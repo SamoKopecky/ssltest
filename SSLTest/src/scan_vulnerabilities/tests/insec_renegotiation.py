@@ -76,7 +76,6 @@ def scan(address, version):
     :return: if the server is vulnerable
     """
     client_hello = construct_client_hello(version)
-    logging.info("Scanning Renegotiation vulnerability...")
     timeout = 2
     server_hello, sock = communicate_data_return_sock(address, client_hello, timeout)
     sock.close()

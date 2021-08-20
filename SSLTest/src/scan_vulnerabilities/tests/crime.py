@@ -68,8 +68,10 @@ def scan(address, version):
     :return: Whether the server is vulnerable
     :rtype: bool
     """
+    if version == 0x04:
+        logging.info('CCS injection scan done.')
+        return False
     client_hello = construct_client_hello(version)
-    logging.info("Scanning CRIME vulnerability...")
     timeout = 2
     server_hello, sock = communicate_data_return_sock(address, client_hello, timeout)
     sock.close()

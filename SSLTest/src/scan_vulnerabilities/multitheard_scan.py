@@ -1,4 +1,5 @@
 import concurrent.futures as cf
+import logging
 
 protocol_binary_version = {
     "TLSv1.3": 0x04,
@@ -28,6 +29,8 @@ def scan_vulnerabilities(tests, address, version):
     with cf.ThreadPoolExecutor(max_workers=len(tests)) as executor:
         for test in tests:
             # 0th index is the function, 1st index is the test name
+            test_name = test[1]
+            logging.info(f'Scanning for {test_name}...')
             futures.update({executor.submit(test[0], address, protocol_binary_version[version]): test[1]})
         for future in cf.as_completed(futures):
             test_name = futures[future]

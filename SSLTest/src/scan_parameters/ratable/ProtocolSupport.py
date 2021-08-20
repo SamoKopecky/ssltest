@@ -26,8 +26,8 @@ class ProtocolSupport:
         Convert protocol versions to dict with PType to get them ready for rating
         """
         logging.info('Scanning SSL/TLS versions...')
-        self.scan_tls_protocols()
         self.scan_ssl_protocols()
+        self.scan_tls_protocols()
         for protocol in self.supported_protocols:
             self.versions[PType.protocols][protocol] = 'N/A'
         for no_protocol in self.unsupported_protocols:
@@ -38,8 +38,8 @@ class ProtocolSupport:
         Test for all possible SSL versions which the server supports
         """
         ssl_versions = [
-            SSLv3(self.url, self.port),
-            SSLv2(self.url, self.port)
+            SSLv2(self.url, self.port),
+            SSLv3(self.url, self.port)
         ]
         for ssl_version in ssl_versions:
             logging.debug(f'scanning for {ssl_version.protocol}...')
@@ -55,10 +55,10 @@ class ProtocolSupport:
         Test for all possible TLS versions which the server supports
         """
         ssl_versions = {
-            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3: 'TLSv1.0',
-            ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3: 'TLSv1.1',
-            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_3: 'TLSv1.2',
-            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1: 'TLSv1.3'
+            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3: 'TLSv1.0',
+            ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3: 'TLSv1.1',
+            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3: 'TLSv1.2',
+            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1 | ssl.OP_NO_SSLv3: 'TLSv1.3'
         }
         for version, str_version in ssl_versions.items():
             logging.debug(f'scanning for {str_version}...')

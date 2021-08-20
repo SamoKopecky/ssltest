@@ -68,10 +68,10 @@ def construct_client_hello(version):
     return client_hello
 
 
-def build_data(data):
+def build_data(data, version):
     data_bytes = bytes([
         0x17,  # Content type (data)
-        0x03, 0x03,  # Version
+        0x03, version,  # Version
         0x00, 0x20,  # Length
         # Data (32 bytes)
         0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -91,12 +91,15 @@ def scan(address, version):
     :return: Whether the server is vulnerable
     :rtype: bool
     """
+    if version == 0x04:
+        logging.info("Poodle vulnerability scan done.")
+        return False
     client_hello = construct_client_hello(version)
-    logging.info("Scanning Poodle vulnerability...")
     server_hello, sock = communicate_data_return_sock(address, client_hello, 2)
     # If no server hello is sent the server doesn't support
     # CBC ciphers
     if not is_server_hello(server_hello):
+        logging.info("Poodle vulnerability scan done.")
         return False
     sock.close()
     unsafe_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -105,7 +108,7 @@ def scan(address, version):
     ssl_socket.do_handshake()
     for i in range(256):
         try:
-            unsafe_sock.send(build_data(i))
+            unsafe_sock.send(build_data(i, version))
             ssl_socket.read(2048)
         # Server didn't send an alert
         except (SSL.ZeroReturnError, SSL.SysCallError):

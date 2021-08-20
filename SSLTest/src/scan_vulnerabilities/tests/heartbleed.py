@@ -63,15 +63,17 @@ def construct_client_hello(version):
     return client_hello
 
 
-heartbeat_request = bytes([
-    # Record protocol
-    0x18,  # Content type (Handshake)
-    0x03, 0x03,  # Version (1.2)
-    0x00, 0x03,  # Length
-    # Heartbeat
-    0x01,  # Type (Request)
-    0x40, 0x00,  # Payload length
-])
+def construct_heartbeat_request(version):
+    heartbeat_request = bytes([
+        # Record protocol
+        0x18,  # Content type (Handshake)
+        0x03, version,  # Version
+        0x00, 0x03,  # Length
+        # Heartbeat
+        0x01,  # Type (Request)
+        0x40, 0x00,  # Payload length
+    ])
+    return heartbeat_request
 
 
 def scan(address, version):
@@ -83,15 +85,17 @@ def scan(address, version):
     :return: Whether the server is vulnerable
     :rtype: bool
     """
+    if version == 0x04:
+        logging.info('Heartbeat scan done.')
+        return False
     client_hello = construct_client_hello(version)
-    logging.info('Scanning Heartbleed vulnerability...')
     timeout = 2
     server_hello, sock = communicate_data_return_sock(address, client_hello, timeout)
     if not is_server_hello(server_hello):
         sock.close()
         logging.info('Heartbeat scan done.')
         return False
-    sock.send(heartbeat_request)
+    sock.send(construct_heartbeat_request(version))
     heartbeat_response = receive_data(sock, timeout)
     sock.close()
     logging.info('Heartbeat scan done.')
