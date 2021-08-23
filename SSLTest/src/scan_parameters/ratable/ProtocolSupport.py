@@ -1,9 +1,8 @@
 import logging
-import ssl
 import socket
 
 from .PType import PType
-from ..connections.connection_utils import create_session
+from ..connections.connection_utils import create_session, create_ssl_context
 from ..utils import rate_parameter
 from ..connections.SSLv3 import SSLv3
 from ..connections.SSLv2 import SSLv2
@@ -54,23 +53,21 @@ class ProtocolSupport:
         """
         Test for all possible TLS versions which the server supports
         """
-        ssl_versions = {
-            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3: 'TLSv1.0',
-            ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3: 'TLSv1.1',
-            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3: 'TLSv1.2',
-            ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1 | ssl.OP_NO_SSLv3: 'TLSv1.3'
-        }
-        for version, str_version in ssl_versions.items():
-            logging.debug(f'scanning for {str_version}...')
-            context = ssl.SSLContext()
-            context.options = ssl.OP_ALL
-            context.options |= version
+        tls_versions = [
+            'TLSv1.0',
+            'TLSv1.1',
+            'TLSv1.2',
+            'TLSv1.3'
+        ]
+        for version in tls_versions:
+            logging.debug(f'scanning for {version}...')
+            context = create_ssl_context(version)
             try:
                 ssl_socket, _ = create_session(self.url, self.port, False, context)
                 ssl_socket.close()
-                self.supported_protocols.append(str_version)
+                self.supported_protocols.append(version)
             except socket.error:
-                self.unsupported_protocols.append(str_version)
+                self.unsupported_protocols.append(version)
 
     def rate_protocols(self):
         """

@@ -30,7 +30,8 @@ def get_website_info(url, port, supported_protocols, worst):
     chosen_protocol = choose_protocol(supported_protocols, worst)
     if 'TLS' in chosen_protocol:
         logging.debug('Connecting with TLS...')
-        ssl_socket, cert_verified = create_session(url, port, True)
+        context = create_ssl_context(chosen_protocol)
+        ssl_socket, cert_verified = create_session(url, port, True, context)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
@@ -111,7 +112,7 @@ def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     return cipher_suite, ssl_socket.version()
 
 
-def create_session(url, port, verify_cert, context=ssl.SSLContext()):
+def create_session(url, port, verify_cert, context):
     """
     Create a secure connection to any server on any port with a defined context
 
@@ -141,20 +142,41 @@ def create_session(url, port, verify_cert, context=ssl.SSLContext()):
             # If cert is was unverified, connect again without verifying
             cert_verified = False
             context.check_hostname = False
-            context.verify_mode = ssl.CERT_NONE
+            context.verify_mode = ssl.VerifyMode.CERT_NONE
         except socket.timeout:
             logging.debug('connection timeout...')
             sleep = incremental_sleep(sleep, Exception('Connection timeout'), 3)
         except socket.gaierror:
             raise Exception('DNS record not found')
         except socket.error as e:
-            ssl_socket.close()
             error_str = e.args[1]
             # Protocol not supported, no need to sleep
             if '[SSL: UNSUPPORTED_PROTOCOL]' in error_str or \
-                    '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]' in error_str:
+                    '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]' in error_str or \
+                    '[SSL: TLSV1_ALERT_PROTOCOL_VERSION]' in error_str:
                 logging.debug('protocol unsupported...')
                 raise e
             logging.debug('error occurred...')
             sleep = incremental_sleep(sleep, e, 3)
+        ssl_socket.close()
     return ssl_socket, cert_verified
+
+
+def create_ssl_context(protocol_version):
+    """
+    Create an ssl context from the native ssl library for the specific protocol version
+
+    :param str protocol_version: Protocol version to create the context with
+    :return: Created SSL context
+    :rtype: ssl.SSLContext
+    """
+    ssl_versions = {
+        'TLSv1.0': ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3,
+        'TLSv1.1': ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3,
+        'TLSv1.2': ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3,
+        'TLSv1.3': ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1 | ssl.OP_NO_SSLv3,
+    }
+    context = ssl.create_default_context()
+    context.options = ssl.OP_ALL
+    context.options |= ssl_versions[protocol_version]
+    return context
