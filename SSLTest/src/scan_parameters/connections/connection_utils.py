@@ -10,7 +10,7 @@ from .SSLv2 import SSLv2
 from ..utils import convert_openssh_to_iana, incremental_sleep
 
 
-def get_website_info(url, port, supported_protocols):
+def get_website_info(url, port, supported_protocols, worst):
     """
     Gather objects required to rate a web server
 
@@ -19,6 +19,7 @@ def get_website_info(url, port, supported_protocols):
     :param int port: Port to scan on
     :param str url: Url of the webserver
     :param list supported_protocols: Supported SSL/TLS protocol versions
+    :param bool worst: Whether to connect with the worst available protocol
     :return:
         certificate -- Used certificate to verify the server
         cert_verified -- Is certificate verified
@@ -26,31 +27,64 @@ def get_website_info(url, port, supported_protocols):
         protocol -- Protocol name and version
     """
     logging.info('Creating main session...')
-    try:
+    chosen_protocol = choose_protocol(supported_protocols, worst)
+    if 'TLS' in chosen_protocol:
         logging.debug('Connecting with TLS...')
         ssl_socket, cert_verified = create_session(url, port, True)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
-    except (ssl.SSLError, ConnectionResetError):
+    else:
         logging.debug('Connecting with SSL...')
-        ssl_protocols = [
-            SSLv3(url, port),
-            SSLv2(url, port)
-        ]
-        chosen_protocol = ssl_protocols[0]
-        if ['SSLv2'] == supported_protocols:
-            chosen_protocol = ssl_protocols[1]
-        chosen_protocol.send_client_hello()
-        chosen_protocol.parse_cipher_suite()
-        chosen_protocol.parse_certificate()
-        chosen_protocol.verify_cert()
-        cipher_suite = chosen_protocol.cipher_suite
-        certificate = chosen_protocol.certificates[0]
-        cert_verified = chosen_protocol.cert_verified
-        protocol = chosen_protocol.protocol
-
+        ssl_protocols = {
+            'SSLv3': SSLv3,
+            'SSLv2': SSLv2
+        }
+        ssl_protocol = ssl_protocols[chosen_protocol](url, port)
+        ssl_protocol.send_client_hello()
+        ssl_protocol.parse_cipher_suite()
+        ssl_protocol.parse_certificate()
+        ssl_protocol.verify_cert()
+        cipher_suite = ssl_protocol.cipher_suite
+        certificate = ssl_protocol.certificates[0]
+        cert_verified = ssl_protocol.cert_verified
+        protocol = ssl_protocol.protocol
     return certificate, cert_verified, cipher_suite, protocol
+
+
+def choose_protocol(protocols, worst):
+    """
+    Find the protocol version which will be used to connect to the server
+
+    :param protocols: Supported protocols by the server
+    :param bool worst: Whether to find worst available protocol or best
+    :return: The string of the chosen protocol
+    :rtype: str
+    """
+    protocol_strengths = {
+        'TLSv1.3': 5,
+        'TLSv1.2': 4,
+        'TLSv1.1': 3,
+        'TLSv1.0': 2,
+        'SSLv3': 1,
+        'SSLv2': 0
+    }
+    items = list(protocol_strengths.items())
+    # Switcher for either the best protocol or the worst
+    # If worst option is False the best protocol is found, in other words the maximum value is found
+    # If worst option is True the worst protocol is found, in other words the minimum value is found
+    switcher = {
+        True: (lambda a, b: a < b, items[0]),
+        False: (lambda a, b: a > b, items[-1])
+    }
+    # Filter out the unsupported protocols
+    filtered_protocol_strengths = dict(filter(lambda item: item[0] in protocols, protocol_strengths.items()))
+    base = switcher[worst][1]
+    comparison = switcher[worst][0]
+    for key, value in filtered_protocol_strengths.items():
+        if comparison(value, base[1]):
+            base = (key, value)
+    return base[0]
 
 
 def get_certificate(ssl_socket):

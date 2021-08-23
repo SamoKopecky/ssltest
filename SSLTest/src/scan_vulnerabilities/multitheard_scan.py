@@ -31,7 +31,7 @@ def scan_vulnerabilities(tests, address, version):
             # 0th index is the function, 1st index is the test name
             test_name = test[1]
             logging.info(f'Scanning for {test_name}...')
-            futures.update({executor.submit(test[0], address, protocol_binary_version[version]): test[1]})
+            futures.update({executor.submit(test[0], address, protocol_binary_version[version]): test_name})
         for future in cf.as_completed(futures):
             test_name = futures[future]
             data = future.result()

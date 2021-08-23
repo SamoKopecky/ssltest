@@ -49,6 +49,7 @@ $ sudo ptmanager -ut SSLTest
                              entered when prompted at the start of the script if no pipe is present
 -ns --nmap-scan              Use nmap to scan the server version
 -nd --nmap-discover          Use nmap to discover web server ports
+-w  --worst                  Create a main connection on the worst available protocol version
 -i  --info                   Output some internal information about the script functions
 -d  --debug                  Output debug information
 -v  --version                Show script version and exit

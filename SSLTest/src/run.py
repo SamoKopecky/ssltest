@@ -193,7 +193,7 @@ def scan(args, port):
     protocol_support.rate_protocols()
 
     certificate, cert_verified, cipher_suite, protocol = get_website_info(
-        args.url, port, protocol_support.supported_protocols
+        args.url, port, protocol_support.supported_protocols, args.worst
     )
 
     cipher_suite = CipherSuite(cipher_suite, protocol)

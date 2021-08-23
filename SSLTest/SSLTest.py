@@ -53,6 +53,7 @@ def get_help():
                                       " script if no pipe is present"],
             ["-ns", "--nmap-scan", "", "Use nmap to scan the server version"],
             ["-nd", "--nmap-discover", "", "Use nmap to discover web server ports"],
+            ["-w", "--worst", "", "Create a main connection on the worst available protocol version"],
             ["-i", "--info", "", "Output some internal information about the script functions"],
             ["-d", "--debug", "", "Output debug information"],
             ["-v", "--version", "", "Show script version and exit"],
@@ -76,6 +77,7 @@ def parse_args():
     parser.add_argument("-fc", "--fix-conf", action="store_true", default=False)
     parser.add_argument("-ns", "--nmap-scan", action="store_true", default=False)
     parser.add_argument("-nd", "--nmap-discover", action="store_true", default=False)
+    parser.add_argument("-w", "--worst", action="store_true", default=False)
     parser.add_argument("-i", "--info", action="store_true", default=False)
     parser.add_argument("-d", "--debug", action="store_true", default=False)
     parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
