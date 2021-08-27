@@ -53,11 +53,11 @@ def handle_test_option(address, tests, supported_protocols):
     # if no -t argument is present
     if not tests:
         # Remove test at 0th index
-        scans = [value for value in list(tests_switcher.values())[1:]]
+        scans = list(tests_switcher.values())[1:]
     elif 0 in tests:
         return {}
     else:
-        scans = [tests_switcher.get(test) for test in tests]
+        scans = list(map(lambda t: tests_switcher.get(t), tests))
     return vulnerability_scans(scans, address, supported_protocols)
 
 

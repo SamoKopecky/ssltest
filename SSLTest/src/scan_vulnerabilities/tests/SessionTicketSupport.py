@@ -6,7 +6,7 @@ from ...utils import communicate_data_return_sock
 class SessionTicketSupport(VulnerabilityTest):
     def __init__(self, supported_protocols, address):
         super().__init__(supported_protocols, address)
-        self.test_name = 'Session Ticker Support'
+        self.test_name = 'Session Ticket Support'
         self.valid_protocols = ['TLSv1.2']
         self.session_ticket_extension = bytes([
             0x00, 0x23, 0x00, 0x00
@@ -90,7 +90,6 @@ class SessionTicketSupport(VulnerabilityTest):
             0x08, 0x09, 0x08, 0x0a, 0x08, 0x0b, 0x08, 0x04,
             0x08, 0x05, 0x08, 0x06, 0x04, 0x01, 0x05, 0x01,
             0x06, 0x01, 0x03, 0x03, 0x03, 0x01, 0x03, 0x02,
-            0x04, 0x02, 0x05, 0x02, 0x06, 0x02,
-
+            0x04, 0x02, 0x05, 0x02, 0x06, 0x02
         ])
         return client_hello
