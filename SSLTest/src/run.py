@@ -3,25 +3,22 @@ import logging
 import sys
 import traceback
 
+import concurrent.futures as cf
+
 from .scan_parameters.connections.connection_utils import get_website_info
 from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
 from .scan_parameters.non_ratable.WebServerSoft import WebServerSoft
 from .scan_parameters.non_ratable.port_discovery import discover_ports
 from .scan_parameters.ratable.Certificate import Certificate
 from .scan_parameters.ratable.CipherSuite import CipherSuite
-from .scan_parameters.ratable.PType import PType
 from .scan_parameters.utils import fix_url
-from .scan_vulnerabilities.multitheard_scan import scan_vulnerabilities
-from .scan_vulnerabilities.tests import ccs_injection
-from .scan_vulnerabilities.tests import crime
-from .scan_vulnerabilities.tests import heartbleed
-from .scan_vulnerabilities.tests import insec_renegotiation as rene
-from .scan_vulnerabilities.tests import poodle
-from .scan_vulnerabilities.tests import rc4_support
-from .scan_vulnerabilities.tests import session_ticket
+from .scan_vulnerabilities.tests.CCSInjection import CCSInjection
+from .scan_vulnerabilities.tests.Crime import Crime
+from .scan_vulnerabilities.tests.Heartbleed import Heartbleed
+from .scan_vulnerabilities.tests.InsecureRenegotiation import InsecureRenegotiation
+from .scan_vulnerabilities.tests.RC4Support import RC4Support
+from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSupport
 from .text_output.TextOutput import TextOutput
-
-from .scan_parameters.connections.SSLv2 import SSLv2
 
 
 def get_tests_switcher():
@@ -33,23 +30,22 @@ def get_tests_switcher():
     """
     return {
         0: (None, 'No test'),
-        1: (heartbleed.scan, 'Heartbleed'),
-        2: (ccs_injection.scan, 'CCS injection'),
-        3: (rene.scan, 'Insecure renegotiation'),
-        4: (poodle.scan, 'ZombiePOODLE/GOLDENDOOLDE'),
-        5: (session_ticket.scan, 'Session ticket support'),
-        6: (crime.scan, 'CRIME'),
-        7: (rc4_support.scan, 'RC4 support')
+        1: (Heartbleed, 'Heartbleed'),
+        2: (CCSInjection, 'CCS Injection'),
+        3: (InsecureRenegotiation, 'Insecure Renegotiation'),
+        4: (SessionTicketSupport, 'Session ticket Support'),
+        5: (Crime, 'CRIME'),
+        6: (RC4Support, 'RC4 Support')
     }
 
 
-def vulnerability_scan(address, tests, version):
+def handle_test_option(address, tests, supported_protocols):
     """
     Forward the appropriate tests to multithreading function
 
     :param tuple address: Url and port
     :param list tests: Test numbers
-    :param str version: SSL/TLS protocol version
+    :param supported_protocols:
     :return: Test results
     :rtype: dict
     """
@@ -62,7 +58,35 @@ def vulnerability_scan(address, tests, version):
         return {}
     else:
         scans = [tests_switcher.get(test) for test in tests]
-    return scan_vulnerabilities(scans, address, version)
+    return vulnerability_scans(scans, address, supported_protocols)
+
+
+def vulnerability_scans(functions, address, supported_protocols):
+    """
+    Run chosen vulnerability tests in parallel
+
+    :param list functions: Functions to be run
+    :param tuple address: Url and port
+    :param list supported_protocols: List of supported protocols
+    :return: Tests results
+    :rtype: dict
+    """
+    # Output dictionary
+    output = {}
+    # Dictionary that all the threads live in where the key
+    # is the thread (future) and value is the function name
+    futures = {}
+    with cf.ThreadPoolExecutor(max_workers=len(functions)) as executor:
+        for function in functions:
+            # 0th index is the function, 1st index is the function name
+            scan_class = function[0](supported_protocols, address)
+            execution = executor.submit(scan_class.scan)
+            futures.update({execution: function[1]})
+        for execution in cf.as_completed(futures):
+            function_name = futures[execution]
+            data = execution.result()
+            output.update({function_name: data})
+    return output
 
 
 def output_option(args, output_data):
@@ -209,8 +233,8 @@ def scan(args, port):
     versions.scan_server_software()
 
     # Get the version the initial connection was made on
-    main_version = list(cipher_suite.parameters[PType.protocol].keys())[0]
-    vulnerabilities = vulnerability_scan((args.url, port), args.test, main_version)
+    # main_version = list(cipher_suite.parameters[PType.protocol].keys())[0]
+    vulnerabilities = handle_test_option((args.url, port), args.test, protocol_support.supported_protocols)
 
     logging.info('Scanning done.')
     return dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
@@ -226,9 +250,6 @@ def run(args):
 
     :param Namespace args: Parsed input arguments
     """
-    # sslv2 = SSLv2('192.168.1.220', 443)
-    # sslv2.send_client_hello()
-    # sslv2.parse_cipher_suite()
     if '/' in args.url:
         args.url = fix_url(args.url)
     info_report_option(args)

@@ -1,4 +1,3 @@
-import inspect
 import json
 import logging
 import os
@@ -22,7 +21,7 @@ def read_json(file_name):
     return json_data
 
 
-def receive_data(sock, timeout, debug_source=None):
+def receive_data(sock, timeout, debug_source):
     """
     Receive network data in chunks
 
@@ -32,11 +31,6 @@ def receive_data(sock, timeout, debug_source=None):
     :return: Array of bytes of received data
     :rtype: bytes
     """
-    if debug_source is None:
-        stack = inspect.stack()
-        full_test_name = stack[len(stack) - 6].filename
-        # Get current test name for debugging purposes
-        debug_source = full_test_name.split(os.path.sep)[-1]
     all_data = []
     begin = time()
     while 1:
@@ -59,7 +53,7 @@ def receive_data(sock, timeout, debug_source=None):
     return bytes(all_data)
 
 
-def communicate_data_return_sock(address, client_hello, timeout, debug_source=None):
+def communicate_data_return_sock(address, client_hello, timeout, debug_source):
     """
     Send client client_hello to the server and catch the response
 

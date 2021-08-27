@@ -41,7 +41,7 @@ class ProtocolSupport:
             SSLv3(self.url, self.port)
         ]
         for ssl_version in ssl_versions:
-            logging.debug(f'scanning for {ssl_version.protocol}...')
+            logging.info(f'scanning for {ssl_version.protocol}...')
             ssl_version.send_client_hello()
             result = ssl_version.scan_version_support()
             if result:
@@ -60,7 +60,7 @@ class ProtocolSupport:
             'TLSv1.3'
         ]
         for version in tls_versions:
-            logging.debug(f'scanning for {version}...')
+            logging.info(f'scanning for {version}...')
             context = create_ssl_context(version)
             try:
                 ssl_socket, _ = create_session(self.url, self.port, False, context)
