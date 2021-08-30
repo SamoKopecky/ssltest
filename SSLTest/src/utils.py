@@ -66,7 +66,34 @@ def communicate_data_return_sock(address, client_hello, timeout, debug_source):
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(timeout)
-    sock.connect(address)
+    sleep_dur = 0
+    while True:
+        try:
+            sock.connect(address)
+            break
+        except socket.timeout:
+            logging.debug('connection timeout...')
+            sleep_dur = incremental_sleep(sleep_dur, Exception('Connection timeout'), 3)
     sock.send(client_hello)
     response = receive_data(sock, timeout, debug_source)
     return response, sock
+
+
+def incremental_sleep(sleep_dur, exception, max_timeout_dur):
+    """
+    Sleeps for a period of time
+
+    :param int sleep_dur: Sleep duration
+    :param exception: Exception to be raised
+    :param max_timeout_dur: Maximum amount of time to sleep
+    :return: Next sleep duration
+    :rtype: int
+    """
+    if sleep_dur >= max_timeout_dur:
+        logging.debug('timed out')
+        raise exception
+    logging.debug('increasing sleep duration')
+    sleep_dur += 1
+    logging.debug(f'sleeping for {sleep_dur}')
+    sleep(sleep_dur)
+    return sleep_dur

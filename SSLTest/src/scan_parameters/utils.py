@@ -129,23 +129,3 @@ def fix_url(url):
         url = re.search('^([^/]+)', url).group(0)
     logging.info('Corrected url: {}'.format(url))
     return url
-
-
-def incremental_sleep(sleep_dur, exception, max_timeout_dur):
-    """
-    Sleeps for a period of time
-
-    :param int sleep_dur: Sleep duration
-    :param exception: Exception to be raised
-    :param max_timeout_dur: Maximum amount of time to sleep
-    :return: Next sleep duration
-    :rtype: int
-    """
-    if sleep_dur >= max_timeout_dur:
-        logging.debug('timed out')
-        raise exception
-    logging.debug('increasing sleep duration')
-    sleep_dur += 1
-    logging.debug(f'sleeping for {sleep_dur}')
-    time.sleep(sleep_dur)
-    return sleep_dur

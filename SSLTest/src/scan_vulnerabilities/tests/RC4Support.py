@@ -7,7 +7,7 @@ class RC4Support(VulnerabilityTest):
     def __init__(self, supported_protocols, address):
         super().__init__(supported_protocols, address)
         self.test_name = 'RC4 Support'
-        self.valid_protocols = ['TLSv1.2']
+        self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
 
     def test(self, version):
         """

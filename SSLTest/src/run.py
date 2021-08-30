@@ -33,7 +33,7 @@ def get_tests_switcher():
         1: (Heartbleed, 'Heartbleed'),
         2: (CCSInjection, 'CCS Injection'),
         3: (InsecureRenegotiation, 'Insecure Renegotiation'),
-        4: (SessionTicketSupport, 'Session ticket Support'),
+        4: (SessionTicketSupport, 'Session Ticket Support'),
         5: (Crime, 'CRIME'),
         6: (RC4Support, 'RC4 Support')
     }

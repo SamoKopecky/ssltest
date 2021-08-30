@@ -7,7 +7,8 @@ from cryptography.hazmat.backends import default_backend
 
 from .SSLv3 import SSLv3
 from .SSLv2 import SSLv2
-from ..utils import convert_openssh_to_iana, incremental_sleep
+from ..utils import convert_openssh_to_iana
+from ...utils import incremental_sleep
 
 
 def get_website_info(url, port, supported_protocols, worst):
