@@ -1,6 +1,7 @@
 import random
 
 from cryptography.x509 import load_der_x509_certificate
+from struct import unpack
 
 from .SSLvX import SSLvX
 from ...utils import read_json
@@ -42,8 +43,8 @@ class SSLv2(SSLvX):
 
     def parse_cipher_suite(self):
         cipher_suites = read_json('cipher_suites_sslv2.json')
-        certificate_len = SSLvX.bytes_to_int([self.response[7], self.response[8]])
-        cipher_spec_len = SSLvX.bytes_to_int([self.response[9], self.response[10]])
+        certificate_len = unpack('>H', self.response[7:9])[0]
+        cipher_spec_len = unpack('>H', self.response[9:11])[0]
         cipher_spec_begin_idx = 11 + 2 + certificate_len
         server_cipher_suites = []
         for idx in range(cipher_spec_begin_idx, cipher_spec_begin_idx + cipher_spec_len, 3):
@@ -58,10 +59,7 @@ class SSLv2(SSLvX):
         self.cipher_suite = server_cipher_suites[random_number]
 
     def parse_certificate(self):
-        certificate_length = SSLvX.bytes_to_int([
-            self.response[7],
-            self.response[8]
-        ])
+        certificate_length = unpack('>H', self.response[7:9])[0]
         certificate_in_bytes = self.response[13:certificate_length + 13]
         self.certificates.append(load_der_x509_certificate(certificate_in_bytes))
 

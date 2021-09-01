@@ -1,6 +1,3 @@
-import random
-
-
 def is_server_hello(message):
     """
     Checks if the message is a server hello
@@ -16,28 +13,6 @@ def is_server_hello(message):
     except IndexError:
         return False
     return False
-
-
-def split_int_to_bytes(int_number, num_of_bytes):
-    """
-    Split one integer into byte sized integers
-
-    Example: Return value for number 1892 and num_of_bytes 4:
-    0x764 converted to hex and [0, 0, 7, 100] split into 4 bytes
-
-    :param int int_number: Integer number to be split
-    :param int num_of_bytes: Number of bytes, used for padding
-    :return: Split integer
-    :rtype: bytearray
-    """
-    hex_number = hex(int_number).replace('0x', '')
-    # If the MSByte is missing a zero
-    if len(hex_number) % 2 == 1:
-        hex_number = '0' + hex_number
-    result = [0] * (num_of_bytes - int(len(hex_number) / 2))
-    for i in range(0, len(hex_number), 2):
-        result.append(int(hex_number[i:i + 2], 16))
-    return bytearray(result)
 
 
 def version_conversion(version, from_string):

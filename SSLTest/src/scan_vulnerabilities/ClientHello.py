@@ -1,6 +1,8 @@
 import secrets
 
-from .utils import split_int_to_bytes, version_conversion
+from struct import pack
+
+from .utils import version_conversion
 
 
 class ClientHello:
@@ -25,7 +27,7 @@ class ClientHello:
             0x00,  # Session id length
         ])
         # Fill random bytes
-        self.handshake_protocol[2:34] = bytearray(list(secrets.token_bytes(32)))
+        self.handshake_protocol[2:34] = secrets.token_bytes(32)
         self.cipher_suites = cipher_suites
         if not self.cipher_suites:
             self.cipher_suites = self.get_cipher_suite_bytes(version)
@@ -55,16 +57,16 @@ class ClientHello:
         :rtype: bytearray
         """
         # Body of the client hello
-        extensions_length = split_int_to_bytes(len(self.extensions), 2)
+        extensions_length = pack('>H', len(self.extensions))
         client_hello = self.handshake_protocol + self.cipher_suites + self.compression
         client_hello += extensions_length + self.extensions
 
         # Handshake protocol header
-        length = split_int_to_bytes(len(client_hello), 3)
+        length = pack('>I', len(client_hello))[1:]
         client_hello = self.handshake_protocol_header + length + client_hello
 
         # Record protocol
-        length = split_int_to_bytes(len(client_hello), 2)
+        length = pack('>H', len(client_hello))
         client_hello = self.record_protocol + length + client_hello
         return client_hello
 
@@ -138,4 +140,4 @@ class ClientHello:
                 0x00, 0x3c, 0x00, 0xba, 0x00, 0x35, 0x00, 0x84,
                 0x00, 0x2f, 0x00, 0x96, 0x00, 0x41, 0x00, 0xff
             ])
-        return split_int_to_bytes(len(cipher_suites), 2) + cipher_suites
+        return pack('>H', len(cipher_suites)) + cipher_suites

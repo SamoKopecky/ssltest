@@ -78,30 +78,6 @@ class SSLvX(ABC):
         pass
 
     @staticmethod
-    def bytes_to_int(hex_nums):
-        """
-        Convert pairs of bytes into one integer
-
-        Example: Return value for [0x25, 0x36]:
-        0x2536 converted to int, so 9526 in decimal
-
-        :param list hex_nums: Hex number pairs
-        :return: Integer of the hex numbers
-        :rtype: int
-        """
-        result = '0x'
-        """
-        num:02x
-            num: -- value
-            0 -- padding with zeros
-            2 -- number digits
-            x -- hex format
-        """
-        for num in hex_nums:
-            result += f'{num:02x}'
-        return int(result, 16)
-
-    @staticmethod
     def get_mozilla_ca_store():
         """
         Converts mozilla root certificates to OpenSSL X509 certificate format
