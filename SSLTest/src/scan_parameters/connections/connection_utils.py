@@ -17,15 +17,17 @@ def get_website_info(url, port, supported_protocols, worst):
 
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
+
     :param int port: Port to scan on
     :param str url: Url of the webserver
     :param list supported_protocols: Supported SSL/TLS protocol versions
     :param bool worst: Whether to connect with the worst available protocol
     :return:
-        certificate -- Used certificate to verify the server
-        cert_verified -- Is certificate verified
-        cipher_suite -- Negotiated cipher suite
-        protocol -- Protocol name and version
+        certificate -- Used certificate to verify the server,
+        cert_verified -- Is certificate verified,
+        cipher_suite -- Negotiated cipher suite,
+        protocol -- Protocol name and version,
+    :rtype: tuple
     """
     logging.info('Creating main session...')
     chosen_protocol = choose_protocol(supported_protocols, worst)

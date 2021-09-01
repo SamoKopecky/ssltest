@@ -15,6 +15,7 @@ class TextOutput:
         Get the rating name according to the rating number
 
         Method made for better reading of code bellow
+
         :param int rating: Rating value to be converted to string
         :return: The rating string
         :rtype: str

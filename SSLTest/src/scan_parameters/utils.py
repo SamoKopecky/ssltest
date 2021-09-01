@@ -31,6 +31,7 @@ def rate_key_length_parameter(algorithm_type, key_len, key_len_type):
 
     Parameter is rated using the security_levels.json file if no rating is
     found 0 is returned
+
     :param PType algorithm_type: Algorithm of the key length
     :param str key_len: Key length of the algorithm
     :param PType key_len_type: Type of the key length parameter
@@ -62,7 +63,6 @@ def rate_key_length_parameter(algorithm_type, key_len, key_len_type):
 def rate_parameter(p_type, parameter):
     """
     Rate a parameter using a defined json file
-
 
     :param PType p_type: Specifies which parameter category should be used for rating
     :param str parameter: Parameter that is going to be rated

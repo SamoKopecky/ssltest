@@ -38,7 +38,7 @@ class WebServerSoft:
 
     def scan_software_http(self):
         """
-        Scan web server software from HEAD response header
+        Get web server software from HEAD response header
         """
         logging.info('Scanning webserver for version using http headers...')
         try:
