@@ -78,12 +78,13 @@ class SSLvX(ABC):
         pass
 
     @staticmethod
-    def hex_to_int(hex_nums):
+    def bytes_to_int(hex_nums):
         """
-        Convert pairs of hex into one number
+        Convert pairs of bytes into one integer
 
-        Return value for [0x25, 0x36]:
+        Example: Return value for [0x25, 0x36]:
         0x2536 converted to int, so 9526 in decimal
+
         :param list hex_nums: Hex number pairs
         :return: Integer of the hex numbers
         :rtype: int

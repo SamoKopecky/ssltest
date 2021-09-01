@@ -76,14 +76,14 @@ class SSLv3(SSLvX):
         if len(self.response) == 0:
             return
         # Length is always at the same place in server_hello (idx 3, 4)
-        server_hello_len = SSLvX.hex_to_int([self.response[3], self.response[4]])
+        server_hello_len = SSLvX.bytes_to_int([self.response[3], self.response[4]])
         # +4 -- Length index in server_hello
         record_protocol_certificate_begin_idx = server_hello_len + 4 + 1
         # +5 -- Certificate index in record layer
         handshake_certificate_idx = record_protocol_certificate_begin_idx + 5
         # +7 -- Certificate length index in handshake protocol: certificate
         certificates_len_idx = handshake_certificate_idx + 4
-        certificates_len = SSLvX.hex_to_int([
+        certificates_len = SSLvX.bytes_to_int([
             self.response[certificates_len_idx],
             self.response[certificates_len_idx + 1],
             self.response[certificates_len_idx + 2]
@@ -94,7 +94,7 @@ class SSLv3(SSLvX):
         # Loop until all certificate bytes are read
         while certificates_len != 0:
             certificate_len_idx += offset
-            certificate_len = SSLvX.hex_to_int([
+            certificate_len = SSLvX.bytes_to_int([
                 self.response[certificate_len_idx],
                 self.response[certificate_len_idx + 1],
                 self.response[certificate_len_idx + 2]

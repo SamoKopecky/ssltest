@@ -42,8 +42,8 @@ class SSLv2(SSLvX):
 
     def parse_cipher_suite(self):
         cipher_suites = read_json('cipher_suites_sslv2.json')
-        certificate_len = SSLvX.hex_to_int([self.response[7], self.response[8]])
-        cipher_spec_len = SSLvX.hex_to_int([self.response[9], self.response[10]])
+        certificate_len = SSLvX.bytes_to_int([self.response[7], self.response[8]])
+        cipher_spec_len = SSLvX.bytes_to_int([self.response[9], self.response[10]])
         cipher_spec_begin_idx = 11 + 2 + certificate_len
         server_cipher_suites = []
         for idx in range(cipher_spec_begin_idx, cipher_spec_begin_idx + cipher_spec_len, 3):
@@ -58,7 +58,7 @@ class SSLv2(SSLvX):
         self.cipher_suite = server_cipher_suites[random_number]
 
     def parse_certificate(self):
-        certificate_length = SSLvX.hex_to_int([
+        certificate_length = SSLvX.bytes_to_int([
             self.response[7],
             self.response[8]
         ])
