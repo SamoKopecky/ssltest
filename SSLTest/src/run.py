@@ -18,6 +18,7 @@ from .scan_vulnerabilities.tests.Heartbleed import Heartbleed
 from .scan_vulnerabilities.tests.InsecureRenegotiation import InsecureRenegotiation
 from .scan_vulnerabilities.tests.RC4Support import RC4Support
 from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSupport
+from .scan_vulnerabilities.tests.FallbackSCSVSupport import FallbackSCSVSupport
 from .text_output.TextOutput import TextOutput
 
 
@@ -35,7 +36,8 @@ def get_tests_switcher():
         3: (InsecureRenegotiation, 'Insecure Renegotiation'),
         4: (SessionTicketSupport, 'Session Ticket Support'),
         5: (Crime, 'CRIME'),
-        6: (RC4Support, 'RC4 Support')
+        6: (RC4Support, 'RC4 Support'),
+        7: (FallbackSCSVSupport, 'Fallback SCSV Support')
     }
 
 
@@ -45,7 +47,7 @@ def handle_test_option(address, tests, supported_protocols):
 
     :param tuple address: Url and port
     :param list tests: Test numbers
-    :param supported_protocols:
+    :param supported_protocols: Supported SSL/TLS protocols by the server
     :return: Test results
     :rtype: dict
     """
@@ -57,7 +59,7 @@ def handle_test_option(address, tests, supported_protocols):
     elif 0 in tests:
         return {}
     else:
-        scans = list(map(lambda t: tests_switcher.get(t), tests))
+        scans = list(map(lambda t: tests_switcher[t], tests))
     return vulnerability_scans(scans, address, supported_protocols)
 
 
@@ -172,7 +174,7 @@ def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
     :param dict vulnerabilities: Results from vulnerability tests
     :param int port: Scanned port
     :param str url: Scanned url
-    :return: All of the arguments
+    :return: A single dictionary created from the parameters
     :rtype: dict
     """
     dump = {}
@@ -232,8 +234,6 @@ def scan(args, port):
     versions = WebServerSoft(args.url, port, args.nmap_scan)
     versions.scan_server_software()
 
-    # Get the version the initial connection was made on
-    # main_version = list(cipher_suite.parameters[PType.protocol].keys())[0]
     vulnerabilities = handle_test_option((args.url, port), args.test, protocol_support.supported_protocols)
 
     logging.info('Scanning done.')

@@ -27,7 +27,7 @@
   "protocol_support": "Protocol support",
   "web_server_software": "Web server software",
   "vulnerabilities": "Vulnerabilities",
-  "http_header": "HTTP header",
+  "http_header": "HTTP Header",
   "certificate_info": "Certificate information",
   "nmap": "Nmap"
 }

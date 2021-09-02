@@ -58,8 +58,7 @@ def get_help():
             ["-d", "--debug", "", "Output debug information"],
             ["-v", "--version", "", "Show script version and exit"],
             ["-h", "--help", "", "Show this help message and exit"]
-        ]
-        }
+        ]}
     ]
 
 

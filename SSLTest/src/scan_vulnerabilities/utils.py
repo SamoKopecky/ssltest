@@ -31,8 +31,13 @@ def version_conversion(version, from_string):
         "TLSv1.0": 0x01,
         "SSLv3": 0x00
     }
+    # TODO: fix
     if from_string:
+        if version not in protocol_version_ints.keys():
+            return -1
         return protocol_version_ints[version]
     else:
+        if version not in protocol_version_ints.values():
+            return ''
         keys = protocol_version_ints.keys()
         return list(filter(lambda key: protocol_version_ints[key] == version, keys))[0]
