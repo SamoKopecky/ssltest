@@ -7,8 +7,7 @@ from cryptography.hazmat.backends import default_backend
 
 from .SSLv3 import SSLv3
 from .SSLv2 import SSLv2
-from ..utils import convert_openssh_to_iana
-from ...utils import incremental_sleep
+from ...utils import incremental_sleep, convert_cipher_suite
 
 
 def get_website_info(url, port, supported_protocols, worst):
@@ -111,7 +110,7 @@ def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     """
     cipher_suite = ssl_socket.cipher()[0]
     if '-' in cipher_suite:
-        cipher_suite = convert_openssh_to_iana(cipher_suite)
+        cipher_suite = convert_cipher_suite(cipher_suite, 'OpenSSL', 'IANA')
     return cipher_suite, ssl_socket.version()
 
 

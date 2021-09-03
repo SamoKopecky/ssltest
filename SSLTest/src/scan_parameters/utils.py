@@ -1,28 +1,11 @@
 import logging
 import re
-import time
 
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
 
 from .ratable.PType import PType
 from ..utils import read_json
-
-
-def convert_openssh_to_iana(search_term):
-    """
-    Convert openssh format of a cipher suite to IANA format
-
-    :param str search_term: Cipher suite
-    :raise: IndexError if not conversion is found
-    :return: Converted cipher suite
-    :rtype: str
-    """
-    json_data = read_json('iana_openssl_cipher_mapping.json')
-    for row in json_data:
-        if json_data[row] == search_term:
-            return row
-    raise Exception('No iana pair found')
 
 
 def rate_key_length_parameter(algorithm_type, key_len, key_len_type):

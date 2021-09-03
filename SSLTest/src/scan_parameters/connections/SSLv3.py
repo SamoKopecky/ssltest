@@ -2,7 +2,7 @@ from struct import unpack
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
-from ...utils import read_json
+from ...utils import bytes_to_cipher_suite
 
 
 class SSLv3(SSLvX):
@@ -66,12 +66,11 @@ class SSLv3(SSLvX):
     def parse_cipher_suite(self):
         if len(self.response) == 0:
             return
-        cipher_suites = read_json('iana_cipher_suites.json')
         sess_id_len_idx = 43  # Always fixed index
         cipher_suite_idx = self.response[sess_id_len_idx] + sess_id_len_idx + 1
         cipher_suites_bytes = f'0x{self.response[cipher_suite_idx]:X},' \
                               f'0x{self.response[cipher_suite_idx + 1]:X}'
-        self.cipher_suite = cipher_suites[cipher_suites_bytes]
+        self.cipher_suite = bytes_to_cipher_suite(cipher_suites_bytes, 'IANA')
 
     def parse_certificate(self):
         if len(self.response) == 0:

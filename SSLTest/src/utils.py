@@ -97,3 +97,55 @@ def incremental_sleep(sleep_dur, exception, max_timeout_dur):
     logging.debug(f'sleeping for {sleep_dur}')
     sleep(sleep_dur)
     return sleep_dur
+
+
+# cipher_suites.json file was created using
+# https://github.com/april/tls-table
+
+def convert_cipher_suite(cipher_suite, from_cipher_suite, to_cipher_suite):
+    """
+    Convert one format of a cipher suite to another
+
+    :param str cipher_suite: Cipher suite to be converted
+    :param str from_cipher_suite: Format of the cipher suite
+    :param str to_cipher_suite: Format to convert to
+    :return: Converted cipher suite
+    :rtype: str
+    """
+    json_data = read_json('cipher_suites.json')
+    for cipher in json_data.values():
+        if cipher[from_cipher_suite] == cipher_suite:
+            return cipher[to_cipher_suite]
+    raise Exception(f'No iana pair found for {cipher_suite}')
+
+
+def bytes_to_cipher_suite(bytes_string, string_format):
+    """
+    Convert from cipher suite bytes to a cipher suite
+
+    :param str bytes_string: Two bytes in this string format eg. 0x00,0xB4
+    :param str string_format: Which cipher format to convert to
+    :return: Cipher suite
+    :rtype: str
+    """
+    json_data = read_json('cipher_suites.json')
+    for key, value in json_data.items():
+        if key == bytes_string:
+            return value[string_format]
+    raise Exception(f'No cipher suite found for {bytes_string}')
+
+
+def cipher_suite_to_bytes(cipher_suite, string_format):
+    """
+    Convert from string cipher suite to bytes
+
+    :param str cipher_suite: String representation of a cipher suite
+    :param str string_format: Which cipher format to convert from
+    :return: Two bytes in this string format eg. 0x00,0xB4
+    :rtype: str
+    """
+    json_data = read_json('cipher_suites.json')
+    for key, value in json_data.items():
+        if value[string_format] == cipher_suite:
+            return key
+    raise Exception(f'No bytes found for {cipher_suite}')
