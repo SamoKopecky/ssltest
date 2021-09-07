@@ -5,10 +5,10 @@ from ...utils import communicate_data_return_sock
 
 
 class InsecureRenegotiation(VulnerabilityTest):
+    test_name = 'Insecure Renegotiation'
 
     def __init__(self, supported_protocols, address):
         super().__init__(supported_protocols, address)
-        self.test_name = 'Insecure Renegotiation'
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
         self.renegotiation_extension = bytes([
             # Secure renegotiation extension

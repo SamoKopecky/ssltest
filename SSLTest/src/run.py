@@ -2,7 +2,6 @@ import json
 import logging
 import sys
 import traceback
-
 import concurrent.futures as cf
 
 from .scan_parameters.connections.connection_utils import get_website_info
@@ -31,13 +30,13 @@ def get_tests_switcher():
     """
     return {
         0: (None, 'No test'),
-        1: (Heartbleed, 'Heartbleed'),
-        2: (CCSInjection, 'CCS Injection'),
-        3: (InsecureRenegotiation, 'Insecure Renegotiation'),
-        4: (SessionTicketSupport, 'Session Ticket Support'),
-        5: (Crime, 'CRIME'),
-        6: (RC4Support, 'RC4 Support'),
-        7: (FallbackSCSVSupport, 'Fallback SCSV Support')
+        1: (CCSInjection, CCSInjection.test_name),
+        2: (Crime, Crime.test_name),
+        3: (FallbackSCSVSupport, FallbackSCSVSupport.test_name),
+        4: (Heartbleed, Heartbleed.test_name),
+        5: (InsecureRenegotiation, InsecureRenegotiation.test_name),
+        6: (RC4Support, RC4Support.test_name),
+        7: (SessionTicketSupport, SessionTicketSupport.test_name),
     }
 
 

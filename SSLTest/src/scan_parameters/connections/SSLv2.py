@@ -1,3 +1,4 @@
+import secrets
 import random
 
 from cryptography.x509 import load_der_x509_certificate
@@ -24,9 +25,10 @@ class SSLv2(SSLvX):
             0x80, 0x04, 0x00, 0x80, 0x05, 0x00, 0x80, 0x06,
             0x00, 0x40, 0x07, 0x00, 0xc0,
             # Challenge
-            0xdc, 0x83, 0x85, 0x49, 0x87, 0xdf, 0x42, 0xad,
-            0x84, 0x90, 0x51, 0x90, 0x00, 0x14, 0x33, 0xf6
+            # 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            # 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ])
+        self.client_hello += secrets.token_bytes(16)
 
     def scan_version_support(self):
         # No response to SSLv2 client hello
@@ -53,8 +55,7 @@ class SSLv2(SSLvX):
                     f'{SSLv2.int_to_hex_str(self.response[idx])},'
                     f'{SSLv2.int_to_hex_str(self.response[idx + 1])},'
                     f'{SSLv2.int_to_hex_str(self.response[idx + 2])}'
-                ]
-            )
+                ])
         random_number = int(random.randint(0, len(server_cipher_suites) - 1))
         self.cipher_suite = server_cipher_suites[random_number]
 

@@ -49,7 +49,7 @@ def receive_data(sock, timeout, debug_source):
             else:
                 sleep(0.1)
         except (socket.timeout, ConnectionResetError):
-            pass
+            break
     return bytes(all_data)
 
 
@@ -116,7 +116,7 @@ def convert_cipher_suite(cipher_suite, from_cipher_suite, to_cipher_suite):
     for cipher in json_data.values():
         if cipher[from_cipher_suite] == cipher_suite:
             return cipher[to_cipher_suite]
-    raise Exception(f'No iana pair found for {cipher_suite}')
+    raise Exception(f'No pair found for {cipher_suite}')
 
 
 def bytes_to_cipher_suite(bytes_string, string_format):

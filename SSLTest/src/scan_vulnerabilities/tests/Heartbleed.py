@@ -5,9 +5,10 @@ from ...utils import receive_data, communicate_data_return_sock
 
 
 class Heartbleed(VulnerabilityTest):
+    test_name = 'Heartbleed'
+
     def __init__(self, supported_protocols, address):
         super().__init__(supported_protocols, address)
-        self.test_name = 'Heartbleed'
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
 
     def test(self, version):

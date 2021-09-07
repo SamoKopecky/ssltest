@@ -5,9 +5,10 @@ from ...utils import communicate_data_return_sock
 
 
 class FallbackSCSVSupport(VulnerabilityTest):
+    test_name = 'No Fallback SCSV Support'
+
     def __init__(self, supported_protocols, address):
         super().__init__(supported_protocols, address)
-        self.test_name = 'Fallback SCSV Support'
         self.timeout = 2
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
         self.fallback_scsv = bytes([0x56, 0x00])
