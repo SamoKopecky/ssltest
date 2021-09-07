@@ -30,8 +30,7 @@ class SSLv3(SSLvX):
             return
         sess_id_len_idx = 43  # Always fixed index
         cipher_suite_idx = self.response[sess_id_len_idx] + sess_id_len_idx + 1
-        cipher_suites_bytes = f'0x{self.response[cipher_suite_idx]:X},' \
-                              f'0x{self.response[cipher_suite_idx + 1]:X}'
+        cipher_suites_bytes = self.response[cipher_suite_idx: cipher_suite_idx + 2]
         self.cipher_suite = bytes_to_cipher_suite(cipher_suites_bytes, 'IANA')
 
     def parse_certificate(self):

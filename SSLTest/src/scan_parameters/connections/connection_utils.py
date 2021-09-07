@@ -122,12 +122,12 @@ def create_session(url, port, verify_cert, context):
     :param int port: Port to create the connection on
     :param bool verify_cert: Whether to verify the certificate or not
     :param ssl.SSLContext context: ssl context
-    :return: Created secure socket
+    :return: Created secure socket, that needs to be closed
     """
     cert_verified = True
-    if verify_cert:
-        context.check_hostname = True
-        context.verify_mode = ssl.VerifyMode.CERT_REQUIRED
+    if not verify_cert:
+        context.check_hostname = False
+        context.verify_mode = ssl.VerifyMode.CERT_NONE
     context.set_ciphers('ALL')
     sleep = 0
     # Loop until there is a valid response or after a timeout
@@ -160,7 +160,6 @@ def create_session(url, port, verify_cert, context):
                 raise e
             logging.debug('error occurred...')
             sleep = incremental_sleep(sleep, e, 3)
-        ssl_socket.close()
     return ssl_socket, cert_verified
 
 

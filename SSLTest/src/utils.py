@@ -119,15 +119,18 @@ def convert_cipher_suite(cipher_suite, from_cipher_suite, to_cipher_suite):
     raise Exception(f'No pair found for {cipher_suite}')
 
 
-def bytes_to_cipher_suite(bytes_string, string_format):
+def bytes_to_cipher_suite(bytes_object, string_format):
     """
     Convert from cipher suite bytes to a cipher suite
 
-    :param str bytes_string: Two bytes in this string format eg. 0x00,0xB4
+    :param bytes bytes_object: Two bytes in an bytes object
     :param str string_format: Which cipher format to convert to
     :return: Cipher suite
     :rtype: str
     """
+    if len(bytes_object) != 2:
+        raise Exception(f'Can only convert from 2 bytes')
+    bytes_string = f'0x{bytes_object[0]:X},0x{bytes_object[1]:X}'
     json_data = read_json('cipher_suites.json')
     for key, value in json_data.items():
         if key == bytes_string:
@@ -141,11 +144,12 @@ def cipher_suite_to_bytes(cipher_suite, string_format):
 
     :param str cipher_suite: String representation of a cipher suite
     :param str string_format: Which cipher format to convert from
-    :return: Two bytes in this string format eg. 0x00,0xB4
-    :rtype: str
+    :return: Two bytes in an bytes object
+    :rtype: bytes
     """
     json_data = read_json('cipher_suites.json')
     for key, value in json_data.items():
         if value[string_format] == cipher_suite:
-            return key
+            bytes_list = key.split(',')
+            return bytes([int(bytes_list[0], 16), int(bytes_list[1], 16)])
     raise Exception(f'No bytes found for {cipher_suite}')
