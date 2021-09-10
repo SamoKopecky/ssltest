@@ -13,3 +13,36 @@ def is_server_hello(message):
     except IndexError:
         return False
     return False
+
+
+def version_conversion(version, from_string):
+    """
+    Convert SSL/TLS version into the required format
+
+    :param str or int version: SSL/TLS version, either in str or int
+    :param bool from_string: Convert from string or not
+    :return: converted version
+    :rtype: str or int
+    """
+    protocol_version_ints = {
+        "TLSv1.3": 0x04,
+        "TLSv1.2": 0x03,
+        "TLSv1.1": 0x02,
+        "TLSv1.0": 0x01,
+        "SSLv3": 0x00
+    }
+    try:
+        if from_string:
+            return protocol_version_ints[version]
+        else:
+            return find_by_value(protocol_version_ints, version)
+    # from_string == True
+    except KeyError:
+        return ''
+    # from_string == False
+    except IndexError:
+        return -1
+
+
+def find_by_value(dictionary, value):
+    return list(filter(lambda key: dictionary[key] == value, dictionary.keys()))[0]

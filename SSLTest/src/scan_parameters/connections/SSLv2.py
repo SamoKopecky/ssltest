@@ -1,6 +1,11 @@
+import secrets
+import random
+
 from cryptography.x509 import load_der_x509_certificate
+from struct import unpack
 
 from .SSLvX import SSLvX
+from ...utils import read_json
 
 
 class SSLv2(SSLvX):
@@ -20,9 +25,10 @@ class SSLv2(SSLvX):
             0x80, 0x04, 0x00, 0x80, 0x05, 0x00, 0x80, 0x06,
             0x00, 0x40, 0x07, 0x00, 0xc0,
             # Challenge
-            0xdc, 0x83, 0x85, 0x49, 0x87, 0xdf, 0x42, 0xad,
-            0x84, 0x90, 0x51, 0x90, 0x00, 0x14, 0x33, 0xf6
+            # 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            # 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ])
+        self.client_hello += secrets.token_bytes(16)
 
     def scan_version_support(self):
         # No response to SSLv2 client hello
@@ -38,18 +44,26 @@ class SSLv2(SSLvX):
         return False
 
     def parse_cipher_suite(self):
-        # TODO: temporary, change if multiple cipher suites rating is implemented
-        # One of the SSLv2 Cipher suites since the client is choosing the cipher suite
-        self.cipher_suite = 'DES_64_CBC_WITH_MD5'
+        cipher_suites = read_json('cipher_suites_sslv2.json')
+        certificate_len = unpack('>H', self.response[7:9])[0]
+        cipher_spec_len = unpack('>H', self.response[9:11])[0]
+        cipher_spec_begin_idx = 11 + 2 + certificate_len
+        server_cipher_suites = []
+        for idx in range(cipher_spec_begin_idx, cipher_spec_begin_idx + cipher_spec_len, 3):
+            server_cipher_suites.append(
+                cipher_suites[
+                    f'{SSLv2.int_to_hex_str(self.response[idx])},'
+                    f'{SSLv2.int_to_hex_str(self.response[idx + 1])},'
+                    f'{SSLv2.int_to_hex_str(self.response[idx + 2])}'
+                ])
+        random_number = int(random.randint(0, len(server_cipher_suites) - 1))
+        self.cipher_suite = server_cipher_suites[random_number]
 
     def parse_certificate(self):
-        print(self.response[13])
-        certificate_length = SSLvX.hex_to_int([
-            self.response[7],
-            self.response[8]
-        ])
+        certificate_length = unpack('>H', self.response[7:9])[0]
         certificate_in_bytes = self.response[13:certificate_length + 13]
-        self.certificate = load_der_x509_certificate(certificate_in_bytes)
+        self.certificates.append(load_der_x509_certificate(certificate_in_bytes))
 
-    def verify_cert(self):
-        self.cert_verified = False
+    @staticmethod
+    def int_to_hex_str(number):
+        return f'0x{number:02X}'

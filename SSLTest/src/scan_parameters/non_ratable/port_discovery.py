@@ -3,7 +3,7 @@ import requests
 import urllib3
 import logging
 
-from ..utils import incremental_sleep
+from ...utils import incremental_sleep
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 

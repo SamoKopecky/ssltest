@@ -6,7 +6,8 @@
   "cert_pub_key_algorithm": "Public key algorithm",
   "cert_pub_key_length": "Public key length",
   "sym_enc_algorithm": "Symmetric encryption algorithm",
-  "sym_enc_algorithm_key_length": "Symmetric encryption algorithm length",
+  "sym_enc_algorithm_mod": "Symmetric encryption algorithm modification",
+  "sym_enc_algorithm_key_length": "Symmetric encryption algorithm key length",
   "sym_enc_algorithm_block_mode": "Symmetric encryption algorithm block mode",
   "sym_ecn_algorithm_block_mode_number": "Symmetric encryption algorithm block mode option",
   "hash_function": "Hash function",
@@ -26,7 +27,7 @@
   "protocol_support": "Protocol support",
   "web_server_software": "Web server software",
   "vulnerabilities": "Vulnerabilities",
-  "http_header": "HTTP header",
+  "http_header": "HTTP Header",
   "certificate_info": "Certificate information",
   "nmap": "Nmap"
 }

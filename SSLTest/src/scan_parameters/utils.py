@@ -1,29 +1,11 @@
 import logging
 import re
-import time
 
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
 
-from .exceptions.NoIanaPairFound import NoIanaPairFound
 from .ratable.PType import PType
 from ..utils import read_json
-
-
-def convert_openssh_to_iana(search_term):
-    """
-    Convert openssh format of a cipher suite to IANA format
-
-    :param str search_term: Cipher suite
-    :raise: IndexError if not conversion is found
-    :return: Converted cipher suite
-    :rtype: str
-    """
-    json_data = read_json('iana_openssl_cipher_mapping.json')
-    for row in json_data:
-        if json_data[row] == search_term:
-            return row
-    raise NoIanaPairFound()
 
 
 def rate_key_length_parameter(algorithm_type, key_len, key_len_type):
@@ -32,6 +14,7 @@ def rate_key_length_parameter(algorithm_type, key_len, key_len_type):
 
     Parameter is rated using the security_levels.json file if no rating is
     found 0 is returned
+
     :param PType algorithm_type: Algorithm of the key length
     :param str key_len: Key length of the algorithm
     :param PType key_len_type: Type of the key length parameter
@@ -63,7 +46,6 @@ def rate_key_length_parameter(algorithm_type, key_len, key_len_type):
 def rate_parameter(p_type, parameter):
     """
     Rate a parameter using a defined json file
-
 
     :param PType p_type: Specifies which parameter category should be used for rating
     :param str parameter: Parameter that is going to be rated
@@ -130,23 +112,3 @@ def fix_url(url):
         url = re.search('^([^/]+)', url).group(0)
     logging.info('Corrected url: {}'.format(url))
     return url
-
-
-def incremental_sleep(sleep_dur, exception, max_timeout_dur):
-    """
-    Sleeps for a period of time
-
-    :param int sleep_dur: Sleep duration
-    :param exception: Exception to be raised
-    :param max_timeout_dur: Maximum amount of time to sleep
-    :return: Next sleep duration
-    :rtype: int
-    """
-    if sleep_dur >= max_timeout_dur:
-        logging.debug('raise unknown connection error')
-        raise exception
-    logging.debug('increasing sleep duration')
-    sleep_dur += 1
-    logging.debug(f'sleeping for {sleep_dur}')
-    time.sleep(sleep_dur)
-    return sleep_dur

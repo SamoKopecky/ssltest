@@ -1,4 +1,3 @@
-import inspect
 import json
 import logging
 import os
@@ -22,7 +21,7 @@ def read_json(file_name):
     return json_data
 
 
-def receive_data(sock, timeout, debug_source=None):
+def receive_data(sock, timeout, debug_source):
     """
     Receive network data in chunks
 
@@ -32,11 +31,6 @@ def receive_data(sock, timeout, debug_source=None):
     :return: Array of bytes of received data
     :rtype: bytes
     """
-    if debug_source is None:
-        stack = inspect.stack()
-        full_test_name = stack[len(stack) - 6].filename
-        # Get current test name for debugging purposes
-        debug_source = full_test_name.split(os.path.sep)[-1]
     all_data = []
     begin = time()
     while 1:
@@ -55,11 +49,11 @@ def receive_data(sock, timeout, debug_source=None):
             else:
                 sleep(0.1)
         except (socket.timeout, ConnectionResetError):
-            pass
+            break
     return bytes(all_data)
 
 
-def communicate_data_return_sock(address, client_hello, timeout, debug_source=None):
+def communicate_data_return_sock(address, client_hello, timeout, debug_source):
     """
     Send client client_hello to the server and catch the response
 
@@ -72,7 +66,90 @@ def communicate_data_return_sock(address, client_hello, timeout, debug_source=No
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(timeout)
-    sock.connect(address)
+    sleep_dur = 0
+    while True:
+        try:
+            sock.connect(address)
+            break
+        except socket.timeout:
+            logging.debug('connection timeout...')
+            sleep_dur = incremental_sleep(sleep_dur, Exception('Connection timeout'), 3)
     sock.send(client_hello)
     response = receive_data(sock, timeout, debug_source)
     return response, sock
+
+
+def incremental_sleep(sleep_dur, exception, max_timeout_dur):
+    """
+    Sleeps for a period of time
+
+    :param int sleep_dur: Sleep duration
+    :param exception: Exception to be raised
+    :param max_timeout_dur: Maximum amount of time to sleep
+    :return: Next sleep duration
+    :rtype: int
+    """
+    if sleep_dur >= max_timeout_dur:
+        logging.debug('timed out')
+        raise exception
+    logging.debug('increasing sleep duration')
+    sleep_dur += 1
+    logging.debug(f'sleeping for {sleep_dur}')
+    sleep(sleep_dur)
+    return sleep_dur
+
+
+# cipher_suites.json file was created using
+# https://github.com/april/tls-table
+
+def convert_cipher_suite(cipher_suite, from_cipher_suite, to_cipher_suite):
+    """
+    Convert one format of a cipher suite to another
+
+    :param str cipher_suite: Cipher suite to be converted
+    :param str from_cipher_suite: Format of the cipher suite
+    :param str to_cipher_suite: Format to convert to
+    :return: Converted cipher suite
+    :rtype: str
+    """
+    json_data = read_json('cipher_suites.json')
+    for cipher in json_data.values():
+        if cipher[from_cipher_suite] == cipher_suite:
+            return cipher[to_cipher_suite]
+    raise Exception(f'No pair found for {cipher_suite}')
+
+
+def bytes_to_cipher_suite(bytes_object, string_format):
+    """
+    Convert from cipher suite bytes to a cipher suite
+
+    :param bytes bytes_object: Two bytes in an bytes object
+    :param str string_format: Which cipher format to convert to
+    :return: Cipher suite
+    :rtype: str
+    """
+    if len(bytes_object) != 2:
+        raise Exception(f'Can only convert from 2 bytes')
+    bytes_string = f'0x{bytes_object[0]:X},0x{bytes_object[1]:X}'
+    json_data = read_json('cipher_suites.json')
+    for key, value in json_data.items():
+        if key == bytes_string:
+            return value[string_format]
+    raise Exception(f'No cipher suite found for {bytes_string}')
+
+
+def cipher_suite_to_bytes(cipher_suite, string_format):
+    """
+    Convert from string cipher suite to bytes
+
+    :param str cipher_suite: String representation of a cipher suite
+    :param str string_format: Which cipher format to convert from
+    :return: Two bytes in an bytes object
+    :rtype: bytes
+    """
+    json_data = read_json('cipher_suites.json')
+    for key, value in json_data.items():
+        if value[string_format] == cipher_suite:
+            bytes_list = key.split(',')
+            return bytes([int(bytes_list[0], 16), int(bytes_list[1], 16)])
+    raise Exception(f'No bytes found for {cipher_suite}')

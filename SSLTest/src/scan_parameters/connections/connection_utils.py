@@ -2,56 +2,92 @@ import logging
 import socket
 import ssl
 
-from OpenSSL import SSL
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
 from .SSLv3 import SSLv3
 from .SSLv2 import SSLv2
-from ..exceptions.ConnectionTimeoutError import ConnectionTimeoutError
-from ..exceptions.DNSError import DNSError
-from ..utils import convert_openssh_to_iana, incremental_sleep
+from ...utils import incremental_sleep, convert_cipher_suite
 
 
-def get_website_info(url, port, supported_protocols):
+def get_website_info(url, port, supported_protocols, worst):
     """
     Gather objects required to rate a web server
 
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
+
     :param int port: Port to scan on
     :param str url: Url of the webserver
     :param list supported_protocols: Supported SSL/TLS protocol versions
+    :param bool worst: Whether to connect with the worst available protocol
     :return:
-        certificate -- Used certificate to verify the server
-        cert_verified -- Is certificate verified
-        cipher_suite -- Negotiated cipher suite
-        protocol -- Protocol name and version
+        certificate -- Used certificate to verify the server,
+        cert_verified -- Is certificate verified,
+        cipher_suite -- Negotiated cipher suite,
+        protocol -- Protocol name and version,
+    :rtype: tuple
     """
-    logging.info('Creating session...')
-    try:
-        ssl_socket, cert_verified = create_session(url, port)
+    logging.info('Creating main session...')
+    chosen_protocol = choose_protocol(supported_protocols, worst)
+    if 'TLS' in chosen_protocol:
+        logging.debug('Connecting with TLS...')
+        context = create_ssl_context(chosen_protocol)
+        ssl_socket, cert_verified = create_session(url, port, True, context)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
-    except (ssl.SSLError, ConnectionResetError) as e:
-        ssl_protocols = [
-            SSLv3(url, port),
-            SSLv2(url, port)
-        ]
-        chosen_protocol = ssl_protocols[0]
-        if ['SSLv2'] == supported_protocols:
-            chosen_protocol = ssl_protocols[1]
-        chosen_protocol.send_client_hello()
-        chosen_protocol.parse_cipher_suite()
-        chosen_protocol.parse_certificate()
-        chosen_protocol.verify_cert()
-        cipher_suite = chosen_protocol.cipher_suite
-        certificate = chosen_protocol.certificate
-        cert_verified = chosen_protocol.cert_verified
-        protocol = chosen_protocol.protocol
-
+    else:
+        logging.debug('Connecting with SSL...')
+        ssl_protocols = {
+            'SSLv3': SSLv3,
+            'SSLv2': SSLv2
+        }
+        ssl_protocol = ssl_protocols[chosen_protocol](url, port)
+        ssl_protocol.send_client_hello()
+        ssl_protocol.parse_cipher_suite()
+        ssl_protocol.parse_certificate()
+        ssl_protocol.verify_cert()
+        cipher_suite = ssl_protocol.cipher_suite
+        certificate = ssl_protocol.certificates[0]
+        cert_verified = ssl_protocol.cert_verified
+        protocol = ssl_protocol.protocol
     return certificate, cert_verified, cipher_suite, protocol
+
+
+def choose_protocol(protocols, worst):
+    """
+    Find the protocol version which will be used to connect to the server
+
+    :param protocols: Supported protocols by the server
+    :param bool worst: Whether to find worst available protocol or best
+    :return: The string of the chosen protocol
+    :rtype: str
+    """
+    protocol_strengths = {
+        'TLSv1.3': 5,
+        'TLSv1.2': 4,
+        'TLSv1.1': 3,
+        'TLSv1.0': 2,
+        'SSLv3': 1,
+        'SSLv2': 0
+    }
+    items = list(protocol_strengths.items())
+    # Switcher for either the best protocol or the worst
+    # If worst option is False the best protocol is found, in other words the maximum value is found
+    # If worst option is True the worst protocol is found, in other words the minimum value is found
+    switcher = {
+        True: (lambda a, b: a < b, items[0]),
+        False: (lambda a, b: a > b, items[-1])
+    }
+    # Filter out the unsupported protocols
+    filtered_protocol_strengths = dict(filter(lambda item: item[0] in protocols, protocol_strengths.items()))
+    base = switcher[worst][1]
+    comparison = switcher[worst][0]
+    for key, value in filtered_protocol_strengths.items():
+        if comparison(value, base[1]):
+            base = (key, value)
+    return base[0]
 
 
 def get_certificate(ssl_socket):
@@ -74,72 +110,74 @@ def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     """
     cipher_suite = ssl_socket.cipher()[0]
     if '-' in cipher_suite:
-        cipher_suite = convert_openssh_to_iana(cipher_suite)
+        cipher_suite = convert_cipher_suite(cipher_suite, 'OpenSSL', 'IANA')
     return cipher_suite, ssl_socket.version()
 
 
-def create_session_pyopenssl(url, port, context: SSL.Context):
-    """
-    Create a secure connection to any server on any port with a defined context
-
-    This function creates a secure connection with pyopenssl lib. Original ssl lib
-    doesn't work with older TLS versions on some OpenSSL implementations and thus
-    the program can't scan for all supported versions.
-    :param str url: Url of the website
-    :param int port: Port to create the connection on
-    :param SSL.Context context: pyopenssl SSL context
-    :return: Created secure socket
-    """
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # sock.settimeout(5)
-    context.set_cipher_list(b'ALL')
-    ssl_socket = SSL.Connection(context, sock)
-    sleep = 0
-    # Loop until there is a valid response or after 15 seconds
-    while True:
-        try:
-            logging.debug(f'connecting... (tls version scanning)')
-            ssl_socket.connect((url, port))
-            break
-        except OSError as e:
-            sleep = incremental_sleep(sleep, e, 5)
-    ssl_socket.do_handshake()
-    return ssl_socket
-
-
-def create_session(url: str, port: int, context=ssl.create_default_context()):
+def create_session(url, port, verify_cert, context):
     """
     Create a secure connection to any server on any port with a defined context
 
     :param str url: Url of the website
     :param int port: Port to create the connection on
+    :param bool verify_cert: Whether to verify the certificate or not
     :param ssl.SSLContext context: ssl context
-    :return: Created secure socket
+    :return: Created secure socket, that needs to be closed
     """
     cert_verified = True
-    context.check_hostname = True
-    context.verify_mode = ssl.VerifyMode.CERT_REQUIRED
+    if not verify_cert:
+        context.check_hostname = False
+        context.verify_mode = ssl.VerifyMode.CERT_NONE
     context.set_ciphers('ALL')
     sleep = 0
-    # Loop until there is a valid response or after 15 seconds
+    # Loop until there is a valid response or after a timeout
     # because of rate limiting on some servers
     while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(5)  # in seconds
+        sock.settimeout(3)  # in seconds
         ssl_socket = context.wrap_socket(sock, server_hostname=url)
         try:
-            logging.debug(f'connecting... (main connection)')
+            logging.debug(f'connecting...')
             ssl_socket.connect((url, port))
             break
         except ssl.SSLCertVerificationError:
+            # If cert is was unverified, connect again without verifying
             cert_verified = False
             context.check_hostname = False
-            context.verify_mode = ssl.CERT_NONE
+            context.verify_mode = ssl.VerifyMode.CERT_NONE
         except socket.timeout:
-            raise ConnectionTimeoutError()
+            logging.debug('connection timeout...')
+            sleep = incremental_sleep(sleep, Exception('Connection timeout'), 3)
         except socket.gaierror:
-            raise DNSError()
+            raise Exception('DNS record not found')
         except socket.error as e:
-            ssl_socket.close()
-            sleep = incremental_sleep(sleep, e, 5)
+            error_str = e.args[1]
+            # Protocol not supported, no need to sleep
+            if '[SSL: UNSUPPORTED_PROTOCOL]' in error_str or \
+                    '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]' in error_str or \
+                    '[SSL: TLSV1_ALERT_PROTOCOL_VERSION]' in error_str:
+                logging.debug('protocol unsupported...')
+                raise e
+            logging.debug('error occurred...')
+            sleep = incremental_sleep(sleep, e, 3)
     return ssl_socket, cert_verified
+
+
+def create_ssl_context(protocol_version):
+    """
+    Create an ssl context from the native ssl library for the specific protocol version
+
+    :param str protocol_version: Protocol version to create the context with
+    :return: Created SSL context
+    :rtype: ssl.SSLContext
+    """
+    ssl_versions = {
+        'TLSv1.0': ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3,
+        'TLSv1.1': ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3,
+        'TLSv1.2': ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_3 | ssl.OP_NO_SSLv3,
+        'TLSv1.3': ssl.OP_NO_TLSv1_1 | ssl.OP_NO_TLSv1_2 | ssl.OP_NO_TLSv1 | ssl.OP_NO_SSLv3,
+    }
+    context = ssl.create_default_context()
+    context.options = ssl.OP_ALL
+    context.options |= ssl_versions[protocol_version]
+    return context

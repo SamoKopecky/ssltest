@@ -15,6 +15,7 @@ class TextOutput:
         Get the rating name according to the rating number
 
         Method made for better reading of code bellow
+
         :param int rating: Rating value to be converted to string
         :return: The rating string
         :rtype: str
@@ -97,13 +98,9 @@ class TextOutput:
         """
         if not data:
             return
-        string_map = {
-            'http_header': 'Http header',
-            'nmap': 'Nmap'
-        }
         self.output += 'Web server software:\n'
         for key, value in list(data.items()):
-            self.output += f'\t{string_map.get(key)}: {value}\n'
+            self.output += f'\t{self.type_names[key]}: {value}\n'
 
     def format_vulnerabilities(self, data):
         """
@@ -119,4 +116,4 @@ class TextOutput:
         }
         self.output += 'Scanned vulnerabilities:\n'
         for key, value in list(data.items()):
-            self.output += f'\t{key}->{string_map.get(value)}\n'
+            self.output += f'\t{key}->{string_map[value]}\n'
