@@ -36,7 +36,7 @@ def get_tests_switcher():
         4: (Heartbleed, Heartbleed.test_name),
         5: (InsecureRenegotiation, InsecureRenegotiation.test_name),
         6: (RC4Support, RC4Support.test_name),
-        7: (SessionTicketSupport, SessionTicketSupport.test_name),
+        7: (SessionTicketSupport, SessionTicketSupport.test_name)
     }
 
 

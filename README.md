@@ -11,6 +11,8 @@
 
 Script that scans web servers cryptographic parameters and vulnerabilities
 
+
+
 ## Installation
 
 ```
@@ -33,14 +35,14 @@ $ sudo ptmanager -ut SSLTest
                              written to the given file
 -t  --test      <number ...> Test the server for a specified vulnerability
                              possible vulnerabilities (separate with spaces):
-                               0: No test
-                               1: Heartbleed
-                               2: CCS injection
-                               3: Insecure renegotiation
-                               4: ZombiePOODLE/GOLDENDOOLDE
-                               5: Session ticket support
-                               6: CRIME
-                               7: RC4 support
+                                   0: No test
+                                   1: CCS Injection
+                                   2: Crime
+                                   3: No Fallback SCSV Support
+                                   4: Heartbleed
+                                   5: Insecure Renegotiation
+                                   6: RC4 Support
+                                   7: Session Ticket Support
                              If this argument isn't specified all tests will be ran
 -fc --fix-conf               Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) 
                              in order to scan a server which still run on these versions. 
@@ -64,8 +66,10 @@ $ SSLTest.py -u https://example.com -t 1 2
 
 ## Version History
 
+* Full changelog [here](/CHANGELOG.md)
 * [0.0.2](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.2)
 * [0.0.1](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.1)
+
 
 ## Licence
 

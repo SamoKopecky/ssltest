@@ -53,7 +53,8 @@ def get_help():
                                       " script if no pipe is present"],
             ["-ns", "--nmap-scan", "", "Use nmap to scan the server version"],
             ["-nd", "--nmap-discover", "", "Use nmap to discover web server ports"],
-            ["-w", "--worst", "", "Create a main connection on the worst available protocol version"],
+            ["-w", "--worst", "", "Create a main connection on the worst available protocol version, otherwise servers "
+                                  "preferred protocol version is chosen"],
             ["-i", "--info", "", "Output some internal information about the script functions"],
             ["-d", "--debug", "", "Output debug information"],
             ["-v", "--version", "", "Show script version and exit"],

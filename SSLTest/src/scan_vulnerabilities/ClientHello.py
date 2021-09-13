@@ -91,6 +91,12 @@ class ClientHello:
         return pack('>H', len(cipher_suites)) + cipher_suites
 
     def ciphers_from_ssl_lib(self):
+        """
+        Extract cipher suites from ssl lib which uses OpenSSL
+
+        :return: Cipher suite bytes
+        :rtype: bytes
+        """
         ciphers = bytes([])
         ctx = ssl.SSLContext()
         ctx.set_ciphers('ALL')
@@ -100,6 +106,12 @@ class ClientHello:
         return ciphers
 
     def ciphers_from_json_file(self):
+        """
+        Extract cipher suites from a json file
+
+        :return: Cipher suite bytes
+        :rtype: bytes
+        """
         ciphers = bytes([])
         json_ciphers = read_json('cipher_suite_bytes.json')
         cipher_bytes = json_ciphers[self.str_version].split(',')

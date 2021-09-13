@@ -9,7 +9,6 @@ class FallbackSCSVSupport(VulnerabilityTest):
 
     def __init__(self, supported_protocols, address):
         super().__init__(supported_protocols, address)
-        self.timeout = 2
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
         self.fallback_scsv = bytes([0x56, 0x00])
 
@@ -24,6 +23,8 @@ class FallbackSCSVSupport(VulnerabilityTest):
         sock.close()
         # If server doesn't respond with an alert, it doesn't support SCSV fallback
         if is_server_hello(response):
+            return True
+        elif not response:
             return True
         # 0x15 for Content Type: Alert, 0x56 for Inappropriate Fallback
         elif response[0] == 0x15 and response[-1] == 0x56:
