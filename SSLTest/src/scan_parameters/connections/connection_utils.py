@@ -59,14 +59,26 @@ def choose_protocol(protocols, worst):
     """
     Find the protocol version which will be used to connect to the server
 
-    :param protocols: Supported protocols by the server
+    :param list protocols: Supported protocols by the server
     :param bool worst: Whether to find worst available protocol or best
-    :return: The string of the chosen protocol
+    :return: The string of the chosen protocol or an empty string
     :rtype: str
     """
     tls_protocols = list(filter(lambda p: 'TLS' in p, protocols))
     if not worst and len(tls_protocols) != 0:
         return ''
+    return worst_or_best_protocol(protocols, worst)
+
+
+def worst_or_best_protocol(protocols, worst):
+    """
+    Find either the best or worst protocol to connect with
+
+    :param list protocols: Supported protocols by the server
+    :param bool worst: Whether to find worst available protocol or best
+    :return: The string of the chosen protocol
+    :rtype: str
+    """
     protocol_strengths = {
         'TLSv1.3': 5,
         'TLSv1.2': 4,
@@ -76,7 +88,6 @@ def choose_protocol(protocols, worst):
         'SSLv2': 0
     }
     items = list(protocol_strengths.items())
-    # Switcher for either the best protocol or the worst
     # If worst option is False the best SSL protocol is found
     # If worst option is True the worst protocol is found, in other words the minimum value is found
     switcher = {
@@ -85,8 +96,8 @@ def choose_protocol(protocols, worst):
     }
     # Filter out the unsupported protocols
     filtered_protocol_strengths = dict(filter(lambda item: item[0] in protocols, protocol_strengths.items()))
-    base = switcher[worst][1]
     comparison = switcher[worst][0]
+    base = switcher[worst][1]
     for key, value in filtered_protocol_strengths.items():
         if comparison(value, base[1]):
             base = (key, value)
