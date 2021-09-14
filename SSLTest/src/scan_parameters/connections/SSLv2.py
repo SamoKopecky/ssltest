@@ -12,6 +12,7 @@ class SSLv2(SSLvX):
     def __init__(self, url, port):
         super().__init__(url, port)
         self.protocol = 'SSLv2'
+        self.server_cipher_suites = []
         self.client_hello = bytes([
             0x80,  # No padding
             0x2e,  # Length
@@ -48,16 +49,15 @@ class SSLv2(SSLvX):
         certificate_len = unpack('>H', self.response[7:9])[0]
         cipher_spec_len = unpack('>H', self.response[9:11])[0]
         cipher_spec_begin_idx = 11 + 2 + certificate_len
-        server_cipher_suites = []
         for idx in range(cipher_spec_begin_idx, cipher_spec_begin_idx + cipher_spec_len, 3):
-            server_cipher_suites.append(
+            self.server_cipher_suites.append(
                 cipher_suites[
                     f'{SSLv2.int_to_hex_str(self.response[idx])},'
                     f'{SSLv2.int_to_hex_str(self.response[idx + 1])},'
                     f'{SSLv2.int_to_hex_str(self.response[idx + 2])}'
                 ])
-        random_number = int(random.randint(0, len(server_cipher_suites) - 1))
-        self.cipher_suite = server_cipher_suites[random_number]
+        random_number = int(random.randint(0, len(self.server_cipher_suites) - 1))
+        self.cipher_suite = self.server_cipher_suites[random_number]
 
     def parse_certificate(self):
         certificate_length = unpack('>H', self.response[7:9])[0]

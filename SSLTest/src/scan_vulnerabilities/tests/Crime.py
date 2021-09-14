@@ -5,7 +5,7 @@ from ...utils import communicate_data_return_sock
 
 
 class Crime(VulnerabilityTest):
-    test_name = 'Crime'
+    test_name = 'CRIME'
     
     def __init__(self, supported_protocols, address):
         super().__init__(supported_protocols, address)

@@ -43,6 +43,7 @@ $ sudo ptmanager -ut SSLTest
                                    5: Insecure Renegotiation
                                    6: RC4 Support
                                    7: Session Ticket Support
+                                   8: DROWN
                              If this argument isn't specified all tests will be ran
 -fc --fix-conf               Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) 
                              in order to scan a server which still run on these versions. 
