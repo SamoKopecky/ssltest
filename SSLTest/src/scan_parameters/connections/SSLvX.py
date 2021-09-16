@@ -1,7 +1,7 @@
 import requests
 import csv
 
-from ...utils import communicate_data_return_sock
+from ...utils import send_data_return_sock
 
 from abc import ABC, abstractmethod
 from OpenSSL import crypto
@@ -22,8 +22,8 @@ class SSLvX(ABC):
         """
         Send the initial client hello
         """
-        self.response, _ = communicate_data_return_sock(self.address, self.client_hello, self.timeout,
-                                                        self.__class__.__name__)
+        self.response, _ = send_data_return_sock(self.address, self.client_hello, self.timeout,
+                                                 self.__class__.__name__)
 
     def verify_cert(self):
         """

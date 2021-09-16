@@ -4,7 +4,7 @@ import ssl
 from struct import pack
 
 from .utils import version_conversion
-from ..utils import cipher_suite_to_bytes, read_json
+from ..utils import cipher_suite_to_bytes, read_json, convert_cipher_suite, bytes_to_cipher_suite
 
 
 class ClientHello:
@@ -84,37 +84,30 @@ class ClientHello:
         if custom_cipher_suites is not None:
             cipher_suites += custom_cipher_suites
         if fill_cipher_suites:
-            if 'SSLv3' == self.str_version:
-                cipher_suites += self.ciphers_from_json_file()
-            else:
-                cipher_suites += self.ciphers_from_ssl_lib()
+            cipher_suites += self.get_cipher_suites_for_version(self.str_version)
         return pack('>H', len(cipher_suites)) + cipher_suites
 
-    def ciphers_from_ssl_lib(self):
+    @staticmethod
+    def get_cipher_suites_for_version(str_version):
         """
-        Extract cipher suites from ssl lib which uses OpenSSL
+        Extract cipher suites from ssl lib or json file
 
+        :param str_version: SSL/TLS protocol version
         :return: Cipher suite bytes
-        :rtype: bytes
+        :rtype: bytearray
         """
-        ciphers = bytes([])
-        ctx = ssl.SSLContext()
-        ctx.set_ciphers('ALL')
-        for cipher in ctx.get_ciphers():
-            if cipher['protocol'] == self.str_version:
-                ciphers += cipher_suite_to_bytes(cipher['name'], 'OpenSSL')
-        return ciphers
-
-    def ciphers_from_json_file(self):
-        """
-        Extract cipher suites from a json file
-
-        :return: Cipher suite bytes
-        :rtype: bytes
-        """
-        ciphers = bytes([])
-        json_ciphers = read_json('cipher_suite_bytes.json')
-        cipher_bytes = json_ciphers[self.str_version].split(',')
-        for byte in cipher_bytes:
-            ciphers += bytes([int(byte, 16)])
+        if str_version == 'TLSv1.1':
+            str_version = 'TLSv1.0'
+        ciphers = bytearray([])
+        if str_version == 'SSLv3':
+            json_ciphers = read_json('cipher_suite_bytes.json')
+            cipher_bytes = json_ciphers[str_version].split(',')
+            for byte in cipher_bytes:
+                ciphers += bytearray([int(byte, 16)])
+        else:
+            ctx = ssl.SSLContext()
+            ctx.set_ciphers('ALL')
+            for cipher in ctx.get_ciphers():
+                if cipher['protocol'] == str_version:
+                    ciphers += cipher_suite_to_bytes(cipher['name'], 'OpenSSL')
         return ciphers

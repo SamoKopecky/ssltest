@@ -2,7 +2,7 @@ from struct import unpack
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
-from ...utils import bytes_to_cipher_suite
+from ...utils import bytes_to_cipher_suite, parse_cipher_suite
 from ...scan_vulnerabilities.ClientHello import ClientHello
 from ...scan_vulnerabilities.utils import version_conversion
 
@@ -28,10 +28,8 @@ class SSLv3(SSLvX):
     def parse_cipher_suite(self):
         if len(self.response) == 0:
             return
-        sess_id_len_idx = 43  # Always fixed index
-        cipher_suite_idx = self.response[sess_id_len_idx] + sess_id_len_idx + 1
-        cipher_suites_bytes = self.response[cipher_suite_idx: cipher_suite_idx + 2]
-        self.cipher_suite = bytes_to_cipher_suite(cipher_suites_bytes, 'IANA')
+        cipher_suite_bytes = parse_cipher_suite(self.response)
+        self.cipher_suite = bytes_to_cipher_suite(cipher_suite_bytes, 'IANA')
 
     def parse_certificate(self):
         if len(self.response) == 0:

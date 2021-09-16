@@ -4,12 +4,15 @@ import sys
 import traceback
 import concurrent.futures as cf
 
+from .utils import bytes_to_cipher_suite
+
 from .scan_parameters.connections.connection_utils import get_website_info
 from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
 from .scan_parameters.non_ratable.WebServerSoft import WebServerSoft
 from .scan_parameters.non_ratable.port_discovery import discover_ports
 from .scan_parameters.ratable.Certificate import Certificate
 from .scan_parameters.ratable.CipherSuite import CipherSuite
+from .scan_parameters.ratable.CipherSuites import CipherSuites
 from .scan_parameters.utils import fix_url
 from .scan_vulnerabilities.tests.CCSInjection import CCSInjection
 from .scan_vulnerabilities.tests.Crime import Crime
@@ -20,6 +23,23 @@ from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSuppor
 from .scan_vulnerabilities.tests.FallbackSCSVSupport import FallbackSCSVSupport
 from .scan_vulnerabilities.tests.Drown import Drown
 from .text_output.TextOutput import TextOutput
+
+
+def cipher_suites_option(args, port, supported_protocols):
+    """
+    Handle cipher suite support scanning
+
+    :param args: Parsed input arguments
+    :param port: Port to scan on
+    :param supported_protocols: Supported SSL/TLS protocols
+    :return: Dictionary of supported protocols
+    :rtype: dict
+    """
+    if args.cipher_suites:
+        cipher_suites = CipherSuites((args.url, port), supported_protocols)
+        cipher_suites.scan_cipher_suites()
+        return cipher_suites.supported_ciphers
+    return {}
 
 
 def get_tests_switcher():
@@ -42,7 +62,7 @@ def get_tests_switcher():
     }
 
 
-def handle_test_option(address, tests, supported_protocols):
+def test_option(address, tests, supported_protocols):
     """
     Forward the appropriate tests to multithreading function
 
@@ -163,7 +183,7 @@ def info_report_option(args):
 
 
 def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
-                 certificate_non_parameters, software, vulnerabilities, port, url):
+                 certificate_non_parameters, software, cipher_suites, vulnerabilities, port, url):
     """
     Dump web server parameters to a single dictionary
 
@@ -172,6 +192,7 @@ def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
     :param tuple protocol_support: Supported SSL/TLS protocols
     :param dict certificate_non_parameters: Not ratable certificate parameters such as subject/issuer
     :param dict software: Web server software which hosts the website
+    :param dict cipher_suites: All scanned cipher suites
     :param dict vulnerabilities: Results from vulnerability tests
     :param int port: Scanned port
     :param str url: Scanned url
@@ -200,6 +221,7 @@ def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
     dump.update({'certificate_info': certificate_info})
     dump.update({'protocol_support': protocols})
     dump.update({'web_server_software': software})
+    dump.update({'cipher_suites': cipher_suites})
     dump.update({'vulnerabilities': vulnerabilities})
     return {f'{url}:{port}': dump}
 
@@ -235,14 +257,16 @@ def scan(args, port):
     versions = WebServerSoft(args.url, port, args.nmap_scan)
     versions.scan_server_software()
 
-    vulnerabilities = handle_test_option((args.url, port), args.test, protocol_support.supported_protocols)
+    cipher_suites = cipher_suites_option(args, port, protocol_support.supported_protocols)
+
+    vulnerabilities = test_option((args.url, port), args.test, protocol_support.supported_protocols)
 
     logging.info('Scanning done.')
     return dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
                         (certificate.parameters, certificate.rating),
                         (protocol_support.versions, protocol_support.rating),
-                        certificate.non_parameters, versions.versions, vulnerabilities,
-                        port, args.url)
+                        certificate.non_parameters, versions.versions, cipher_suites,
+                        vulnerabilities, port, args.url)
 
 
 def run(args):

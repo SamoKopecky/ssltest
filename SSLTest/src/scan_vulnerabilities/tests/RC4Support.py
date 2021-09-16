@@ -1,7 +1,7 @@
 from ..VulnerabilityTest import VulnerabilityTest
 from ..ClientHello import ClientHello
 from ..utils import is_server_hello
-from ...utils import communicate_data_return_sock
+from ...utils import send_data_return_sock
 
 
 class RC4Support(VulnerabilityTest):
@@ -29,7 +29,7 @@ class RC4Support(VulnerabilityTest):
             0xC0, 0x16, 0xC0, 0x33
         ])
         client_hello = ClientHello(version, rc4_ciphers).construct_client_hello()
-        response, sock = communicate_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
+        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
         sock.close()
         if not is_server_hello(response):
             return False

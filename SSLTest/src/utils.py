@@ -53,7 +53,7 @@ def receive_data(sock, timeout, debug_source):
     return bytes(all_data)
 
 
-def communicate_data_return_sock(address, client_hello, timeout, debug_source):
+def send_data_return_sock(address, client_hello, timeout, debug_source):
     """
     Send client client_hello to the server and catch the response
 
@@ -130,7 +130,7 @@ def bytes_to_cipher_suite(bytes_object, string_format):
     """
     if len(bytes_object) != 2:
         raise Exception(f'Can only convert from 2 bytes')
-    bytes_string = f'0x{bytes_object[0]:X},0x{bytes_object[1]:X}'
+    bytes_string = f'0x{bytes_object[0]:02X},0x{bytes_object[1]:02X}'
     json_data = read_json('cipher_suites.json')
     for key, value in json_data.items():
         if key == bytes_string:
@@ -153,3 +153,17 @@ def cipher_suite_to_bytes(cipher_suite, string_format):
             bytes_list = key.split(',')
             return bytes([int(bytes_list[0], 16), int(bytes_list[1], 16)])
     raise Exception(f'No bytes found for {cipher_suite}')
+
+
+def parse_cipher_suite(data):
+    """
+    Extract the cipher suite out of a client hello
+
+    :param data: Data to extract from
+    :return: 2 cipher suite bytes
+    :rtype: bytearray
+    """
+    sess_id_len_idx = 43  # Always fixed index
+    cipher_suite_idx = data[sess_id_len_idx] + sess_id_len_idx + 1
+    cipher_suites_bytes = data[cipher_suite_idx: cipher_suite_idx + 2]
+    return bytearray(cipher_suites_bytes)

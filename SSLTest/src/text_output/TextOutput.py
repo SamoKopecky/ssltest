@@ -36,6 +36,7 @@ class TextOutput:
             self.format_supported_versions(self.current_data['protocol_support'])
             self.format_certificate_info(self.current_data['certificate_info'])
             self.format_software(self.current_data['web_server_software'])
+            self.format_cipher_suites(self.current_data['cipher_suites'])
             self.format_vulnerabilities(self.current_data['vulnerabilities'])
         self.output = self.output[:-1]
 
@@ -101,6 +102,21 @@ class TextOutput:
         self.output += 'Web server software:\n'
         for key, value in list(data.items()):
             self.output += f'\t{self.type_names[key]}: {value}\n'
+
+    def format_cipher_suites(self, data):
+        """
+        Format supported cipher suites
+
+        :param data: Data to format
+        """
+        if not data:
+            return
+        self.output += 'Supported cipher suites:\n'
+        for key, value in data.items():
+            if type(value) is dict:
+                value = list(map(lambda cs: f'\t\t{cs[0]}->{cs[1]}', value.items()))
+                value = '\n'.join(value)
+            self.output += f'\t{key}: \n{value}\n'
 
     def format_vulnerabilities(self, data):
         """

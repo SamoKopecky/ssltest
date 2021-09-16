@@ -46,6 +46,7 @@ def get_help():
             ["-j", "--json", "<file>",
              "Change output to json format, if a file name is specified output is written to the given file"],
             ["-t", "--test", "<number ...>", get_tests_help()],
+            ["-cs", "--cipher-suites", "", "Scan all supported cipher suites by the server"],
             ["-fc", "--fix-conf", "", "Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) in order to"
                                       "scan a server which still run on these versions. !WARNING!: this may rewrite"
                                       "the contents of a configuration file located at /etc/ssl/openssl.cnf"
@@ -74,6 +75,7 @@ def parse_args():
     parser.add_argument("-p", "--port", default=[443], type=int, nargs="+", metavar="port")
     parser.add_argument("-j", "--json", action="store", metavar="output_file", required=False, nargs="?", default=False)
     parser.add_argument("-t", "--test", type=int, metavar="test_num", nargs="+")
+    parser.add_argument("-cs", "--cipher-suites", action="store_true", default=False)
     parser.add_argument("-fc", "--fix-conf", action="store_true", default=False)
     parser.add_argument("-ns", "--nmap-scan", action="store_true", default=False)
     parser.add_argument("-nd", "--nmap-discover", action="store_true", default=False)

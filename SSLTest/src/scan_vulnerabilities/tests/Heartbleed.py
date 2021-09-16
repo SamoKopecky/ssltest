@@ -1,7 +1,7 @@
 from ..VulnerabilityTest import VulnerabilityTest
 from ..ClientHello import ClientHello
 from ..utils import is_server_hello
-from ...utils import receive_data, communicate_data_return_sock
+from ...utils import receive_data, send_data_return_sock
 
 
 class Heartbleed(VulnerabilityTest):
@@ -22,8 +22,8 @@ class Heartbleed(VulnerabilityTest):
         heartbeat_extension = bytearray([0x00, 0x0f, 0x00, 0x01, 0x01])
         client_hello = ClientHello(version)
         client_hello.extensions += heartbeat_extension
-        response, sock = communicate_data_return_sock(self.address, client_hello.construct_client_hello(),
-                                                      self.timeout, self.test_name)
+        response, sock = send_data_return_sock(self.address, client_hello.construct_client_hello(),
+                                               self.timeout, self.test_name)
         if not is_server_hello(response):
             sock.close()
             return False

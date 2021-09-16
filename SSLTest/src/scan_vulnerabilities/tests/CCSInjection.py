@@ -1,7 +1,7 @@
 from ..VulnerabilityTest import VulnerabilityTest
 from ..ClientHello import ClientHello
 from ..utils import is_server_hello
-from ...utils import receive_data, communicate_data_return_sock
+from ...utils import receive_data, send_data_return_sock
 
 
 class CCSInjection(VulnerabilityTest):
@@ -21,7 +21,7 @@ class CCSInjection(VulnerabilityTest):
         :rtype: bool
         """
         client_hello = ClientHello(version).construct_client_hello()
-        response, sock = communicate_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
+        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
         if not is_server_hello(response):
             sock.close()
             return False

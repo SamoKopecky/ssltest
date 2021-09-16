@@ -1,7 +1,7 @@
 from ..VulnerabilityTest import VulnerabilityTest, version_conversion
 from ..ClientHello import ClientHello
 from ..utils import is_server_hello
-from ...utils import communicate_data_return_sock
+from ...utils import send_data_return_sock
 
 
 class FallbackSCSVSupport(VulnerabilityTest):
@@ -19,7 +19,7 @@ class FallbackSCSVSupport(VulnerabilityTest):
             return False
         client_hello = ClientHello(version, self.fallback_scsv)
         client_hello = client_hello.construct_client_hello()
-        response, sock = communicate_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
+        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
         sock.close()
         # If server doesn't respond with an alert, it doesn't support SCSV fallback
         if is_server_hello(response):
