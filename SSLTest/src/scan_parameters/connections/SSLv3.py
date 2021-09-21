@@ -8,8 +8,8 @@ from ...scan_vulnerabilities.utils import protocol_version_conversion
 
 
 class SSLv3(SSLvX):
-    def __init__(self, url, port):
-        super().__init__(url, port)
+    def __init__(self, url, port, timeout):
+        super().__init__(url, port, timeout)
         self.protocol = 'SSLv3'
         self.client_hello = ClientHello(protocol_version_conversion(self.protocol, True)).construct_client_hello()
 

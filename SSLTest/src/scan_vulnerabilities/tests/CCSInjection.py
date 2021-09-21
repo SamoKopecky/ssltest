@@ -7,8 +7,8 @@ from ...utils import receive_data, send_data_return_sock
 class CCSInjection(VulnerabilityTest):
     test_name = 'CCS Injection'
 
-    def __init__(self, supported_protocols, address):
-        super().__init__(supported_protocols, address)
+    def __init__(self, supported_protocols, address, timeout):
+        super().__init__(supported_protocols, address, timeout)
 
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
 

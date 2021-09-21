@@ -10,7 +10,7 @@ from .SSLv2 import SSLv2
 from ...utils import incremental_sleep, convert_cipher_suite
 
 
-def get_website_info(url, port, supported_protocols, worst):
+def get_website_info(url, port, supported_protocols, worst, timeout):
     """
     Gather objects required to rate a web server
 
@@ -21,6 +21,7 @@ def get_website_info(url, port, supported_protocols, worst):
     :param str url: Url of the webserver
     :param list supported_protocols: Supported SSL/TLS protocol versions
     :param bool worst: Whether to connect with the worst available protocol
+    :param int timeout: Timeout in seconds
     :return:
         certificate -- Used certificate to verify the server,
         cert_verified -- Is certificate verified,
@@ -36,7 +37,7 @@ def get_website_info(url, port, supported_protocols, worst):
             'SSLv3': SSLv3,
             'SSLv2': SSLv2
         }
-        ssl_protocol = ssl_protocols[chosen_protocol](url, port)
+        ssl_protocol = ssl_protocols[chosen_protocol](url, port, timeout)
         ssl_protocol.send_client_hello()
         ssl_protocol.parse_cipher_suite()
         ssl_protocol.parse_certificate()
@@ -48,7 +49,7 @@ def get_website_info(url, port, supported_protocols, worst):
     else:
         logging.debug('Connecting with TLS...')
         context = create_ssl_context(chosen_protocol)
-        ssl_socket, cert_verified = create_session(url, port, True, context)
+        ssl_socket, cert_verified = create_session(url, port, True, context, timeout)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
@@ -151,7 +152,7 @@ def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     return cipher_suite, ssl_socket.version()
 
 
-def create_session(url, port, verify_cert, context):
+def create_session(url, port, verify_cert, context, timeout):
     """
     Create a secure connection to any server on any port with a defined context
 
@@ -159,6 +160,7 @@ def create_session(url, port, verify_cert, context):
     :param int port: Port to create the connection on
     :param bool verify_cert: Whether to verify the certificate or not
     :param ssl.SSLContext context: ssl context
+    :param int timeout: Timeout in seconds
     :return: Created secure socket, that needs to be closed
     """
     cert_verified = True
@@ -172,7 +174,7 @@ def create_session(url, port, verify_cert, context):
     # because of rate limiting on some servers
     while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(3)  # in seconds
+        sock.settimeout(timeout)  # in seconds
         ssl_socket = context.wrap_socket(sock, server_hostname=url)
         try:
             logging.debug(f'connecting...')

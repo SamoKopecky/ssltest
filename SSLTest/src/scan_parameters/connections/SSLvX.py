@@ -8,13 +8,13 @@ from OpenSSL import crypto
 
 
 class SSLvX(ABC):
-    def __init__(self, url, port):
+    def __init__(self, url, port, timeout):
         self.address = (url, port)
         self.protocol = ''
         self.cipher_suite = None
         self.certificates = []
         self.cert_verified = None
-        self.timeout = 2
+        self.timeout = timeout
         self.response = b''
         self.client_hello = bytes([])
 

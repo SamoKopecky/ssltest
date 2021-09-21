@@ -1,13 +1,12 @@
 from ..VulnerabilityTest import VulnerabilityTest
-from ..ClientHello import ClientHello
 from ...scan_parameters.connections.SSLv2 import SSLv2
 
 
 class Drown(VulnerabilityTest):
     test_name = 'DROWN'
 
-    def __init__(self, supported_protocols, address):
-        super().__init__(supported_protocols, address)
+    def __init__(self, supported_protocols, address, timeout):
+        super().__init__(supported_protocols, address, timeout)
         self.valid_protocols = ['SSLv2', 'SSLv3', 'TLSv1.0', 'TLSv1.1', 'TLSv1.2']
 
     def test(self, version):
@@ -15,7 +14,7 @@ class Drown(VulnerabilityTest):
             return False
         elif self.supported_protocols == ['SSLv2']:
             return False
-        sslv2 = SSLv2(self.address[0], self.address[1])
+        sslv2 = SSLv2(self.address[0], self.address[1], self.timeout)
         sslv2.send_client_hello()
         sslv2.parse_cipher_suite()
         export_cipher_suites = list(filter(lambda cs: 'EXPORT' in cs, sslv2.server_cipher_suites))

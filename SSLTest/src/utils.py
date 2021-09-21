@@ -37,7 +37,7 @@ def receive_data(sock, timeout, debug_source):
         if all_data and time() - begin > timeout:
             logging.debug(f"({debug_source}) timed out with received data")
             break
-        elif time() - begin > timeout * 2:
+        elif time() - begin > timeout:
             logging.debug(f"({debug_source}) timed out with no received data")
             break
         try:

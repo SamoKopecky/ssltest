@@ -10,13 +10,14 @@ from ..connections.SSLv2 import SSLv2
 
 class ProtocolSupport:
 
-    def __init__(self, url: str, port: int):
+    def __init__(self, url: str, port: int, timeout):
         self.versions = {PType.protocols: {}, PType.no_protocol: {}}
         self.supported_protocols = []
         self.unsupported_protocols = []
         self.url = url
         self.port = port
         self.rating = 0
+        self.timeout = timeout
 
     def scan_protocols(self):
         """
@@ -37,10 +38,11 @@ class ProtocolSupport:
         Test for all possible SSL versions which the server supports
         """
         ssl_versions = [
-            SSLv2(self.url, self.port),
-            SSLv3(self.url, self.port)
+            SSLv2,
+            SSLv3
         ]
         for ssl_version in ssl_versions:
+            ssl_version = ssl_version(self.url, self.port, self.timeout)
             logging.info(f'scanning for {ssl_version.protocol}...')
             ssl_version.send_client_hello()
             result = ssl_version.scan_protocol_support()
@@ -63,7 +65,7 @@ class ProtocolSupport:
             logging.info(f'scanning for {version}...')
             context = create_ssl_context(version)
             try:
-                ssl_socket, _ = create_session(self.url, self.port, False, context)
+                ssl_socket, _ = create_session(self.url, self.port, False, context, self.timeout)
                 ssl_socket.close()
                 self.supported_protocols.append(version)
             except socket.error:

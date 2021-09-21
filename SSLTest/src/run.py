@@ -62,7 +62,7 @@ def get_tests_switcher():
     }
 
 
-def test_option(address, tests, supported_protocols):
+def test_option(address, tests, supported_protocols, timeout):
     """
     Forward the appropriate tests to multithreading function
 
@@ -81,10 +81,10 @@ def test_option(address, tests, supported_protocols):
         return {}
     else:
         scans = list(map(lambda t: tests_switcher[t], tests))
-    return vulnerability_scans(scans, address, supported_protocols)
+    return vulnerability_scans(scans, address, supported_protocols, timeout)
 
 
-def vulnerability_scans(functions, address, supported_protocols):
+def vulnerability_scans(functions, address, supported_protocols, timeout):
     """
     Run chosen vulnerability tests in parallel
 
@@ -102,7 +102,7 @@ def vulnerability_scans(functions, address, supported_protocols):
     with cf.ThreadPoolExecutor(max_workers=len(functions)) as executor:
         for function in functions:
             # 0th index is the function, 1st index is the function name
-            scan_class = function[0](supported_protocols, address)
+            scan_class = function[0](supported_protocols, address, timeout)
             execution = executor.submit(scan_class.scan)
             futures.update({execution: function[1]})
         for execution in cf.as_completed(futures):
@@ -237,12 +237,12 @@ def scan(args, port):
     """
     logging.info(f'Scanning for {args.url}:{port}')
 
-    protocol_support = ProtocolSupport(args.url, port)
+    protocol_support = ProtocolSupport(args.url, port, args.timeout)
     protocol_support.scan_protocols()
     protocol_support.rate_protocols()
 
     certificate, cert_verified, cipher_suite, protocol = get_website_info(
-        args.url, port, protocol_support.supported_protocols, args.worst
+        args.url, port, protocol_support.supported_protocols, args.worst, args.timeout
     )
 
     cipher_suite = CipherSuite(cipher_suite, protocol)
@@ -259,7 +259,7 @@ def scan(args, port):
 
     cipher_suites = cipher_suites_option(args, port, protocol_support.supported_protocols)
 
-    vulnerabilities = test_option((args.url, port), args.test, protocol_support.supported_protocols)
+    vulnerabilities = test_option((args.url, port), args.test, protocol_support.supported_protocols, args.timeout)
 
     logging.info('Scanning done.')
     return dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
