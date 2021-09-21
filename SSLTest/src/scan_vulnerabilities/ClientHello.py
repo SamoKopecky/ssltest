@@ -3,17 +3,17 @@ import ssl
 
 from struct import pack
 
-from .utils import version_conversion
-from ..utils import cipher_suite_to_bytes, read_json, convert_cipher_suite, bytes_to_cipher_suite
+from .utils import protocol_version_conversion
+from ..utils import cipher_suite_to_bytes, read_json
 
 
 class ClientHello:
-    def __init__(self, version, cipher_suites=None, fill_cipher_suites=True):
-        self.version = version
-        self.str_version = version_conversion(version, False)
+    def __init__(self, protocol, cipher_suites=None, fill_cipher_suites=True):
+        self.protocol = protocol
+        self.str_protocol = protocol_version_conversion(protocol, False)
         self.record_protocol = bytearray([
             0x16,  # Content type (Handshake)
-            0x03, self.version,  # Version
+            0x03, self.protocol,  # Version
             # 0x00, 0x00,  Length
         ])
         self.handshake_protocol_header = bytearray([
@@ -21,7 +21,7 @@ class ClientHello:
             # 0x00, 0x00, 0x00,  Length
         ])
         self.handshake_protocol = bytearray([
-            0x03, self.version,  # TLS version
+            0x03, self.protocol,  # TLS version
             # Random bytes
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -84,7 +84,7 @@ class ClientHello:
         if custom_cipher_suites is not None:
             cipher_suites += custom_cipher_suites
         if fill_cipher_suites:
-            cipher_suites += self.get_cipher_suites_for_version(self.str_version)
+            cipher_suites += self.get_cipher_suites_for_version(self.str_protocol)
         return pack('>H', len(cipher_suites)) + cipher_suites
 
     @staticmethod

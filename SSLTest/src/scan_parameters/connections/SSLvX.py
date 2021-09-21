@@ -51,7 +51,7 @@ class SSLvX(ABC):
             self.cert_verified = False
 
     @abstractmethod
-    def scan_version_support(self):
+    def scan_protocol_support(self):
         """
         Check if SSLvX version is supported by the web server
 

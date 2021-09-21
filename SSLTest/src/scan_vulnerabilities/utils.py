@@ -15,9 +15,9 @@ def is_server_hello(message):
     return False
 
 
-def version_conversion(version, from_string):
+def protocol_version_conversion(version, from_string):
     """
-    Convert SSL/TLS version into the required format
+    Convert SSL/TLS protocol version into the required format
 
     :param str or int version: SSL/TLS version, either in str or int
     :param bool from_string: Convert from string or not

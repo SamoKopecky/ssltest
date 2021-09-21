@@ -31,7 +31,7 @@ class SSLv2(SSLvX):
         ])
         self.client_hello += secrets.token_bytes(16)
 
-    def scan_version_support(self):
+    def scan_protocol_support(self):
         # No response to SSLv2 client hello
         if len(self.response) == 0:
             return False

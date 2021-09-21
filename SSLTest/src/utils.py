@@ -64,14 +64,16 @@ def send_data_return_sock(address, client_hello, timeout, debug_source):
     :return: Created socket and received response
     :rtype: bytes or socket
     """
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(timeout)
+    sock = socket
     sleep_dur = 0
     while True:
         try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(timeout)
             sock.connect(address)
             break
         except socket.timeout:
+            sock.close()
             logging.debug('connection timeout...')
             sleep_dur = incremental_sleep(sleep_dur, Exception('Connection timeout'), 3)
     sock.send(client_hello)

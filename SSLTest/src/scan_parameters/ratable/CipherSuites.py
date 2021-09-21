@@ -1,6 +1,6 @@
 from ...scan_vulnerabilities.ClientHello import ClientHello
 from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite
-from ...scan_vulnerabilities.utils import version_conversion, is_server_hello
+from ...scan_vulnerabilities.utils import protocol_version_conversion, is_server_hello
 
 
 class CipherSuites:
@@ -19,7 +19,7 @@ class CipherSuites:
             test_ciphers = ClientHello.get_cipher_suites_for_version(protocol)
             good_ciphers = bytearray([])
             while True:
-                client_hello = ClientHello(version_conversion(protocol, True), test_ciphers,
+                client_hello = ClientHello(protocol_version_conversion(protocol, True), test_ciphers,
                                            False).construct_client_hello()
                 response, sock = send_data_return_sock(self.address, client_hello, 1,
                                                        'cipher_suite_scanning')

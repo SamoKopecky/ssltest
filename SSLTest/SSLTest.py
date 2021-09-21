@@ -30,7 +30,7 @@ def get_tests_help():
     for key, value in get_tests_switcher().items():
         test_number = key
         test_desc = value[1]
-        tests_help += f'{" " * 4}{test_number}: {test_desc}\n'
+        tests_help += f'{" " * 30}{test_number}: {test_desc}\n'
     tests_help += 'if this argument isn\'t specified all tests will be ran'
     return tests_help
 
@@ -47,11 +47,10 @@ def get_help():
              "Change output to json format, if a file name is specified output is written to the given file"],
             ["-t", "--test", "<number ...>", get_tests_help()],
             ["-cs", "--cipher-suites", "", "Scan all supported cipher suites by the server"],
-            ["-fc", "--fix-conf", "", "Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) in order to"
-                                      "scan a server which still run on these versions. !WARNING!: this may rewrite"
-                                      "the contents of a configuration file located at /etc/ssl/openssl.cnf"
-                                      " Password can be piped to stdin or entered when prompted at the start of the"
-                                      " script if no pipe is present"],
+            ["-fc", "--fix-conf", "", "Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols"
+                                      " (TLSv1 and TLSv1.1)"],
+            ["-st", "--sudo-tty", "", "Use the terminal prompt to enter the sudo password"],
+            ["-ss", "--sudo-stdin", "", "Use the stdin of the script to enter the sudo password"],
             ["-ns", "--nmap-scan", "", "Use nmap to scan the server version"],
             ["-nd", "--nmap-discover", "", "Use nmap to discover web server ports"],
             ["-w", "--worst", "", "Create a main connection on the worst available protocol version, otherwise servers "
@@ -71,14 +70,17 @@ def print_help():
 def parse_args():
     parser = argparse.ArgumentParser(add_help=False, usage=f"{SCRIPTNAME}.py <options>")
     required = parser.add_argument_group("required arguments")
+    fix_config = parser.add_mutually_exclusive_group()
     required.add_argument("-u", "--url", required=True, metavar="url")
+    fix_config.add_argument("-st", "--sudo-tty", action="store_true", default=False)
+    fix_config.add_argument("-ss", "--sudo-stdin", action="store_true", default=False)
     parser.add_argument("-p", "--port", default=[443], type=int, nargs="+", metavar="port")
     parser.add_argument("-j", "--json", action="store", metavar="output_file", required=False, nargs="?", default=False)
     parser.add_argument("-t", "--test", type=int, metavar="test_num", nargs="+")
     parser.add_argument("-cs", "--cipher-suites", action="store_true", default=False)
-    parser.add_argument("-fc", "--fix-conf", action="store_true", default=False)
     parser.add_argument("-ns", "--nmap-scan", action="store_true", default=False)
     parser.add_argument("-nd", "--nmap-discover", action="store_true", default=False)
+    parser.add_argument("-fc", "--fix-conf", action="store_true", default=False)
     parser.add_argument("-w", "--worst", action="store_true", default=False)
     parser.add_argument("-i", "--info", action="store_true", default=False)
     parser.add_argument("-d", "--debug", action="store_true", default=False)
@@ -88,6 +90,10 @@ def parse_args():
         print_help()
         sys.exit(0)
     args = parser.parse_args()
+    if not args.fix_conf and (args.sudo_tty or args.sudo_stdin):
+        parser.error('argument -fc/--fix-conf needs to be used to use -st/--sudo-tty or -ss/--sudo-stdin')
+    elif args.fix_conf and (not args.sudo_tty and not args.sudo_stdin):
+        parser.error('argument -fc/--fix-conf needs -st/--sudo-tty or -ss/--sudo-stdin to be present')
     fix_conf_option(args)
     check_test_option(args.test)
     if '-j' not in sys.argv:
@@ -102,17 +108,28 @@ def fix_conf_option(args):
     :param Namespace args: Parsed input arguments
     """
     if args.fix_conf:
-        if sys.stdin.isatty():
+        if args.sudo_tty:
+            try_to_remove_argument('-st', '--sudo-ttv')
             return_code = subprocess.run(
                 ['sudo', '-k', '-p', '[sudo] password for %H to fix config file: ', './src/fix_openssl_config.py']
             ).returncode
-        else:
+        elif args.sudo_stdin:
+            try_to_remove_argument('-ss', '--sudo-stdin')
             return_code = subprocess.run(['sudo', '-k', '-S', '-p', '', './src/fix_openssl_config.py']).returncode
+        else:
+            return_code = 1
         if return_code == 1:
             exit(1)
-        sys.argv.remove('-fc')
+        try_to_remove_argument('-fc', '--fix-conf')
         # Restarts the program without the fc argument
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+
+
+def try_to_remove_argument(short_name, full_name):
+    try:
+        sys.argv.remove(short_name)
+    except ValueError:
+        sys.argv.remove(full_name)
 
 
 def check_test_option(tests):

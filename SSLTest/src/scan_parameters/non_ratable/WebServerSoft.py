@@ -9,7 +9,7 @@ class WebServerSoft:
     def __init__(self, url: str, port: int, scan_nmap: bool):
         self.scans = []
         self.port = port
-        self.versions = {}
+        self.software = {}
         self.url = url
         self.scan_nmap = scan_nmap
 
@@ -34,7 +34,7 @@ class WebServerSoft:
                 error = 'unable to find'
                 if error not in values and not values:
                     values.append(error)
-        self.versions['nmap'] = ' '.join(values)
+        self.software['nmap'] = ' '.join(values)
 
     def scan_software_http(self):
         """
@@ -53,7 +53,7 @@ class WebServerSoft:
                 requests.exceptions.Timeout,
                 requests.exceptions.ReadTimeout):
             value = 'unable to connect (try scanning with nmap)'
-        self.versions["http_header"] = value
+        self.software["http_header"] = value
 
     def scan_server_software(self):
         """

@@ -254,8 +254,8 @@ def scan(args, port):
     certificate.parse_certificate()
     certificate.rate_certificate()
 
-    versions = WebServerSoft(args.url, port, args.nmap_scan)
-    versions.scan_server_software()
+    web_server = WebServerSoft(args.url, port, args.nmap_scan)
+    web_server.scan_server_software()
 
     cipher_suites = cipher_suites_option(args, port, protocol_support.supported_protocols)
 
@@ -265,7 +265,7 @@ def scan(args, port):
     return dump_to_dict((cipher_suite.parameters, cipher_suite.rating),
                         (certificate.parameters, certificate.rating),
                         (protocol_support.versions, protocol_support.rating),
-                        certificate.non_parameters, versions.versions, cipher_suites,
+                        certificate.non_parameters, web_server.software, cipher_suites,
                         vulnerabilities, port, args.url)
 
 

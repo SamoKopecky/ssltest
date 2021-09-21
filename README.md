@@ -45,11 +45,10 @@ $ sudo ptmanager -ut SSLTest
                                    7: Session Ticket Support
                                    8: DROWN
                              If this argument isn't specified all tests will be ran
--fc --fix-conf               Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) 
-                             in order to scan a server which still run on these versions. 
-                             !WARNING!: this may rewrite the contents of a configuration file 
-                             located at /etc/ssl/openssl.cnf. Password can be piped to stdin or
-                             entered when prompted at the start of the script if no pipe is present
+-fc --fix-conf               Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1) 
+                             protocol versions of TLS protocol (TLSv1 and TLSv1.1)
+-st --sudo-tty               Use the terminal prompt to enter the sudo password
+-ss --sudo-stdin             Use the stdin of the script to enter the sudo password
 -ns --nmap-scan              Use nmap to scan the server version
 -nd --nmap-discover          Use nmap to discover web server ports
 -w  --worst                  Create a main connection on the worst available protocol version
@@ -58,6 +57,8 @@ $ sudo ptmanager -ut SSLTest
 -v  --version                Show script version and exit
 -h  --help                   Show this help message and exit
 ```
+### -fc argument
+TODO
 
 ## Usage examples
 

@@ -1,4 +1,4 @@
-from ..VulnerabilityTest import VulnerabilityTest, version_conversion
+from ..VulnerabilityTest import VulnerabilityTest, protocol_version_conversion
 from ..ClientHello import ClientHello
 from ..utils import is_server_hello
 from ...utils import send_data_return_sock
@@ -15,7 +15,7 @@ class FallbackSCSVSupport(VulnerabilityTest):
     def test(self, version):
         stronger_version = version + 1
         # A stronger version not supported by the server, can't test
-        if version_conversion(stronger_version, False) not in self.supported_protocols:
+        if protocol_version_conversion(stronger_version, False) not in self.supported_protocols:
             return False
         client_hello = ClientHello(version, self.fallback_scsv)
         client_hello = client_hello.construct_client_hello()

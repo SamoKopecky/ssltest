@@ -4,16 +4,16 @@ from cryptography.x509 import load_der_x509_certificate
 from .SSLvX import SSLvX
 from ...utils import bytes_to_cipher_suite, parse_cipher_suite
 from ...scan_vulnerabilities.ClientHello import ClientHello
-from ...scan_vulnerabilities.utils import version_conversion
+from ...scan_vulnerabilities.utils import protocol_version_conversion
 
 
 class SSLv3(SSLvX):
     def __init__(self, url, port):
         super().__init__(url, port)
         self.protocol = 'SSLv3'
-        self.client_hello = ClientHello(version_conversion(self.protocol, True)).construct_client_hello()
+        self.client_hello = ClientHello(protocol_version_conversion(self.protocol, True)).construct_client_hello()
 
-    def scan_version_support(self):
+    def scan_protocol_support(self):
         if len(self.response) == 0:
             return False
         # Test if the response is Content type Alert (0x15)
