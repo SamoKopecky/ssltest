@@ -5,6 +5,8 @@ import socket
 
 from time import sleep, time
 
+from .exceptions.ConnectionTimeout import ConnectionTimeout
+
 
 def read_json(file_name):
     """
@@ -64,18 +66,20 @@ def send_data_return_sock(address, client_hello, timeout, debug_source):
     :return: Created socket and received response
     :rtype: bytes or socket
     """
-    sock = socket
     sleep_dur = 0
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(timeout)
     while True:
         try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(timeout)
             sock.connect(address)
             break
         except socket.timeout:
             sock.close()
             logging.debug('connection timeout...')
-            sleep_dur = incremental_sleep(sleep_dur, Exception('Connection timeout'), 3)
+            raise ConnectionTimeout()
+        except socket.error as e:
+            logging.debug('error occurred...')
+            sleep_dur = incremental_sleep(sleep_dur, e, 3)
     sock.send(client_hello)
     response = receive_data(sock, timeout, debug_source)
     return response, sock

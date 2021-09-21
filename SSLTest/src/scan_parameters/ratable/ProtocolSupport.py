@@ -44,7 +44,10 @@ class ProtocolSupport:
         for ssl_version in ssl_versions:
             ssl_version = ssl_version(self.url, self.port, self.timeout)
             logging.info(f'scanning for {ssl_version.protocol}...')
-            ssl_version.send_client_hello()
+            try:
+                ssl_version.send_client_hello()
+            except socket.error:
+                pass
             result = ssl_version.scan_protocol_support()
             if result:
                 self.supported_protocols.append(ssl_version.protocol)

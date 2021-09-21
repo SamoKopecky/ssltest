@@ -8,6 +8,7 @@ from cryptography.hazmat.backends import default_backend
 from .SSLv3 import SSLv3
 from .SSLv2 import SSLv2
 from ...utils import incremental_sleep, convert_cipher_suite
+from ...exceptions.ConnectionTimeout import ConnectionTimeout
 
 
 def get_website_info(url, port, supported_protocols, worst, timeout):
@@ -187,7 +188,7 @@ def create_session(url, port, verify_cert, context, timeout):
             context.verify_mode = ssl.VerifyMode.CERT_NONE
         except socket.timeout:
             logging.debug('connection timeout...')
-            sleep = incremental_sleep(sleep, Exception('Connection timeout'), 3)
+            raise ConnectionTimeout()
         except socket.gaierror:
             raise Exception('DNS record not found')
         except socket.error as e:
