@@ -1,7 +1,7 @@
 from ..VulnerabilityTest import VulnerabilityTest, protocol_version_conversion
-from ..ClientHello import ClientHello
 from ..utils import is_server_hello
 from ...utils import send_data_return_sock
+from ...scan_parameters.connections.ClientHello import ClientHello
 
 
 class FallbackSCSVSupport(VulnerabilityTest):

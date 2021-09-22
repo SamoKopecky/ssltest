@@ -3,8 +3,8 @@ import ssl
 
 from struct import pack
 
-from .utils import protocol_version_conversion
-from ..utils import cipher_suite_to_bytes, read_json
+from ...utils import cipher_suite_to_bytes, read_json
+from ...scan_vulnerabilities.utils import protocol_version_conversion
 
 
 class ClientHello:
@@ -39,16 +39,42 @@ class ClientHello:
         self.extensions = bytearray([
             # 0x00, 0x00,  Extensions length
             # Supported groups
-            0x00, 0x0a, 0x00, 0x0c, 0x00, 0x0a, 0x00, 0x1d,
-            0x00, 0x17, 0x00, 0x1e, 0x00, 0x19, 0x00, 0x18,
-            # Signature algorithm
-            0x00, 0x0d, 0x00, 0x2a, 0x00, 0x28, 0x04, 0x03,
-            0x05, 0x03, 0x06, 0x03, 0x08, 0x07, 0x08, 0x08,
-            0x08, 0x09, 0x08, 0x0a, 0x08, 0x0b, 0x08, 0x04,
-            0x08, 0x05, 0x08, 0x06, 0x04, 0x01, 0x05, 0x01,
-            0x06, 0x01, 0x03, 0x03, 0x03, 0x01, 0x03, 0x02,
-            0x04, 0x02, 0x05, 0x02, 0x06, 0x02,
+            0x00, 0x0a,  # Supported groups extension
+            0x00, 0x0c,  # Length
+            0x00, 0x0a,  # Supported groups length
+            # Supported groups
+            0x00, 0x1d, 0x00, 0x17, 0x00, 0x1e, 0x00, 0x19,
+            0x00, 0x18,
+            # Signature algorithms extension
+            0x00, 0x0d,  # Signature algorithms extension
+            0x00, 0x30,  # Length
+            0x00, 0x2e,  # Signature algorithms length
+            # Signature algorithms
+            0x04, 0x03, 0x05, 0x03, 0x06, 0x03, 0x08, 0x07,
+            0x08, 0x08, 0x08, 0x09, 0x08, 0x0a, 0x08, 0x0b,
+            0x08, 0x04, 0x08, 0x05, 0x08, 0x06, 0x04, 0x01,
+            0x05, 0x01, 0x06, 0x01, 0x03, 0x03, 0x02, 0x03,
+            0x03, 0x01, 0x02, 0x01, 0x03, 0x02, 0x02, 0x02,
+            0x04, 0x02, 0x05, 0x02, 0x06, 0x02
         ])
+        if self.str_protocol == 'TLSv1.3':
+            # It is specified in RFC8446 that TLSv1.3 uses TLSv1.2 protocol version
+            # number in the client hello, TLSv1.3 is specified by the supported versions
+            # extension
+            tls_v12_number = protocol_version_conversion('TLSv1.2', True)
+            self.record_protocol[2] = tls_v12_number
+            self.handshake_protocol[1] = tls_v12_number
+            self.extensions += bytearray([
+                # Supported versions extension
+                0x00, 0x2b,  # Supported versions extension
+                0x00, 0x03,  # Length
+                0x02,  # Supported versions length
+                0x03, 0x04,  # Supported versions (TLSv1.3)
+                # Key share extension, required extensions for TLSv1.3
+                0x00, 0x33,  # Key share extension
+                0x00, 0x02,  # Length
+                0x00, 0x00,  # Key share length
+            ])
 
     def construct_client_hello(self):
         """
@@ -99,7 +125,7 @@ class ClientHello:
         if str_version == 'TLSv1.1':
             str_version = 'TLSv1.0'
         ciphers = bytearray([])
-        if str_version == 'SSLv3':
+        if str_version == 'SSLv3' or str_version == 'TLSv1.3':
             json_ciphers = read_json('cipher_suite_bytes.json')
             cipher_bytes = json_ciphers[str_version].split(',')
             for byte in cipher_bytes:

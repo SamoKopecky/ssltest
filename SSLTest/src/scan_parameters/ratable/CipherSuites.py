@@ -1,4 +1,4 @@
-from ...scan_vulnerabilities.ClientHello import ClientHello
+from ..connections.ClientHello import ClientHello
 from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite
 from ...scan_vulnerabilities.utils import protocol_version_conversion, is_server_hello
 

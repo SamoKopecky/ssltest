@@ -2,8 +2,8 @@ from struct import unpack
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
+from .ClientHello import ClientHello
 from ...utils import bytes_to_cipher_suite, parse_cipher_suite
-from ...scan_vulnerabilities.ClientHello import ClientHello
 from ...scan_vulnerabilities.utils import protocol_version_conversion
 
 
