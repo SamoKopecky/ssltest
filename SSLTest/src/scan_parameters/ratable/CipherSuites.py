@@ -9,7 +9,7 @@ from ...scan_vulnerabilities.utils import protocol_version_conversion, is_server
 
 class CipherSuites:
     def __init__(self, address, supported_protocols, timeout):
-        self.cipher_suite_scan_timeout = 0.1
+        self.cipher_suite_scan_timeout = 0.3
         self.timeout = timeout
         self.address = address
         self.supported_cipher_suites = {}
