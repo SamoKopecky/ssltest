@@ -31,7 +31,7 @@ class ClientHello:
         ])
         # Fill random bytes
         self.handshake_protocol[2:34] = secrets.token_bytes(32)
-        self.cipher_suites = self.get_cipher_suite_bytes(cipher_suites, fill_cipher_suites)
+        self.cipher_suites = self.pack_cipher_suite_bytes(cipher_suites, fill_cipher_suites)
         self.compression = bytearray([
             0x01,  # Compression method length
             0x00  # Compression method
@@ -97,13 +97,13 @@ class ClientHello:
         client_hello = self.record_protocol + length + client_hello
         return client_hello
 
-    def get_cipher_suite_bytes(self, custom_cipher_suites, fill_cipher_suites):
+    def pack_cipher_suite_bytes(self, custom_cipher_suites, fill_cipher_suites):
         """
-        Choose cipher suites based on the protocol version
+        Packs the cipher suites based on the given cipher suites
 
-        :param bool fill_cipher_suites:
         :param bytes or bytearray custom_cipher_suites: Additional cipher suites
-        :return: Chosen ciphers
+        :param bool fill_cipher_suites: Whether to add usual protocol version cipher suites
+        :return: Chosen cipher suites
         :rtype: bytearray
         """
         cipher_suites = bytearray()

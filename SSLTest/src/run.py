@@ -38,7 +38,7 @@ def cipher_suites_option(args, port, supported_protocols):
     if args.cipher_suites:
         cipher_suites = CipherSuites((args.url, port), supported_protocols)
         cipher_suites.scan_cipher_suites()
-        return cipher_suites.supported_ciphers
+        return cipher_suites.supported_cipher_suites
     return {}
 
 

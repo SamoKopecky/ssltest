@@ -9,7 +9,7 @@
     "1": "EC,RSA,ECDSA,DSA,DSS,EdDSA",
     "2": "",
     "3": "",
-    "4": ""
+    "4": "anon"
   },
   "sym_enc_algorithm": {
     "1": "AES",

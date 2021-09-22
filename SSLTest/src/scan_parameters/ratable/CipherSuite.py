@@ -5,7 +5,7 @@ from ...utils import read_json
 
 class CipherSuite(Parameters):
 
-    def __init__(self, cipher_suite: str, protocol: str):
+    def __init__(self, cipher_suite: str, protocol=None):
         super().__init__()
         # Create a dictionary for cipher suite parameters with PType keys
         self.parameters = {enum: {} for enum in PType if enum.is_cipher_suite}
