@@ -4,8 +4,6 @@ import sys
 import traceback
 import concurrent.futures as cf
 
-from .utils import bytes_to_cipher_suite
-
 from .scan_parameters.connections.connection_utils import get_website_info
 from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
 from .scan_parameters.non_ratable.WebServerSoft import WebServerSoft
@@ -23,6 +21,7 @@ from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSuppor
 from .scan_vulnerabilities.tests.FallbackSCSVSupport import FallbackSCSVSupport
 from .scan_vulnerabilities.tests.Drown import Drown
 from .text_output.TextOutput import TextOutput
+from .scan_parameters.ratable.PType import PType
 
 
 def cipher_suites_option(args, port, supported_protocols):
@@ -204,7 +203,10 @@ def dump_to_dict(cipher_suite, certificate_parameters, protocol_support,
     # Parameters
     worst_rating = max([cipher_suite[1], certificate_parameters[1]])
     parameters = {key.name: value for key, value in cipher_suite[0].items()}
-    parameters.update({key.name: value for key, value in certificate_parameters[0].items()})
+    for key, value in certificate_parameters[0].items():
+        if key == PType.cert_pub_key_algorithm and not parameters[key.name] == {'N/A': '0'}:
+            continue
+        parameters.update({key.name: value})
     parameters.update({'rating': worst_rating})
 
     # Non ratable cert info

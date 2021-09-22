@@ -24,6 +24,8 @@ class CipherSuite(Parameters):
         raw_parameters = self.cipher_suite.split('_')
         if 'TLS' in raw_parameters:
             raw_parameters.remove('TLS')
+        if 'WITH' in raw_parameters:
+            raw_parameters.remove('WITH')
         parameter_types = list(self.parameters.keys())
         # For each parameter iterate through each enum value until a match is found
         for p_raw in raw_parameters:
