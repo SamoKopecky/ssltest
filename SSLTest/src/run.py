@@ -24,21 +24,28 @@ from .text_output.TextOutput import TextOutput
 from .scan_parameters.ratable.PType import PType
 
 
-def cipher_suites_option(args, port, supported_protocols):
+def cipher_suites_option(args, port, supported_protocols, protocol, timeout):
     """
     Handle cipher suite support scanning
 
-    :param args: Parsed input arguments
-    :param port: Port to scan on
-    :param supported_protocols: Supported SSL/TLS protocols
+    :param Namespace args: Parsed input arguments
+    :param int port: Port to scan on
+    :param list supported_protocols: Supported SSL/TLS protocols
+    :param str protocol: Protocol of the main connection
+    :param int timeout: Timeout in seconds
     :return: Dictionary of supported protocols
     :rtype: dict
     """
-    if args.cipher_suites:
-        cipher_suites = CipherSuites((args.url, port), supported_protocols)
+    cipher_suites = CipherSuites((args.url, port), supported_protocols, timeout)
+    if protocol == 'SSLv2' and not args.cipher_suites:
+        cipher_suites.scan_sslv2_cipher_suites()
+    elif args.cipher_suites:
         cipher_suites.scan_cipher_suites()
+    cipher_suites.rate_cipher_suites()
+    if cipher_suites.supported_cipher_suites is None:
+        return {}
+    else:
         return cipher_suites.supported_cipher_suites
-    return {}
 
 
 def get_tests_switcher():
@@ -259,7 +266,7 @@ def scan(args, port):
     web_server = WebServerSoft(args.url, port, args.nmap_scan)
     web_server.scan_server_software()
 
-    cipher_suites = cipher_suites_option(args, port, protocol_support.supported_protocols)
+    cipher_suites = cipher_suites_option(args, port, protocol_support.supported_protocols, protocol, args.timeout)
 
     vulnerabilities = test_option((args.url, port), args.test, protocol_support.supported_protocols, args.timeout)
 
