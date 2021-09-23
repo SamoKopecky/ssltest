@@ -1,6 +1,7 @@
 import json
 import logging
 import sys
+import re
 import traceback
 import concurrent.futures as cf
 
@@ -11,7 +12,6 @@ from .scan_parameters.non_ratable.port_discovery import discover_ports
 from .scan_parameters.ratable.Certificate import Certificate
 from .scan_parameters.ratable.CipherSuite import CipherSuite
 from .scan_parameters.ratable.CipherSuites import CipherSuites
-from .scan_parameters.utils import fix_url
 from .scan_vulnerabilities.tests.CCSInjection import CCSInjection
 from .scan_vulnerabilities.tests.Crime import Crime
 from .scan_vulnerabilities.tests.Heartbleed import Heartbleed
@@ -276,6 +276,25 @@ def scan(args, port):
                         (protocol_support.versions, protocol_support.rating),
                         certificate.non_parameters, web_server.software, cipher_suites,
                         vulnerabilities, port, args.url)
+
+
+def fix_url(url):
+    """
+    Extract the root domain name
+
+    :param str url: Url of the web server
+    :return: Fixed hostname address
+    :rtype: str
+    """
+    logging.info('Correcting url...')
+    if url[:4] == 'http':
+        # Removes http(s):// and anything after TLD (*.com)
+        url = re.search('[/]{2}([^/]+)', url).group(1)
+    else:
+        # Removes anything after TLD (*.com)
+        url = re.search('^([^/]+)', url).group(0)
+    logging.info('Corrected url: {}'.format(url))
+    return url
 
 
 def run(args):

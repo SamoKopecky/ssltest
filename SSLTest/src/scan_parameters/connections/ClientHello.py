@@ -3,8 +3,7 @@ import ssl
 
 from struct import pack
 
-from ...utils import cipher_suite_to_bytes, read_json
-from ...scan_vulnerabilities.utils import protocol_version_conversion
+from ...utils import cipher_suite_to_bytes, read_json, protocol_version_conversion
 
 
 class ClientHello:

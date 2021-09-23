@@ -3,8 +3,8 @@ import logging
 from .CipherSuite import CipherSuite
 from ..connections.ClientHello import ClientHello
 from ..connections.SSLv2 import SSLv2
-from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite
-from ...scan_vulnerabilities.utils import protocol_version_conversion, is_server_hello
+from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
+    is_server_hello
 
 
 class CipherSuites:

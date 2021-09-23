@@ -1,6 +1,5 @@
 from ..VulnerabilityTest import VulnerabilityTest
-from ..utils import is_server_hello
-from ...utils import send_data_return_sock
+from ...utils import send_data_return_sock, is_server_hello
 from ...scan_parameters.connections.ClientHello import ClientHello
 
 

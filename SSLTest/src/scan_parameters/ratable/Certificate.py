@@ -2,7 +2,7 @@ from cryptography import x509
 
 from .Parameters import Parameters
 from .PType import PType
-from ..utils import pub_key_alg_from_cert, get_sig_alg_from_oid
+from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
 
 
 class Certificate(Parameters):
@@ -22,14 +22,14 @@ class Certificate(Parameters):
         Parse information from a certificate and into a dictionary
         """
         # Public key algorithm
-        self.parameters[PType.cert_pub_key_algorithm][pub_key_alg_from_cert(self.certificate.public_key())] = 0
+        self.parameters[PType.cert_pub_key_algorithm][self.pub_key_alg_from_cert(self.certificate.public_key())] = 0
         # Public key length
         self.parameters[PType.cert_pub_key_length][str(self.certificate.public_key().key_size)] = 0
         # Certificate hash function
         hash_function = str(self.certificate.signature_hash_algorithm.name).upper()
         self.parameters[PType.cert_sign_algorithm_hash_function][hash_function] = 0
         # Signature algorithm
-        sign_algorithm = get_sig_alg_from_oid(self.certificate.signature_algorithm_oid)
+        sign_algorithm = self.get_sig_alg_from_oid(self.certificate.signature_algorithm_oid)
         self.parameters[PType.cert_sign_algorithm][sign_algorithm] = 0
         # Certificate verified
         self.parameters[PType.cert_verified][str(self.verified)] = 0
@@ -76,3 +76,36 @@ class Certificate(Parameters):
         rateable_parameters = list(self.parameters.keys())
         key_types = [PType.cert_pub_key_length]
         self.rate_parameters(rateable_parameters, key_types)
+
+    @staticmethod
+    def pub_key_alg_from_cert(public_key):
+        """
+        Get the public key algorithm from a certificate
+
+        :param public_key: Instance of a public key
+        :return: Parameter
+        :rtype: str
+        """
+        if isinstance(public_key, ec.EllipticCurvePublicKey):
+            return 'EC'
+        elif isinstance(public_key, rsa.RSAPublicKey):
+            return 'RSA'
+        elif isinstance(public_key, dsa.DSAPublicKey):
+            return 'DSA'
+        elif isinstance(public_key, ed25519.Ed25519PublicKey) or isinstance(public_key, ed448.Ed448PublicKey):
+            return 'ECDSA'
+        else:
+            return 'N/A'
+
+    @staticmethod
+    def get_sig_alg_from_oid(oid):
+        """
+        Get a signature algorithm from an oid of a certificate
+
+        :param x509.ObjectIdentifier oid: Object identifier
+        :return: Signature algorithm
+        :rtype: str
+        """
+        values = list(x509.SignatureAlgorithmOID.__dict__.values())
+        keys = list(x509.SignatureAlgorithmOID.__dict__.keys())
+        return keys[values.index(oid)].split('_')[0]

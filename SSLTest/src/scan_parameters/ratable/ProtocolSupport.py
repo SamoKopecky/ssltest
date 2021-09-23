@@ -3,9 +3,9 @@ import socket
 
 from .PType import PType
 from ..connections.connection_utils import create_session, create_ssl_context
-from ..utils import rate_parameter
 from ..connections.SSLv3 import SSLv3
 from ..connections.SSLv2 import SSLv2
+from .Parameters import Parameters
 
 
 class ProtocolSupport:
@@ -79,9 +79,9 @@ class ProtocolSupport:
         Rate the scanned protocols
         """
         for protocol in list(self.versions[PType.protocols].keys()):
-            self.versions[PType.protocols][protocol] = rate_parameter(PType.protocol, protocol)
+            self.versions[PType.protocols][protocol] = Parameters.rate_parameter(PType.protocol, protocol)
         for no_protocol in list(self.versions[PType.no_protocol].keys()):
-            self.versions[PType.no_protocol][no_protocol] = rate_parameter(PType.no_protocol, no_protocol)
+            self.versions[PType.no_protocol][no_protocol] = Parameters.rate_parameter(PType.no_protocol, no_protocol)
         if not self.versions:
             return
         ratings = list(self.versions[PType.protocols].values()) + list(self.versions[PType.no_protocol].values())

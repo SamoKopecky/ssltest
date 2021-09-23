@@ -1,6 +1,6 @@
 from abc import ABC
 
-from ..utils import rate_key_length_parameter, rate_parameter
+from ...utils import read_json
 
 
 class Parameters(ABC):
@@ -19,13 +19,13 @@ class Parameters(ABC):
             parameter = self.key(self.parameters[p_type])
             # length parameters
             if p_type in key_types:
-                self.parameters[p_type][parameter] = rate_key_length_parameter(
+                self.parameters[p_type][parameter] = self.rate_key_length_parameter(
                     self.key(self.parameters[p_type.key_pair]),
                     parameter, p_type
                 )
                 continue
             # normal parameters
-            self.parameters[p_type][parameter] = rate_parameter(p_type, parameter)
+            self.parameters[p_type][parameter] = self.rate_parameter(p_type, parameter)
         self.rating = self.get_worst_rating()
 
     def get_worst_rating(self):
@@ -50,3 +50,57 @@ class Parameters(ABC):
         :return: First key
         """
         return next(iter(dictionary))
+
+    @staticmethod
+    def rate_key_length_parameter(algorithm_type, key_len, key_len_type):
+        """
+        Get the rating of an algorithm key length
+
+        Parameter is rated using the security_levels.json file if no rating is
+        found 0 is returned
+
+        :param PType algorithm_type: Algorithm of the key length
+        :param str key_len: Key length of the algorithm
+        :param PType key_len_type: Type of the key length parameter
+        :return: Rating of the parameter
+        :rtype: str
+        """
+        functions = {
+            ">=": lambda a, b: a >= b,
+            ">>": lambda a, b: a > b,
+            "<=": lambda a, b: a <= b,
+            "<<": lambda a, b: a < b,
+            "==": lambda a, b: a == b
+        }
+        # TODO: All of the algorithms are not yet added to the security_levels.json
+        levels_str = read_json('security_levels.json')[key_len_type.name]
+        if key_len == 'N/A':
+            return '0'
+        for idx in range(1, 5):
+            levels = levels_str[str(idx)].split(',')
+            if algorithm_type in levels:
+                # gets the operation assigned to the algorithm key length
+                operation = levels[levels.index(algorithm_type) + 1]
+                function = functions[operation[:2]]
+                if function(int(key_len), int(operation[2:])):
+                    return str(idx)
+        return '0'
+
+    @staticmethod
+    def rate_parameter(p_type, parameter):
+        """
+        Rate a parameter using a defined json file
+
+        :param PType p_type: Specifies which parameter category should be used for rating
+        :param str parameter: Parameter that is going to be rated
+        :return: Rating of the parameter else 0
+        :rtype: str
+        """
+        # TODO: All of the algorithms are not yet added to the security_levels.json
+        security_levels_json = read_json('security_levels.json')
+        if parameter == 'N/A':
+            return '0'
+        for idx in range(1, 5):
+            if parameter in security_levels_json[p_type.name][str(idx)].split(','):
+                return str(idx)
+        return '0'
