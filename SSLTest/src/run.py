@@ -24,7 +24,7 @@ from .text_output.TextOutput import TextOutput
 from .scan_parameters.ratable.PType import PType
 
 
-def cipher_suites_option(args, port, supported_protocols, protocol, timeout):
+def cipher_suites_option(args, port, supported_protocols, protocol):
     """
     Handle cipher suite support scanning
 
@@ -32,11 +32,10 @@ def cipher_suites_option(args, port, supported_protocols, protocol, timeout):
     :param int port: Port to scan on
     :param list supported_protocols: Supported SSL/TLS protocols
     :param str protocol: Protocol of the main connection
-    :param int timeout: Timeout in seconds
     :return: Dictionary of supported protocols
     :rtype: dict
     """
-    cipher_suites = CipherSuites((args.url, port), supported_protocols, timeout)
+    cipher_suites = CipherSuites((args.url, port), supported_protocols, args.timeout)
     if protocol == 'SSLv2' and not args.cipher_suites:
         cipher_suites.scan_sslv2_cipher_suites()
     elif args.cipher_suites:
@@ -68,35 +67,38 @@ def get_tests_switcher():
     }
 
 
-def test_option(address, tests, supported_protocols, timeout):
+def test_option(args, port, supported_protocols, protocol):
     """
     Forward the appropriate tests to multithreading function
 
-    :param tuple address: Url and port
-    :param list tests: Test numbers
+    :param Namespace args: Input arguments
+    :param int port: Port to scan on
     :param supported_protocols: Supported SSL/TLS protocols by the server
+    :param str protocol: SSL/TLS protocol to scan on
     :return: Test results
     :rtype: dict
     """
     tests_switcher = get_tests_switcher()
     # if no -t argument is present
-    if not tests:
+    if not args.test:
         # Remove test at 0th index
         scans = list(tests_switcher.values())[1:]
-    elif 0 in tests:
+    elif 0 in args.test:
         return {}
     else:
-        scans = list(map(lambda t: tests_switcher[t], tests))
-    return vulnerability_scans(scans, address, supported_protocols, timeout)
+        scans = list(map(lambda t: tests_switcher[t], args.test))
+    return vulnerability_scans(scans, (args.url, port), supported_protocols, args.timeout, protocol)
 
 
-def vulnerability_scans(functions, address, supported_protocols, timeout):
+def vulnerability_scans(functions, address, supported_protocols, timeout, protocol):
     """
     Run chosen vulnerability tests in parallel
 
     :param list functions: Functions to be run
     :param tuple address: Url and port
     :param list supported_protocols: List of supported protocols
+    :param int timeout:
+    :param str protocol:
     :return: Tests results
     :rtype: dict
     """
@@ -108,7 +110,7 @@ def vulnerability_scans(functions, address, supported_protocols, timeout):
     with cf.ThreadPoolExecutor(max_workers=len(functions)) as executor:
         for function in functions:
             # 0th index is the function, 1st index is the function name
-            scan_class = function[0](supported_protocols, address, timeout)
+            scan_class = function[0](supported_protocols, address, timeout, protocol)
             execution = executor.submit(scan_class.scan)
             futures.update({execution: function[1]})
         for execution in cf.as_completed(futures):
@@ -266,9 +268,9 @@ def scan(args, port):
     web_server = WebServerSoft(args.url, port, args.nmap_scan)
     web_server.scan_server_software()
 
-    cipher_suites = cipher_suites_option(args, port, protocol_support.supported_protocols, protocol, args.timeout)
+    cipher_suites = cipher_suites_option(args, port, protocol_support.supported_protocols, protocol)
 
-    vulnerabilities = test_option((args.url, port), args.test, protocol_support.supported_protocols, args.timeout)
+    vulnerabilities = test_option(args, port, protocol_support.supported_protocols, protocol)
 
     logging.info('Scanning done.')
     return dump_to_dict((cipher_suite.parameters, cipher_suite.rating),

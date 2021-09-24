@@ -6,8 +6,8 @@ from ...scan_parameters.connections.ClientHello import ClientHello
 class Heartbleed(VulnerabilityTest):
     test_name = 'Heartbleed'
 
-    def __init__(self, supported_protocols, address, timeout):
-        super().__init__(supported_protocols, address, timeout)
+    def __init__(self, supported_protocols, address, timeout, protocol):
+        super().__init__(supported_protocols, address, timeout, protocol)
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
 
     def test(self, version):

@@ -37,7 +37,7 @@ class CipherSuites:
                 continue
             test_cipher_suites = ClientHello.get_cipher_suites_for_version(protocol)
             accepted_cipher_suites = bytearray([])
-            client_hello = ClientHello(protocol_version_conversion(protocol, True), test_cipher_suites, False)
+            client_hello = ClientHello(protocol_version_conversion(protocol), test_cipher_suites, False)
             while True:
                 client_hello_bytes = client_hello.construct_client_hello()
                 debug_msg = f'cipher_suite_scanning_for_{protocol}'

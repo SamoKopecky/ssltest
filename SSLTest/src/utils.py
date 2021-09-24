@@ -175,12 +175,11 @@ def parse_cipher_suite(data):
     return bytearray(cipher_suites_bytes)
 
 
-def protocol_version_conversion(version, from_string):
+def protocol_version_conversion(version):
     """
     Convert SSL/TLS protocol version into the required format
 
     :param str or int version: SSL/TLS version, either in str or int
-    :param bool from_string: Convert from string or not
     :return: converted version
     :rtype: str or int
     """
@@ -191,21 +190,11 @@ def protocol_version_conversion(version, from_string):
         "TLSv1.0": 0x01,
         "SSLv3": 0x00
     }
-    try:
-        if from_string:
-            return protocol_version_ints[version]
-        else:
-            return find_by_value(protocol_version_ints, version)
-    # from_string == True
-    except KeyError:
-        return ''
-    # from_string == False
-    except IndexError:
-        return -1
-
-
-def find_by_value(dictionary, value):
-    return list(filter(lambda key: dictionary[key] == value, dictionary.keys()))[0]
+    protocol_type = type(version)
+    if protocol_type is str:
+        return protocol_version_ints[version]
+    elif protocol_type is int:
+        return list(filter(lambda key: protocol_version_ints[key] == version, protocol_version_ints.keys()))[0]
 
 
 def is_server_hello(message):

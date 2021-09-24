@@ -10,7 +10,7 @@ class SSLv3(SSLvX):
     def __init__(self, url, port, timeout):
         super().__init__(url, port, timeout)
         self.protocol = 'SSLv3'
-        self.client_hello = ClientHello(protocol_version_conversion(self.protocol, True)).construct_client_hello()
+        self.client_hello = ClientHello(protocol_version_conversion(self.protocol)).construct_client_hello()
 
     def scan_protocol_support(self):
         if len(self.response) == 0:

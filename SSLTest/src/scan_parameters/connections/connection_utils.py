@@ -89,21 +89,15 @@ def worst_or_best_protocol(protocols, worst):
         'SSLv3': 1,
         'SSLv2': 0
     }
-    items = list(protocol_strengths.items())
     # If worst option is False the best SSL protocol is found
     # If worst option is True the worst protocol is found, in other words the minimum value is found
     switcher = {
-        True: (lambda a, b: a < b, items[0]),
-        False: (lambda a, b: a > b, items[-1])
+        True: min,
+        False: max
     }
     # Filter out the unsupported protocols
     filtered_protocol_strengths = dict(filter(lambda item: item[0] in protocols, protocol_strengths.items()))
-    comparison = switcher[worst][0]
-    base = switcher[worst][1]
-    for key, value in filtered_protocol_strengths.items():
-        if comparison(value, base[1]):
-            base = (key, value)
-    return base[0]
+    return switcher[worst](filtered_protocol_strengths)
 
 
 def create_ssl_context(protocol_version):

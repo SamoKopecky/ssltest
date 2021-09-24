@@ -9,7 +9,7 @@ from ...utils import cipher_suite_to_bytes, read_json, protocol_version_conversi
 class ClientHello:
     def __init__(self, protocol, cipher_suites=None, fill_cipher_suites=True):
         self.protocol = protocol
-        self.str_protocol = protocol_version_conversion(protocol, False)
+        self.str_protocol = protocol_version_conversion(protocol)
         self.record_protocol = bytearray([
             0x16,  # Content type (Handshake)
             0x03, self.protocol,  # Version
@@ -60,7 +60,7 @@ class ClientHello:
             # It is specified in RFC8446 that TLSv1.3 uses TLSv1.2 protocol version
             # number in the client hello, TLSv1.3 is specified by the supported versions
             # extension
-            tls_v12_number = protocol_version_conversion('TLSv1.2', True)
+            tls_v12_number = protocol_version_conversion('TLSv1.2')
             self.record_protocol[2] = tls_v12_number
             self.handshake_protocol[1] = tls_v12_number
             self.extensions += bytearray([

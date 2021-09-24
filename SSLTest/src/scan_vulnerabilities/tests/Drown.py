@@ -5,8 +5,8 @@ from ...scan_parameters.connections.SSLv2 import SSLv2
 class Drown(VulnerabilityTest):
     test_name = 'DROWN'
 
-    def __init__(self, supported_protocols, address, timeout):
-        super().__init__(supported_protocols, address, timeout)
+    def __init__(self, supported_protocols, address, timeout, protocol):
+        super().__init__(supported_protocols, address, timeout, protocol)
         self.valid_protocols = ['SSLv2', 'SSLv3', 'TLSv1.0', 'TLSv1.1', 'TLSv1.2']
 
     def test(self, version):

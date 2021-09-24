@@ -6,8 +6,8 @@ from ...scan_parameters.connections.ClientHello import ClientHello
 class InsecureRenegotiation(VulnerabilityTest):
     test_name = 'Insecure Renegotiation'
 
-    def __init__(self, supported_protocols, address, timeout):
-        super().__init__(supported_protocols, address, timeout)
+    def __init__(self, supported_protocols, address, timeout, protocol):
+        super().__init__(supported_protocols, address, timeout, protocol)
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
         self.renegotiation_extension = bytes([
             # Secure renegotiation extension
