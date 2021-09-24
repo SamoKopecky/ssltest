@@ -174,7 +174,7 @@ def nmap_discover_option(args):
             tb = traceback.format_exc()
             logging.debug(tb)
             print(f'Unexpected exception occurred: {ex}', file=sys.stderr)
-        scanned_ports = list(filter(lambda port: port not in args.port, scanned_ports))
+        scanned_ports = list(filter(lambda p: p not in args.port, scanned_ports))
         args.port.extend(scanned_ports)
 
 

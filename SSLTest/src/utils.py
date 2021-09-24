@@ -194,7 +194,7 @@ def protocol_version_conversion(version):
     if protocol_type is str:
         return protocol_version_ints[version]
     elif protocol_type is int:
-        return list(filter(lambda key: protocol_version_ints[key] == version, protocol_version_ints.keys()))[0]
+        return list(filter(lambda k: protocol_version_ints[k] == version, protocol_version_ints.keys()))[0]
 
 
 def is_server_hello(message):

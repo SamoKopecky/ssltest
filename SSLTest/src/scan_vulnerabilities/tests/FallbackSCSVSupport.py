@@ -12,7 +12,7 @@ class FallbackSCSVSupport(VulnerabilityTest):
         self.fallback_scsv = bytes([0x56, 0x00])
 
     def test(self, version):
-        usable_protocols = list(filter(lambda protocol: protocol in self.valid_protocols, self.supported_protocols))
+        usable_protocols = list(filter(lambda p: p in self.valid_protocols, self.supported_protocols))
         if len(usable_protocols) == 1:
             return False
         usable_protocols = sorted(usable_protocols)

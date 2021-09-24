@@ -96,7 +96,7 @@ def worst_or_best_protocol(protocols, worst):
         False: max
     }
     # Filter out the unsupported protocols
-    filtered_protocol_strengths = dict(filter(lambda item: item[0] in protocols, protocol_strengths.items()))
+    filtered_protocol_strengths = {k: v for k, v in protocol_strengths.items() if k in protocols}
     return switcher[worst](filtered_protocol_strengths)
 
 

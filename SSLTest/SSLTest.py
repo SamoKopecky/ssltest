@@ -123,7 +123,7 @@ def fix_conf_option(args):
         if return_code == 1:
             exit(1)
         try_to_remove_argument('-fc', '--fix-conf')
-        # Restarts the program without the fc argument
+        # Restarts the program without the fc, st and ss arguments
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
 
 
@@ -139,7 +139,7 @@ def check_test_option(tests):
         return
     tests_switcher = get_tests_switcher()
     test_numbers = [test for test in tests_switcher.keys()]
-    unknown_tests = list(filter(lambda test: test not in test_numbers, tests))
+    unknown_tests = list(filter(lambda t: t not in test_numbers, tests))
     if unknown_tests:
         print_help()
         if len(unknown_tests) > 1:
