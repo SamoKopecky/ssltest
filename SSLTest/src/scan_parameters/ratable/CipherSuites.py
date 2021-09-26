@@ -12,8 +12,8 @@ class CipherSuites:
         self.cipher_suite_scan_timeout = 0.3
         self.timeout = timeout
         self.address = address
-        self.supported_cipher_suites = {}
-        self.unrated_cipher_suites = {}
+        self.supported = {}
+        self.unrated = {}
         self.supported_protocols = supported_protocols
 
     def scan_cipher_suites(self):
@@ -58,7 +58,7 @@ class CipherSuites:
                 string_cipher_suites.append(bytes_to_cipher_suite(accepted_cipher_suites[i:i + 2], 'IANA'))
             if protocol == 'TLSv1.0':
                 protocol = 'TLSv1.0/TLSv1.1'
-            self.unrated_cipher_suites.update({protocol: string_cipher_suites})
+            self.unrated.update({protocol: string_cipher_suites})
 
     def scan_sslv2_cipher_suites(self):
         """
@@ -69,23 +69,23 @@ class CipherSuites:
         message.
         """
         logging.debug('cipher_suite_scanning_for_SSLv2}')
-        sslv2 = SSLv2(self.address[0], self.address[1], self.timeout)
+        sslv2 = SSLv2(self.address, self.timeout)
         sslv2.send_client_hello()
         sslv2.parse_cipher_suite()
-        self.unrated_cipher_suites.update({'SSLv2': sslv2.server_cipher_suites})
+        self.unrated.update({'SSLv2': sslv2.server_cipher_suites})
 
     def rate_cipher_suites(self):
         """
         Rates the supported cipher suites
         """
-        if self.unrated_cipher_suites is None:
+        if self.unrated is None:
             return
         rated_cipher_suites = {}
-        for protocol, protocol_cipher_suites in self.unrated_cipher_suites.items():
+        for protocol, protocol_cipher_suites in self.unrated.items():
             for suite in protocol_cipher_suites:
                 cipher_suite = CipherSuite(suite)
                 cipher_suite.parse_cipher_suite()
                 cipher_suite.rate_cipher_suite()
                 rated_cipher_suites.update({suite: cipher_suite.rating})
-            self.supported_cipher_suites.update({protocol: rated_cipher_suites})
+            self.supported.update({protocol: rated_cipher_suites})
             rated_cipher_suites = {}

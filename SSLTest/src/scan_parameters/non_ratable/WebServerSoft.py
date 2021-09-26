@@ -4,14 +4,14 @@ import nmap3
 import requests
 
 
+
 class WebServerSoft:
 
-    def __init__(self, url: str, port: int, scan_nmap: bool):
-        self.scans = []
-        self.port = port
-        self.software = {}
-        self.url = url
+    def __init__(self, address, scan_nmap: bool):
+        self.address = address
         self.scan_nmap = scan_nmap
+        self.scans = []
+        self.software = {}
 
     def scan_software_nmap(self):
         """
@@ -23,7 +23,7 @@ class WebServerSoft:
         keys = ['product', 'version']
         nmap = nmap3.Nmap()
         logging.info('Scanning webserver for version with nmap...')
-        result = nmap.scan_top_ports(self.url, args=f"-sV -p {self.port}")
+        result = nmap.scan_top_ports(self.address.url, args=f"-sV -p {self.address.port}")
 
         values = []
         service = list(result.items())[0][1]['ports'][0]['service']
@@ -42,7 +42,8 @@ class WebServerSoft:
         """
         logging.info('Scanning webserver for version using http headers...')
         try:
-            response = requests.head(f'https://{self.url}:{self.port}', timeout=3, headers={'Connection': 'close'},
+            response = requests.head(f'https://{self.address.url}:{self.address.port}', timeout=3,
+                                     headers={'Connection': 'close'},
                                      verify=False)
             value = response.headers["server"]
         except KeyError:

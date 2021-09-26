@@ -10,12 +10,11 @@ from .Parameters import Parameters
 
 class ProtocolSupport:
 
-    def __init__(self, url: str, port: int, timeout):
-        self.versions = {PType.protocols: {}, PType.no_protocol: {}}
-        self.supported_protocols = []
-        self.unsupported_protocols = []
-        self.url = url
-        self.port = port
+    def __init__(self, address, timeout):
+        self.protocols = {PType.protocols: {}, PType.no_protocol: {}}
+        self.supported = []
+        self.unsupported = []
+        self.address = address
         self.rating = 0
         self.timeout = timeout
 
@@ -28,10 +27,10 @@ class ProtocolSupport:
         logging.info('Scanning SSL/TLS versions...')
         self.scan_ssl_protocols()
         self.scan_tls_protocols()
-        for protocol in self.supported_protocols:
-            self.versions[PType.protocols][protocol] = 'N/A'
-        for no_protocol in self.unsupported_protocols:
-            self.versions[PType.no_protocol][no_protocol] = 'N/A'
+        for protocol in self.supported:
+            self.protocols[PType.protocols][protocol] = 'N/A'
+        for no_protocol in self.unsupported:
+            self.protocols[PType.no_protocol][no_protocol] = 'N/A'
 
     def scan_ssl_protocols(self):
         """
@@ -42,7 +41,7 @@ class ProtocolSupport:
             SSLv3
         ]
         for ssl_version in ssl_versions:
-            ssl_version = ssl_version(self.url, self.port, self.timeout)
+            ssl_version = ssl_version(self.address, self.timeout)
             logging.info(f'scanning for {ssl_version.protocol}...')
             try:
                 ssl_version.send_client_hello()
@@ -50,9 +49,9 @@ class ProtocolSupport:
                 pass
             result = ssl_version.scan_protocol_support()
             if result:
-                self.supported_protocols.append(ssl_version.protocol)
+                self.supported.append(ssl_version.protocol)
             else:
-                self.unsupported_protocols.append(ssl_version.protocol)
+                self.unsupported.append(ssl_version.protocol)
 
     def scan_tls_protocols(self):
         """
@@ -68,21 +67,21 @@ class ProtocolSupport:
             logging.info(f'scanning for {version}...')
             context = create_ssl_context(version)
             try:
-                ssl_socket, _ = create_session(self.url, self.port, False, context, self.timeout)
+                ssl_socket, _ = create_session(self.address, False, context, self.timeout)
                 ssl_socket.close()
-                self.supported_protocols.append(version)
+                self.supported.append(version)
             except socket.error:
-                self.unsupported_protocols.append(version)
+                self.unsupported.append(version)
 
     def rate_protocols(self):
         """
         Rate the scanned protocols
         """
-        for protocol in list(self.versions[PType.protocols].keys()):
-            self.versions[PType.protocols][protocol] = Parameters.rate_parameter(PType.protocol, protocol)
-        for no_protocol in list(self.versions[PType.no_protocol].keys()):
-            self.versions[PType.no_protocol][no_protocol] = Parameters.rate_parameter(PType.no_protocol, no_protocol)
-        if not self.versions:
+        for protocol in list(self.protocols[PType.protocols].keys()):
+            self.protocols[PType.protocols][protocol] = Parameters.rate_parameter(PType.protocol, protocol)
+        for no_protocol in list(self.protocols[PType.no_protocol].keys()):
+            self.protocols[PType.no_protocol][no_protocol] = Parameters.rate_parameter(PType.no_protocol, no_protocol)
+        if not self.protocols:
             return
-        ratings = list(self.versions[PType.protocols].values()) + list(self.versions[PType.no_protocol].values())
+        ratings = list(self.protocols[PType.protocols].values()) + list(self.protocols[PType.no_protocol].values())
         self.rating = max(ratings)

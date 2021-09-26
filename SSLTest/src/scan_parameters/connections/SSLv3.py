@@ -7,8 +7,8 @@ from ...utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version
 
 
 class SSLv3(SSLvX):
-    def __init__(self, url, port, timeout):
-        super().__init__(url, port, timeout)
+    def __init__(self, address, timeout):
+        super().__init__(address, timeout)
         self.protocol = 'SSLv3'
         self.client_hello = ClientHello(protocol_version_conversion(self.protocol)).construct_client_hello()
 

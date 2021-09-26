@@ -9,8 +9,8 @@ from ...utils import read_json
 
 
 class SSLv2(SSLvX):
-    def __init__(self, url, port, timeout):
-        super().__init__(url, port, timeout)
+    def __init__(self, address, timeout):
+        super().__init__(address, timeout)
         self.protocol = 'SSLv2'
         self.server_cipher_suites = []
         self.client_hello = bytes([

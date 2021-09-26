@@ -4,31 +4,34 @@ import ssl
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+from typing import NamedTuple
 
 from .SSLv3 import SSLv3
 from .SSLv2 import SSLv2
-from ...utils import incremental_sleep, convert_cipher_suite
+from ...utils import incremental_sleep, convert_cipher_suite, Address
 from ...exceptions.ConnectionTimeout import ConnectionTimeout
 
 
-def get_website_info(url, port, supported_protocols, worst, timeout):
+class WebServer(NamedTuple):
+    certificate: x509.Certificate
+    cert_verified: bool
+    cipher_suite: str
+    protocol: str
+
+
+def get_webserver_info(address, supported_protocols, worst, timeout):
     """
     Gather objects required to rate a web server
 
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
 
-    :param int port: Port to scan on
-    :param str url: Url of the webserver
+    :param Address address:
     :param list supported_protocols: Supported SSL/TLS protocol versions
     :param bool worst: Whether to connect with the worst available protocol
     :param int timeout: Timeout in seconds
-    :return:
-        certificate -- Used certificate to verify the server,
-        cert_verified -- Is certificate verified,
-        cipher_suite -- Negotiated cipher suite,
-        protocol -- Protocol name and version,
-    :rtype: tuple
+    :return: Tuple of all the values
+    :rtype: WebServer
     """
     logging.info('Creating main session...')
     chosen_protocol = choose_protocol(supported_protocols, worst)
@@ -38,7 +41,7 @@ def get_website_info(url, port, supported_protocols, worst, timeout):
             'SSLv3': SSLv3,
             'SSLv2': SSLv2
         }
-        ssl_protocol = ssl_protocols[chosen_protocol](url, port, timeout)
+        ssl_protocol = ssl_protocols[chosen_protocol](address, timeout)
         ssl_protocol.send_client_hello()
         ssl_protocol.parse_cipher_suite()
         ssl_protocol.parse_certificate()
@@ -50,11 +53,12 @@ def get_website_info(url, port, supported_protocols, worst, timeout):
     else:
         logging.debug('Connecting with TLS...')
         context = create_ssl_context(chosen_protocol)
-        ssl_socket, cert_verified = create_session(url, port, True, context, timeout)
+        ssl_socket, cert_verified = create_session(address, True, context, timeout)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
-    return certificate, cert_verified, cipher_suite, protocol
+    webserver_info = WebServer(certificate, cert_verified, cipher_suite, protocol)
+    return webserver_info
 
 
 def choose_protocol(protocols, worst):
@@ -147,12 +151,11 @@ def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
     return cipher_suite, ssl_socket.version()
 
 
-def create_session(url, port, verify_cert, context, timeout):
+def create_session(address, verify_cert, context, timeout):
     """
     Create a secure connection to any server on any port with a defined context
 
-    :param str url: Url of the website
-    :param int port: Port to create the connection on
+    :param Address address:
     :param bool verify_cert: Whether to verify the certificate or not
     :param ssl.SSLContext context: ssl context
     :param int timeout: Timeout in seconds
@@ -170,10 +173,10 @@ def create_session(url, port, verify_cert, context, timeout):
     while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(timeout)  # in seconds
-        ssl_socket = context.wrap_socket(sock, server_hostname=url)
+        ssl_socket = context.wrap_socket(sock, server_hostname=address.url)
         try:
             logging.debug(f'connecting...')
-            ssl_socket.connect((url, port))
+            ssl_socket.connect(address)
             break
         except ssl.SSLCertVerificationError:
             # If cert is was unverified, connect again without verifying

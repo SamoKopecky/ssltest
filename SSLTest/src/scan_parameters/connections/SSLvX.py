@@ -8,8 +8,8 @@ from OpenSSL import crypto
 
 
 class SSLvX(ABC):
-    def __init__(self, url, port, timeout):
-        self.address = (url, port)
+    def __init__(self, address, timeout):
+        self.address = address
         self.protocol = ''
         self.cipher_suite = None
         self.certificates = []

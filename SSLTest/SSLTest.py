@@ -9,7 +9,8 @@ import os
 
 from ptlibs import ptjsonlib, ptmisclib
 
-from src.run import run, get_tests_switcher
+from src.scan import get_tests_switcher
+from src.run import run
 
 
 class SSLTest:

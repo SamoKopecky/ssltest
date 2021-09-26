@@ -4,8 +4,14 @@ import os
 import socket
 
 from time import sleep, time
+from typing import NamedTuple
 
 from .exceptions.ConnectionTimeout import ConnectionTimeout
+
+
+class Address(NamedTuple):
+    url: str
+    port: int
 
 
 def read_json(file_name):
@@ -59,7 +65,7 @@ def send_data_return_sock(address, client_hello, timeout, debug_source):
     """
     Send client client_hello to the server and catch the response
 
-    :param tuple address: Tuple of an url and port
+    :param Address address: Webserver address
     :param bytes client_hello: client_hello data in bytes
     :param float timeout: Timeout in seconds
     :param str debug_source: Description of the debug source
