@@ -1,12 +1,12 @@
 import json
 import logging
-import sys
 import re
+import sys
 import traceback
 
+from .scan import scan
 from .scan_parameters.non_ratable.port_discovery import discover_ports
 from .text_output.TextOutput import TextOutput
-from .scan import scan
 
 
 def run(args):

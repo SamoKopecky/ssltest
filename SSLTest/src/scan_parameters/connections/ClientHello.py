@@ -1,6 +1,5 @@
 import secrets
 import ssl
-
 from struct import pack
 
 from ...utils import cipher_suite_to_bytes, read_json, protocol_version_conversion

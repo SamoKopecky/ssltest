@@ -2,10 +2,10 @@ import logging
 import socket
 
 from .PType import PType
-from ..connections.connection_utils import create_session, create_ssl_context
-from ..connections.SSLv3 import SSLv3
-from ..connections.SSLv2 import SSLv2
 from .Parameters import Parameters
+from ..connections.SSLv2 import SSLv2
+from ..connections.SSLv3 import SSLv3
+from ..connections.connection_utils import create_session, create_ssl_context
 
 
 class ProtocolSupport:

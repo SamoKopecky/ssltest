@@ -1,22 +1,22 @@
-import logging
 import concurrent.futures as cf
+import logging
 
-from .utils import Address
 from .scan_parameters.connections.connection_utils import get_webserver_info
-from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
 from .scan_parameters.non_ratable.WebServerSoft import WebServerSoft
 from .scan_parameters.ratable.Certificate import Certificate
 from .scan_parameters.ratable.CipherSuite import CipherSuite
 from .scan_parameters.ratable.CipherSuites import CipherSuites
 from .scan_parameters.ratable.PType import PType
+from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
 from .scan_vulnerabilities.tests.CCSInjection import CCSInjection
 from .scan_vulnerabilities.tests.Crime import Crime
+from .scan_vulnerabilities.tests.Drown import Drown
+from .scan_vulnerabilities.tests.FallbackSCSVSupport import FallbackSCSVSupport
 from .scan_vulnerabilities.tests.Heartbleed import Heartbleed
 from .scan_vulnerabilities.tests.InsecureRenegotiation import InsecureRenegotiation
 from .scan_vulnerabilities.tests.RC4Support import RC4Support
 from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSupport
-from .scan_vulnerabilities.tests.FallbackSCSVSupport import FallbackSCSVSupport
-from .scan_vulnerabilities.tests.Drown import Drown
+from .utils import Address
 
 
 def scan(args, port):

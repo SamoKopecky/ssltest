@@ -1,6 +1,6 @@
 from ..VulnerabilityTest import VulnerabilityTest
-from ...utils import receive_data, send_data_return_sock, is_server_hello
 from ...scan_parameters.connections.ClientHello import ClientHello
+from ...utils import receive_data, send_data_return_sock, is_server_hello
 
 
 class CCSInjection(VulnerabilityTest):

@@ -1,8 +1,8 @@
 from cryptography import x509
-
-from .Parameters import Parameters
-from .PType import PType
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
+
+from .PType import PType
+from .Parameters import Parameters
 
 
 class Certificate(Parameters):

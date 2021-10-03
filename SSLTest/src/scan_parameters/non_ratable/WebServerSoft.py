@@ -4,7 +4,6 @@ import nmap3
 import requests
 
 
-
 class WebServerSoft:
 
     def __init__(self, address, scan_nmap: bool):

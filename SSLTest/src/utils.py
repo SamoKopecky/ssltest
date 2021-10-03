@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import socket
-
 from time import sleep, time
 from typing import NamedTuple
 
@@ -165,6 +164,23 @@ def cipher_suite_to_bytes(cipher_suite, string_format):
             bytes_list = key.split(',')
             return bytes([int(bytes_list[0], 16), int(bytes_list[1], 16)])
     raise Exception(f'No bytes found for {cipher_suite}')
+
+
+def filter_cipher_suite_bytes(cipher_suites, filter_fun):
+    """
+    TODO
+
+    :param bytearray cipher_suites: TODO
+    :param lambda filter_fun: TODO
+    :return: TODO
+    :rtype: bytearray
+    """
+    filtered_suites = bytearray([])
+    for i in range(0, len(cipher_suites), 2):
+        cipher_suite = bytes_to_cipher_suite(cipher_suites[i: i + 2], 'IANA')
+        if filter_fun(cipher_suite):
+            filtered_suites += cipher_suite_to_bytes(cipher_suite, 'IANA')
+    return filtered_suites
 
 
 def parse_cipher_suite(data):

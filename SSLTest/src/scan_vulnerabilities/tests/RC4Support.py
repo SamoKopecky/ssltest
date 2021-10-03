@@ -1,6 +1,6 @@
 from ..VulnerabilityTest import VulnerabilityTest
-from ...utils import send_data_return_sock, is_server_hello
 from ...scan_parameters.connections.ClientHello import ClientHello
+from ...utils import send_data_return_sock, is_server_hello
 
 
 class RC4Support(VulnerabilityTest):
@@ -21,6 +21,8 @@ class RC4Support(VulnerabilityTest):
         :return: Whether the server is vulnerable
         :rtype: bool
         """
+        if 'TLSv1.0' in self.supported_protocols and version == 'TLSv1.1':
+            return False
         rc4_ciphers = bytearray([
             0x00, 0x24,  # Cipher suites length
             # Only RC4 Cipher suites

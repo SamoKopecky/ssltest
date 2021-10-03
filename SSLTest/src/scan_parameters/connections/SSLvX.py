@@ -1,10 +1,10 @@
-import requests
 import csv
+from abc import ABC, abstractmethod
+
+import requests
+from OpenSSL import crypto
 
 from ...utils import send_data_return_sock
-
-from abc import ABC, abstractmethod
-from OpenSSL import crypto
 
 
 class SSLvX(ABC):

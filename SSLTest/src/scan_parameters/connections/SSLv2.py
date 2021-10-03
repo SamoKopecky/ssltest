@@ -1,8 +1,8 @@
-import secrets
 import random
+import secrets
+from struct import unpack
 
 from cryptography.x509 import load_der_x509_certificate
-from struct import unpack
 
 from .SSLvX import SSLvX
 from ...utils import read_json

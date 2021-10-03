@@ -1,6 +1,6 @@
 from ..VulnerabilityTest import VulnerabilityTest
-from ...utils import send_data_return_sock, is_server_hello
 from ...scan_parameters.connections.ClientHello import ClientHello
+from ...utils import send_data_return_sock, is_server_hello
 
 
 class InsecureRenegotiation(VulnerabilityTest):
