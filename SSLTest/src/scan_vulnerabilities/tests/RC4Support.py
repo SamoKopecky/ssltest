@@ -1,6 +1,6 @@
 from ..VulnerabilityTest import VulnerabilityTest
 from ...scan_parameters.connections.ClientHello import ClientHello
-from ...utils import send_data_return_sock, is_server_hello
+from ...utils import send_data_return_sock, is_server_hello, filter_cipher_suite_bytes, protocol_version_conversion
 
 
 class RC4Support(VulnerabilityTest):
@@ -23,7 +23,7 @@ class RC4Support(VulnerabilityTest):
         """
         if 'TLSv1.0' in self.supported_protocols and version == 'TLSv1.1':
             return False
-        rc4_ciphers = bytearray([
+        rc4_cipher_suites = bytearray([
             0x00, 0x24,  # Cipher suites length
             # Only RC4 Cipher suites
             0x00, 0x03, 0x00, 0x04, 0x00, 0x05, 0x00, 0x17,
@@ -32,7 +32,10 @@ class RC4Support(VulnerabilityTest):
             0xC0, 0x02, 0xC0, 0x07, 0xC0, 0x0C, 0xC0, 0x11,
             0xC0, 0x16, 0xC0, 0x33
         ])
-        client_hello = ClientHello(version, rc4_ciphers, False).construct_client_hello()
+        # TODO: uncomment when client hello creation is fixed
+        # cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(protocol_version_conversion(version))
+        # rc4_cipher_suites = filter_cipher_suite_bytes(cipher_suite_bytes, lambda cs: 'RC4' in cs)
+        client_hello = ClientHello(version, rc4_cipher_suites, False).construct_client_hello()
         response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
         sock.close()
         if not is_server_hello(response):

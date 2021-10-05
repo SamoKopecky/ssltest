@@ -49,10 +49,13 @@ def info_report_option(args):
 
     :param Namespace args: Parsed input arguments
     """
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)s %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S')
     if args.debug:
-        logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+        logging.getLogger().setLevel(logging.DEBUG)
     elif args.info:
-        logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+        logging.getLogger().setLevel(logging.INFO)
 
 
 def nmap_discover_option(args):

@@ -3,14 +3,14 @@
 __version__ = "0.0.2"
 
 import argparse
-import sys
-import subprocess
 import os
+import subprocess
+import sys
 
 from ptlibs import ptjsonlib, ptmisclib
 
-from src.scan import get_tests_switcher
 from src.run import run
+from src.scan import get_tests_switcher
 
 
 class SSLTest:
