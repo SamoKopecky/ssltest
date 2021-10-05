@@ -1,7 +1,7 @@
 from ..VulnerabilityTest import VulnerabilityTest
 from ...scan_parameters.connections.ClientHello import ClientHello
 from ...scan_parameters.connections.SSLv2 import SSLv2
-from ...utils import filter_cipher_suite_bytes, protocol_version_conversion, send_data_return_sock, is_server_hello
+from ...utils import filter_cipher_suite_bytes, send_data_return_sock, is_server_hello
 
 
 class Drown(VulnerabilityTest):
@@ -20,7 +20,7 @@ class Drown(VulnerabilityTest):
                 or not self.sslv2_vulnerable:
             return False
         # TODO: Test on home server
-        cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(protocol_version_conversion(version))
+        cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
         # All cipher suites that use RSA for kex
         rsa_cipher_suites = filter_cipher_suite_bytes(cipher_suite_bytes, lambda cs: 'TLS_RSA' in cs)
         client_hello = ClientHello(version, rsa_cipher_suites, False)

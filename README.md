@@ -44,6 +44,8 @@ $ sudo ptmanager -ut SSLTest
                                    6: RC4 Support
                                    7: Session Ticket Support
                                    8: DROWN
+                                   9: Sweet32
+                                   10: No Forward Secrecy Support
                              If this argument isn't specified all tests will be ran
 -fc --fix-conf               Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1) 
                              protocol versions of TLS protocol (TLSv1 and TLSv1.1)

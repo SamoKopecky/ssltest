@@ -12,10 +12,12 @@ from .scan_vulnerabilities.tests.CCSInjection import CCSInjection
 from .scan_vulnerabilities.tests.Crime import Crime
 from .scan_vulnerabilities.tests.Drown import Drown
 from .scan_vulnerabilities.tests.FallbackSCSVSupport import FallbackSCSVSupport
+from .scan_vulnerabilities.tests.ForwardSecrecySupport import ForwardSecrecySupport
 from .scan_vulnerabilities.tests.Heartbleed import Heartbleed
 from .scan_vulnerabilities.tests.InsecureRenegotiation import InsecureRenegotiation
 from .scan_vulnerabilities.tests.RC4Support import RC4Support
 from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSupport
+from .scan_vulnerabilities.tests.Sweet32 import Sweet32
 from .utils import Address
 
 
@@ -122,7 +124,9 @@ def get_tests_switcher():
         5: (InsecureRenegotiation, InsecureRenegotiation.test_name),
         6: (RC4Support, RC4Support.test_name),
         7: (SessionTicketSupport, SessionTicketSupport.test_name),
-        8: (Drown, Drown.test_name)
+        8: (Drown, Drown.test_name),
+        9: (Sweet32, Sweet32.test_name),
+        10: (ForwardSecrecySupport, ForwardSecrecySupport.test_name)
     }
 
 

@@ -112,26 +112,28 @@ class ClientHello:
         return pack('>H', len(cipher_suites)) + cipher_suites
 
     @staticmethod
-    def get_cipher_suites_for_version(str_version):
+    def get_cipher_suites_for_version(version):
         """
         Extract cipher suites from ssl lib or json file
 
-        :param str_version: SSL/TLS protocol version
+        :param version: SSL/TLS protocol version
         :return: Cipher suite bytes
         :rtype: bytearray
         """
-        if str_version == 'TLSv1.1':
-            str_version = 'TLSv1.0'
+        if type(version) == int:
+            version = protocol_version_conversion(version)
+        if version == 'TLSv1.1':
+            version = 'TLSv1.0'
         ciphers = bytearray([])
-        if str_version == 'SSLv3' or str_version == 'TLSv1.3':
+        if version == 'SSLv3' or version == 'TLSv1.3' or version == 'TLSv1.2':
             json_ciphers = read_json('cipher_suite_bytes.json')
-            cipher_bytes = json_ciphers[str_version].split(',')
+            cipher_bytes = json_ciphers[version].split(',')
             for byte in cipher_bytes:
                 ciphers += bytearray([int(byte, 16)])
         else:
             ctx = ssl.SSLContext()
             ctx.set_ciphers('ALL')
             for cipher in ctx.get_ciphers():
-                if cipher['protocol'] == str_version:
+                if cipher['protocol'] == version:
                     ciphers += cipher_suite_to_bytes(cipher['name'], 'OpenSSL')
         return ciphers
