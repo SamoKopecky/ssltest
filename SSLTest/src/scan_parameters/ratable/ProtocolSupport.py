@@ -31,6 +31,8 @@ class ProtocolSupport:
             self.protocols[PType.protocols][protocol] = 'N/A'
         for no_protocol in self.unsupported:
             self.protocols[PType.no_protocol][no_protocol] = 'N/A'
+        if len(self.supported) == 0:
+            raise Exception('No SSL/TLS protocol support found')
 
     def scan_ssl_protocols(self):
         """
