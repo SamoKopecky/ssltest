@@ -193,7 +193,8 @@ def create_session(address, verify_cert, context, timeout):
             # Protocol not supported, no need to sleep
             if '[SSL: UNSUPPORTED_PROTOCOL]' in error_str or \
                     '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]' in error_str or \
-                    '[SSL: TLSV1_ALERT_PROTOCOL_VERSION]' in error_str:
+                    '[SSL: TLSV1_ALERT_PROTOCOL_VERSION]' in error_str or \
+                    'EOF occurred in violation of protocol' in error_str:
                 logging.debug('protocol unsupported...')
                 raise e
             logging.debug('error occurred...')
