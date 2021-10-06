@@ -125,15 +125,9 @@ class ClientHello:
         if version == 'TLSv1.1':
             version = 'TLSv1.0'
         ciphers = bytearray([])
-        if version == 'SSLv3' or version == 'TLSv1.3' or version == 'TLSv1.2':
-            json_ciphers = read_json('cipher_suite_bytes.json')
-            cipher_bytes = json_ciphers[version].split(',')
-            for byte in cipher_bytes:
-                ciphers += bytearray([int(byte, 16)])
-        else:
-            ctx = ssl.SSLContext()
-            ctx.set_ciphers('ALL')
-            for cipher in ctx.get_ciphers():
-                if cipher['protocol'] == version:
-                    ciphers += cipher_suite_to_bytes(cipher['name'], 'OpenSSL')
+        json_ciphers = read_json('cipher_suites.json')
+        for key, value in json_ciphers.items():
+            if version in value['protocol_version']:
+                cs_bytes = key.split(',')
+                ciphers += bytearray([int(cs_bytes[0], 16), int(cs_bytes[1], 16)])
         return ciphers
