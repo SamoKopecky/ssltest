@@ -11,18 +11,6 @@ class TextOutput:
         self.data = data
         self.current_data = {}
 
-    def rating_name(self, rating):
-        """
-        Get the rating name according to the rating number
-
-        Method made for better reading of code bellow
-
-        :param int rating: Rating value to be converted to string
-        :return: The rating string
-        :rtype: str
-        """
-        return self.ratings[str(rating)]
-
     def get_formatted_text(self):
         """
         Call all other text output functions for each port and url
@@ -50,11 +38,11 @@ class TextOutput:
         self.output += 'Cryptographic parameters:\n'
         for key, value in list(data.items()):
             if key == 'rating':
-                self.output += f'\t{key}: {self.rating_name(value)}\n'
+                self.output += f'\t{key}: {self.ratings[value]}\n'
                 continue
             values = list(value.items())[0]
             if values[0] != 'N/A':
-                self.output += f'\t{self.type_names[key]}: {values[0]}->{self.rating_name(values[1])}\n'
+                self.output += f'\t{self.type_names[key]}: {values[0]}->{self.ratings[values[1]]}\n'
 
     def format_certificate_info(self, data):
         """
@@ -83,7 +71,7 @@ class TextOutput:
         self.output += 'Protocol support:\n'
         for key, values in list(data.items()):
             if key == 'rating':
-                self.output += f'\t{key}: {self.rating_name(values)}\n'
+                self.output += f'\t{key}: {self.ratings[values]}\n'
                 continue
             if len(values) > 0:
                 versions = []

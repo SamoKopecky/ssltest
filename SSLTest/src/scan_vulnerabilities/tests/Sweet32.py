@@ -12,8 +12,13 @@ class Sweet32(VulnerabilityTest):
         self.scan_once = False
 
     def test(self, version):
-        if 'TLSv1.0' in self.supported_protocols and version == 'TLSv1.1':
-            return False
+        """
+        Scan for SWEET32 vulnerability (CVE-2016-2183)
+
+        :param int version: SSL/TLS version
+        :return: Whether the server is vulnerable
+        :rtype: bool
+        """
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
         sixty_four_bit_ciphers = filter_cipher_suite_bytes(cipher_suite_bytes, lambda cs: 'DES' in cs)
         client_hello = ClientHello(version, sixty_four_bit_ciphers, False).construct_client_hello()

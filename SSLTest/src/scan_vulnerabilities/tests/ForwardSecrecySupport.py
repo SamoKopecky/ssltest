@@ -12,8 +12,14 @@ class ForwardSecrecySupport(VulnerabilityTest):
         self.scan_once = False
 
     def test(self, version):
-        if 'TLSv1.0' in self.supported_protocols and version == 'TLSv1.1':
-            return False
+        """
+        Check if server supports any forward secrecy cipher suites
+
+        :param int version: SSL/TLS version
+        :return: Whether the server doesn't support any forward secrecy cipher suites
+        :rtype: bool
+
+        """
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
         sixty_four_bit_ciphers = filter_cipher_suite_bytes(cipher_suite_bytes, lambda cs: 'ECDHE' in cs or 'DHE' in cs)
         client_hello = ClientHello(version, sixty_four_bit_ciphers, False).construct_client_hello()

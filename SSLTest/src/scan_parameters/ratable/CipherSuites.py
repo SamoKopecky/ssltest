@@ -4,7 +4,7 @@ from .CipherSuite import CipherSuite
 from ..connections.ClientHello import ClientHello
 from ..connections.SSLv2 import SSLv2
 from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
-    is_server_hello
+    is_server_hello, get_cipher_suite_protocols
 
 
 class CipherSuites:
@@ -15,6 +15,7 @@ class CipherSuites:
         self.supported = {}
         self.unrated = {}
         self.supported_protocols = supported_protocols
+        self.tested_cipher_suites = bytearray()
 
     def scan_cipher_suites(self):
         """
@@ -31,13 +32,25 @@ class CipherSuites:
         if 'SSLv2' in self.supported_protocols:
             self.supported_protocols.remove('SSLv2')
             self.scan_sslv2_cipher_suites()
+
         for protocol in self.supported_protocols:
             # Ignore TLSv1.1 since the same cipher suites apply for TLSv1.0
             if protocol == 'TLSv1.1' and 'TLSv1.0' in self.supported_protocols:
                 continue
-            test_cipher_suites = ClientHello.get_cipher_suites_for_version(protocol)
-            accepted_cipher_suites = bytearray([])
-            client_hello = ClientHello(protocol_version_conversion(protocol), test_cipher_suites, False)
+
+            # Init
+            to_test_cipher_suites = ClientHello.get_cipher_suites_for_version(protocol)
+            accepted_cipher_suites = bytearray()
+
+            # Skip already tested cipher suites from previous protocol versions if applicable
+            for i in range(0, len(self.tested_cipher_suites), 2):
+                tested_cipher_suite = self.tested_cipher_suites[i: i + 2]
+                cipher_suite_protocols = get_cipher_suite_protocols(tested_cipher_suite)
+                if protocol in cipher_suite_protocols:
+                    to_test_cipher_suites.remove(tested_cipher_suite[0])
+                    to_test_cipher_suites.remove(tested_cipher_suite[1])
+                    accepted_cipher_suites.extend(tested_cipher_suite)
+            client_hello = ClientHello(protocol_version_conversion(protocol), to_test_cipher_suites, False)
             while True:
                 client_hello_bytes = client_hello.construct_client_hello()
                 debug_msg = f'cipher_suite_scanning_for_{protocol}'
@@ -46,13 +59,19 @@ class CipherSuites:
                 sock.close()
                 if not is_server_hello(response):
                     break
-                cipher_suite_index = test_cipher_suites.find(parse_cipher_suite(response))
-                accepted_cipher_suites.extend(test_cipher_suites[cipher_suite_index: cipher_suite_index + 2])
-                test_cipher_suites.pop(cipher_suite_index)
-                test_cipher_suites.pop(cipher_suite_index)
+
+                # Register accepted cipher suite
+                cipher_suite_index = to_test_cipher_suites.find(parse_cipher_suite(response))
+                cipher_suite = to_test_cipher_suites[cipher_suite_index: cipher_suite_index + 2]
+                accepted_cipher_suites.extend(cipher_suite)
+                if cipher_suite not in self.tested_cipher_suites:
+                    self.tested_cipher_suites.extend(cipher_suite)
+                to_test_cipher_suites.pop(cipher_suite_index)
+                to_test_cipher_suites.pop(cipher_suite_index)
                 client_hello.cipher_suites = client_hello.pack_cipher_suite_bytes(
-                    test_cipher_suites, False
+                    to_test_cipher_suites, False
                 )
+            # Convert to cipher suite to string
             string_cipher_suites = []
             for i in range(0, len(accepted_cipher_suites), 2):
                 string_cipher_suites.append(bytes_to_cipher_suite(accepted_cipher_suites[i:i + 2], 'IANA'))
@@ -68,7 +87,7 @@ class CipherSuites:
         the server sends his supported cipher suites in the ServerHello
         message.
         """
-        logging.debug('cipher_suite_scanning_for_SSLv2}')
+        logging.debug('cipher_suite_scanning_for_SSLv2')
         sslv2 = SSLv2(self.address, self.timeout)
         sslv2.send_client_hello()
         sslv2.parse_cipher_suite()

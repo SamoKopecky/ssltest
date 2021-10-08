@@ -28,6 +28,9 @@ def read_json(file_name):
     return json_data
 
 
+cipher_suites_json = read_json('cipher_suites.json')
+
+
 def receive_data(sock, timeout, debug_source):
     """
     Receive network data in chunks
@@ -123,8 +126,7 @@ def convert_cipher_suite(cipher_suite, from_cipher_suite, to_cipher_suite):
     :return: Converted cipher suite
     :rtype: str
     """
-    json_data = read_json('cipher_suites.json')
-    for cipher in json_data.values():
+    for cipher in cipher_suites_json.values():
         if cipher[from_cipher_suite] == cipher_suite:
             return cipher[to_cipher_suite]
     raise Exception(f'No pair found for {cipher_suite}')
@@ -141,9 +143,8 @@ def bytes_to_cipher_suite(bytes_object, string_format):
     """
     if len(bytes_object) != 2:
         raise Exception(f'Can only convert from 2 bytes')
-    bytes_string = f'0x{bytes_object[0]:02X},0x{bytes_object[1]:02X}'
-    json_data = read_json('cipher_suites.json')
-    for key, value in json_data.items():
+    bytes_string = cs_bytes_to_str(bytes_object)
+    for key, value in cipher_suites_json.items():
         if key == bytes_string:
             return value[string_format]
     raise Exception(f'No cipher suite found for {bytes_string}')
@@ -158,21 +159,48 @@ def cipher_suite_to_bytes(cipher_suite, string_format):
     :return: Two bytes in an bytes object
     :rtype: bytes
     """
-    json_data = read_json('cipher_suites.json')
-    for key, value in json_data.items():
+    for key, value in cipher_suites_json.items():
         if value[string_format] == cipher_suite:
             bytes_list = key.split(',')
             return bytes([int(bytes_list[0], 16), int(bytes_list[1], 16)])
     raise Exception(f'No bytes found for {cipher_suite}')
 
 
+def get_cipher_suite_protocols(cipher_suite):
+    """
+    Get a cipher suites supported protocols
+
+    :param bytearray or bytes or str cipher_suite: cipher suite
+    :return: list of supported protocols
+    :rtype: list
+    """
+    if type(cipher_suite) == str:
+        cipher_suite_to_bytes(cipher_suite, 'IANA')
+    for key, value in cipher_suites_json.items():
+        if key == cs_bytes_to_str(cipher_suite):
+            return value['protocol_version'].split(',')
+
+
+def cs_bytes_to_str(bytes_object):
+    """
+    Convert cipher suite bytes into string bytes
+
+    e.g. bytes([192, 13]) => "0xC0,0x13"
+
+    :param bytearray or bytes bytes_object: Pair of bytes representing a cipher suite
+    :return: Converted string representation
+    :rtype: str
+    """
+    return f'0x{bytes_object[0]:02X},0x{bytes_object[1]:02X}'
+
+
 def filter_cipher_suite_bytes(cipher_suites, filter_fun):
     """
-    TODO
+    Filters cipher suite bytes with the given filter function
 
-    :param bytearray cipher_suites: TODO
-    :param lambda filter_fun: TODO
-    :return: TODO
+    :param bytearray or bytes cipher_suites: Cipher suites
+    :param lambda filter_fun: Function to filter the cipher suites
+    :return: Filter cipher suites
     :rtype: bytearray
     """
     filtered_suites = bytearray([])

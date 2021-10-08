@@ -12,6 +12,13 @@ class FallbackSCSVSupport(VulnerabilityTest):
         self.fallback_scsv = bytes([0x56, 0x00])
 
     def test(self, version):
+        """
+        Check if the server supports Fallback SCSV
+
+        :param int version: SSL/TLS version
+        :return: Whether the server don't support fallback SCSV
+        :rtype: bool
+        """
         usable_protocols = list(filter(lambda p: p in self.valid_protocols, self.supported_protocols))
         if len(usable_protocols) == 1:
             return False

@@ -14,12 +14,16 @@ class Drown(VulnerabilityTest):
         self.sslv2_vulnerable = True
 
     def test(self, version):
-        if 'TLSv1.0' in self.supported_protocols and version == 'TLSv1.1':
-            return False
-        elif 'SSLv2' not in self.supported_protocols or self.supported_protocols == ['SSLv2'] \
+        """
+        Scan for DROWN vulnerability (CVE-2016-0800)
+
+        :param int version: SSL/TLS version
+        :return: Whether the server is vulnerable
+        :rtype: bool
+        """
+        if 'SSLv2' not in self.supported_protocols or self.supported_protocols == ['SSLv2'] \
                 or not self.sslv2_vulnerable:
             return False
-        # TODO: Test on home server
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
         # All cipher suites that use RSA for kex
         rsa_cipher_suites = filter_cipher_suite_bytes(cipher_suite_bytes, lambda cs: 'TLS_RSA' in cs)
@@ -32,6 +36,9 @@ class Drown(VulnerabilityTest):
         return True
 
     def run_once(self):
+        """
+        Scan for the EXPORT cipher suites in SSLv2 support
+        """
         sslv2 = SSLv2(self.address, self.timeout)
         sslv2.send_client_hello()
         sslv2.parse_cipher_suite()

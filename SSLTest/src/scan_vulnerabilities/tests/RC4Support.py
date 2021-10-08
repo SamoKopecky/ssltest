@@ -21,8 +21,6 @@ class RC4Support(VulnerabilityTest):
         :return: Whether the server is vulnerable
         :rtype: bool
         """
-        if 'TLSv1.0' in self.supported_protocols and version == 'TLSv1.1':
-            return False
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
         rc4_cipher_suites = filter_cipher_suite_bytes(cipher_suite_bytes, lambda cs: 'RC4' in cs)
         client_hello = ClientHello(version, rc4_cipher_suites, False).construct_client_hello()
