@@ -3,13 +3,14 @@ import logging
 from .CipherSuite import CipherSuite
 from ..connections.ClientHello import ClientHello
 from ..connections.SSLv2 import SSLv2
+from ...exceptions.ConnectionTimeout import ConnectionTimeout
 from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
     is_server_hello, get_cipher_suite_protocols
 
 
 class CipherSuites:
     def __init__(self, address, supported_protocols, timeout):
-        self.cipher_suite_scan_timeout = 0.3
+        self.short_timeout = 0.3
         self.timeout = timeout
         self.address = address
         self.supported = {}
@@ -53,13 +54,18 @@ class CipherSuites:
             client_hello = ClientHello(protocol_version_conversion(protocol), to_test_cipher_suites, False)
             while True:
                 client_hello_bytes = client_hello.construct_client_hello()
-                debug_msg = f'cipher_suite_scanning_for_{protocol}'
-                response, sock = send_data_return_sock(self.address, client_hello_bytes, self.cipher_suite_scan_timeout,
-                                                       debug_msg)
+                if self.short_timeout >= 1:
+                    raise ConnectionTimeout
+                try:
+                    response, sock = send_data_return_sock(self.address, client_hello_bytes, self.short_timeout,
+                                                           f'cipher_suite_scanning_for_{protocol}')
+                except ConnectionTimeout:
+                    logging.debug('increasing timeout period')
+                    self.short_timeout += 0.1
+                    continue
                 sock.close()
                 if not is_server_hello(response):
                     break
-
                 # Register accepted cipher suite
                 cipher_suite_index = to_test_cipher_suites.find(parse_cipher_suite(response))
                 cipher_suite = to_test_cipher_suites[cipher_suite_index: cipher_suite_index + 2]

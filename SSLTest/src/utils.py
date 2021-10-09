@@ -80,16 +80,17 @@ def send_data_return_sock(address, client_hello, timeout, debug_source):
     while True:
         try:
             sock.connect(address)
+            sock.send(client_hello)
+            response = receive_data(sock, timeout, debug_source)
             break
         except socket.timeout:
             sock.close()
             logging.debug('connection timeout...')
             raise ConnectionTimeout()
-        except socket.error as e:
+        except (socket.error, ConnectionResetError) as e:
             logging.debug('error occurred...')
             sleep_dur = incremental_sleep(sleep_dur, e, 3)
-    sock.send(client_hello)
-    response = receive_data(sock, timeout, debug_source)
+
     return response, sock
 
 
@@ -233,7 +234,7 @@ def protocol_version_conversion(version):
     :return: converted version
     :rtype: str or int
     """
-    protocol_version_ints = {
+    protocol_version = {
         "TLSv1.3": 0x04,
         "TLSv1.2": 0x03,
         "TLSv1.1": 0x02,
@@ -242,9 +243,9 @@ def protocol_version_conversion(version):
     }
     protocol_type = type(version)
     if protocol_type is str:
-        return protocol_version_ints[version]
+        return protocol_version[version]
     elif protocol_type is int:
-        return list(filter(lambda k: protocol_version_ints[k] == version, protocol_version_ints.keys()))[0]
+        return next(key for key, value in protocol_version.items() if value == version)
 
 
 def is_server_hello(message):

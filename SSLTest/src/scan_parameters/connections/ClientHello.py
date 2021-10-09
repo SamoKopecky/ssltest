@@ -116,7 +116,7 @@ class ClientHello:
         """
         Extract cipher suites from ssl lib or json file
 
-        :param version: SSL/TLS protocol version
+        :param int or str version: SSL/TLS protocol version
         :return: Cipher suite bytes
         :rtype: bytearray
         """
