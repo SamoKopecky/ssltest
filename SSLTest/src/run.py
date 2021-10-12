@@ -8,6 +8,8 @@ from .scan import scan
 from .scan_parameters.non_ratable.port_discovery import discover_ports
 from .text_output.TextOutput import TextOutput
 
+log = logging.getLogger(__name__)
+
 
 def run(args):
     """
@@ -17,7 +19,6 @@ def run(args):
     """
     if '/' in args.url:
         args.url = fix_url(args.url)
-    info_report_option(args)
     nmap_discover_option(args)
     output_data = scan_all_ports(args)
     out = output_option(args, output_data)
@@ -32,30 +33,15 @@ def fix_url(url):
     :return: Fixed hostname address
     :rtype: str
     """
-    logging.info('Correcting url...')
+    log.warning('Url in incorrect format, correcting url')
     if url[:4] == 'http':
         # Removes http(s):// and anything after TLD (*.com)
         url = re.search('[/]{2}([^/]+)', url).group(1)
     else:
         # Removes anything after TLD (*.com)
         url = re.search('^([^/]+)', url).group(0)
-    logging.info('Corrected url: {}'.format(url))
+    log.info(f'Corrected url: {url}')
     return url
-
-
-def info_report_option(args):
-    """
-    Handle the debug and information options
-
-    :param Namespace args: Parsed input arguments
-    """
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)s %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S')
-    if args.debug:
-        logging.getLogger().setLevel(logging.DEBUG)
-    elif args.info:
-        logging.getLogger().setLevel(logging.INFO)
 
 
 def nmap_discover_option(args):
@@ -68,9 +54,10 @@ def nmap_discover_option(args):
     if args.nmap_discover:
         try:
             scanned_ports = discover_ports(args.url)
+            log.info(f"Found ports: {scanned_ports}")
         except Exception as ex:
             tb = traceback.format_exc()
-            logging.debug(tb)
+            log.debug(tb)
             print(f'Unexpected exception occurred: {ex}', file=sys.stderr)
         scanned_ports = list(filter(lambda p: p not in args.port, scanned_ports))
         args.port.extend(scanned_ports)
@@ -90,7 +77,7 @@ def scan_all_ports(args):
             output_data.update(scan(args, port))
         except Exception as ex:
             tb = traceback.format_exc()
-            logging.debug(tb)
+            log.debug(tb)
             print(f'Unexpected exception occurred: {ex}', file=sys.stderr)
     return output_data
 
@@ -113,4 +100,4 @@ def output_option(args, output_data):
         file = open(args.json, 'w')
         file.write(json_output_data)
         file.close()
-        print(f"Output writen to {args.json}", file=sys.stderr)
+        log.info(f"Output writen to {args.json}")

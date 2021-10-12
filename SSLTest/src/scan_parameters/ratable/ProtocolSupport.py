@@ -7,6 +7,8 @@ from ..connections.SSLv2 import SSLv2
 from ..connections.SSLv3 import SSLv3
 from ..connections.connection_utils import create_session, create_ssl_context
 
+log = logging.getLogger(__name__)
+
 
 class ProtocolSupport:
 
@@ -24,7 +26,7 @@ class ProtocolSupport:
 
         Convert protocol versions to dict with PType to get them ready for rating
         """
-        logging.info('Scanning SSL/TLS versions...')
+        log.info('Scanning supported SSL/TLS versions')
         self.scan_ssl_protocols()
         self.scan_tls_protocols()
         for protocol in self.supported:
@@ -44,7 +46,7 @@ class ProtocolSupport:
         ]
         for ssl_version in ssl_versions:
             ssl_version = ssl_version(self.address, self.timeout)
-            logging.info(f'scanning for {ssl_version.protocol}...')
+            log.info(f'Scanning for {ssl_version.protocol}')
             try:
                 ssl_version.send_client_hello()
             except socket.error:
@@ -66,7 +68,7 @@ class ProtocolSupport:
             'TLSv1.3'
         ]
         for version in tls_versions:
-            logging.info(f'scanning for {version}...')
+            log.info(f'Scanning for {version}')
             context = create_ssl_context(version)
             try:
                 ssl_socket, _ = create_session(self.address, False, context, self.timeout)

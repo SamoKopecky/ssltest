@@ -7,6 +7,8 @@ from typing import NamedTuple
 
 from .exceptions.ConnectionTimeout import ConnectionTimeout
 
+log = logging.getLogger(__name__)
+
 
 class Address(NamedTuple):
     url: str
@@ -22,7 +24,9 @@ def read_json(file_name):
     :rtype: dict
     """
     root_dir = os.path.dirname(os.path.abspath(__file__))
-    file = open(f'{root_dir}/../../resources/{file_name}', 'r')
+    file_path = f"{root_dir}/../../resources/{file_name}"
+    file = open(file_path, 'r')
+    log.debug(f"Opening {file_path}")
     json_data = json.loads(file.read())
     file.close()
     return json_data
@@ -43,22 +47,23 @@ def receive_data(sock, timeout, debug_source):
     """
     all_data = []
     begin = time()
-    while 1:
-        if all_data and time() - begin > timeout:
-            logging.debug(f"({debug_source}) timed out with received data")
-            break
-        elif time() - begin > timeout:
-            logging.debug(f"({debug_source}) timed out with no received data")
-            break
+    while True:
         try:
             data = sock.recv(2048)
             if data:
-                logging.debug(f"({debug_source}) receiving data")
+                log.debug(f"({debug_source}) receiving data")
                 all_data.extend(data)
                 begin = time()
             else:
                 sleep(0.1)
-        except (socket.timeout, ConnectionResetError):
+        except socket.timeout:
+            log.debug("Timeout out while receiving data")
+            break
+        if all_data and time() - begin > timeout:
+            log.debug(f"({debug_source}) finished with received data")
+            break
+        elif time() - begin > timeout:
+            log.debug(f"({debug_source}) finished with no received data")
             break
     return bytes(all_data)
 
@@ -83,14 +88,13 @@ def send_data_return_sock(address, client_hello, timeout, debug_source):
             sock.send(client_hello)
             response = receive_data(sock, timeout, debug_source)
             break
-        except socket.timeout:
+        except socket.timeout as e:
             sock.close()
-            logging.debug('connection timeout...')
-            raise ConnectionTimeout()
+            log.warning("Timeout out while creating socket and sending data, retrying")
+            sleep_dur = incremental_sleep(sleep_dur, e, 2)
         except (socket.error, ConnectionResetError) as e:
-            logging.debug('error occurred...')
+            log.warning('Socket error occurred, retrying')
             sleep_dur = incremental_sleep(sleep_dur, e, 3)
-
     return response, sock
 
 
@@ -105,11 +109,10 @@ def incremental_sleep(sleep_dur, exception, max_timeout_dur):
     :rtype: int
     """
     if sleep_dur >= max_timeout_dur:
-        logging.debug('timed out')
+        log.debug('timed out')
         raise exception
-    logging.debug('increasing sleep duration')
     sleep_dur += 1
-    logging.debug(f'sleeping for {sleep_dur}')
+    log.debug(f'increasing sleep duration to {sleep_dur}')
     sleep(sleep_dur)
     return sleep_dur
 

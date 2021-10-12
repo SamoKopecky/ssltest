@@ -54,7 +54,7 @@ $ sudo ptmanager -ut SSLTest
 -ns --nmap-scan              Use nmap to scan the server version
 -nd --nmap-discover          Use nmap to discover web server ports
 -w  --worst                  Create a main connection on the worst available protocol version
--i  --info                   Output some internal information about the script functions
+-l  --logging                Enable logging   
 -d  --debug                  Output debug information
 -v  --version                Show script version and exit
 -h  --help                   Show this help message and exit

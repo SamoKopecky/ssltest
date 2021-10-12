@@ -1,8 +1,9 @@
 import secrets
-import ssl
 from struct import pack
 
-from ...utils import cipher_suite_to_bytes, read_json, protocol_version_conversion
+from ...utils import read_json, protocol_version_conversion
+
+json_ciphers = read_json('cipher_suites.json')
 
 
 class ClientHello:
@@ -125,7 +126,6 @@ class ClientHello:
         if version == 'TLSv1.1':
             version = 'TLSv1.0'
         ciphers = bytearray([])
-        json_ciphers = read_json('cipher_suites.json')
         for key, value in json_ciphers.items():
             if version in value['protocol_version']:
                 cs_bytes = key.split(',')

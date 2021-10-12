@@ -20,6 +20,8 @@ from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSuppor
 from .scan_vulnerabilities.tests.Sweet32 import Sweet32
 from .utils import Address
 
+log = logging.getLogger(__name__)
+
 
 def scan(args, port):
     """
@@ -31,7 +33,7 @@ def scan(args, port):
     :rtype: dict
     """
     address = Address(args.url, port)
-    logging.info(f'Scanning for {address.url}:{address.port}')
+    log.info(f'Scanning for {address.url}:{address.port}')
 
     protocol_support = ProtocolSupport(address, args.timeout)
     protocol_support.scan_protocols()
@@ -53,10 +55,9 @@ def scan(args, port):
 
     cipher_suites = cipher_suites_option(address, args, protocol_support.supported, webserver.protocol)
 
-    vulnerabilities = test_option(args, address, protocol_support.supported, webserver.protocol,
-                                  cipher_suites.supported)
+    vulnerabilities = test_option(args, address, protocol_support.supported, webserver.protocol)
 
-    logging.info('Scanning done.')
+    log.info(f'Scanning done for {address.url}:{address.port}.')
     return dump_to_dict(address, cipher_suite, certificate, protocol_support, web_server, cipher_suites,
                         vulnerabilities)
 
@@ -130,7 +131,7 @@ def get_tests_switcher():
     }
 
 
-def test_option(args, address, supported_protocols, protocol, cipher_suites):
+def test_option(args, address, supported_protocols, protocol):
     """
     Forward the appropriate tests to multithreading function
 
@@ -150,10 +151,10 @@ def test_option(args, address, supported_protocols, protocol, cipher_suites):
         return {}
     else:
         classes = list(map(lambda t: tests_switcher[t], args.test))
-    return vulnerability_scans(classes, address, supported_protocols, args.timeout, protocol, cipher_suites)
+    return vulnerability_scans(classes, address, supported_protocols, args.timeout, protocol)
 
 
-def vulnerability_scans(classes, address, supported_protocols, timeout, protocol, cipher_suites):
+def vulnerability_scans(classes, address, supported_protocols, timeout, protocol):
     """
     Run chosen vulnerability tests in parallel
 
@@ -162,7 +163,6 @@ def vulnerability_scans(classes, address, supported_protocols, timeout, protocol
     :param list supported_protocols: List of supported protocols
     :param int timeout: Timeout in seconds
     :param str protocol: SSL/TLS protocol
-    :param cipher_suites: Supported cipher suites
     :return: Tests results
     :rtype: dict
     """
@@ -171,6 +171,7 @@ def vulnerability_scans(classes, address, supported_protocols, timeout, protocol
     # Dictionary that all the threads live in where the key
     # is the thread (future) and value is the function name
     futures = {}
+    log.info(f"Creating {len(classes)} threads for vulnerability tests")
     with cf.ThreadPoolExecutor(max_workers=len(classes)) as executor:
         for test_class in classes:
             # 0th index is the function, 1st index is the function name
@@ -200,6 +201,7 @@ def cipher_suites_option(address, args, supported_protocols, protocol):
     """
     cipher_suites = CipherSuites(address, supported_protocols, args.timeout)
     if protocol == 'SSLv2' and not args.cipher_suites:
+        log.info("Scanning for SSLv2 cipher suites")
         cipher_suites.scan_sslv2_cipher_suites()
     elif args.cipher_suites:
         cipher_suites.scan_cipher_suites()

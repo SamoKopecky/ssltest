@@ -7,6 +7,7 @@ import urllib3
 from ...utils import incremental_sleep
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+log = logging.getLogger(__name__)
 
 
 def discover_ports(url):
@@ -17,14 +18,13 @@ def discover_ports(url):
     :return: Usable ports
     :rtype: list
     """
-    logging.info('Discovering ports...')
+    log.info('Discovering ports')
     nmap = nmap3.NmapHostDiscovery()
     # Scan with nmap for all open ports
-    logging.debug('Scanning with nmap for all open ports...')
     result = nmap.nmap_portscan_only(url)
     open_ports = [port['portid'] for port in list(result.items())[0][1]['ports']]
     usable_ports = []
-    logging.debug(f'ports : {open_ports}')
+    log.debug(f'Scanned ports by nmap : {open_ports}')
     for port in open_ports:
         sleep = 0
         # Loop until there is a valid response or after 10 seconds
@@ -43,5 +43,4 @@ def discover_ports(url):
                 break
             except requests.exceptions.ConnectionError as exception:
                 sleep = incremental_sleep(sleep, exception, 5)
-    logging.debug(f'scanned ports : {usable_ports}')
     return usable_ports

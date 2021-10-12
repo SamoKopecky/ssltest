@@ -1,5 +1,7 @@
 import logging
 
+from typing import Tuple
+
 from .CipherSuite import CipherSuite
 from ..connections.ClientHello import ClientHello
 from ..connections.SSLv2 import SSLv2
@@ -7,10 +9,12 @@ from ...exceptions.ConnectionTimeout import ConnectionTimeout
 from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
     is_server_hello, get_cipher_suite_protocols
 
+log = logging.getLogger(__name__)
+
 
 class CipherSuites:
     def __init__(self, address, supported_protocols, timeout):
-        self.short_timeout = 0.3
+        self.short_timeout = 0.1
         self.timeout = timeout
         self.address = address
         self.supported = {}
@@ -29,12 +33,14 @@ class CipherSuites:
         If the server response with an error of some kind the supported cipher
         suites are those which the server chose before.
         """
-        logging.info('scanning cipher suite support')
+        log.info('Scanning for cipher suite support')
         if 'SSLv2' in self.supported_protocols:
+            log.info("Scanning SSLv2 cipher suites")
             self.supported_protocols.remove('SSLv2')
             self.scan_sslv2_cipher_suites()
 
         for protocol in self.supported_protocols:
+            log.info(f"Scanning {protocol} cipher suites")
             # Ignore TLSv1.1 since the same cipher suites apply for TLSv1.0
             if protocol == 'TLSv1.1' and 'TLSv1.0' in self.supported_protocols:
                 continue
@@ -54,16 +60,9 @@ class CipherSuites:
             client_hello = ClientHello(protocol_version_conversion(protocol), to_test_cipher_suites, False)
             while True:
                 client_hello_bytes = client_hello.construct_client_hello()
-                if self.short_timeout >= 1:
-                    raise ConnectionTimeout
-                try:
-                    response, sock = send_data_return_sock(self.address, client_hello_bytes, self.short_timeout,
-                                                           f'cipher_suite_scanning_for_{protocol}')
-                except ConnectionTimeout:
-                    logging.debug('increasing timeout period')
-                    self.short_timeout += 0.1
+                response, try_again = self.try_receive_data(client_hello_bytes, protocol)
+                if try_again:
                     continue
-                sock.close()
                 if not is_server_hello(response):
                     break
                 # Register accepted cipher suite
@@ -85,6 +84,33 @@ class CipherSuites:
                 protocol = 'TLSv1.0/TLSv1.1'
             self.unrated.update({protocol: string_cipher_suites})
 
+    def try_receive_data(self, client_hello_bytes, protocol):
+        """
+        Try to receive the response of the sent client hello
+
+        If the server can't keep up or it resets the connection, slow down
+
+        :param bytes or bytearray client_hello_bytes: client hello msg
+        :param str protocol: SSL/TLS protocol
+        :return: The server response and whether to try again
+        :rtype: Tuple[bytes, bool]
+        """
+        if self.short_timeout >= 1:
+            raise ConnectionTimeout
+        try:
+            response, sock = send_data_return_sock(self.address, client_hello_bytes, self.short_timeout,
+                                                   f'cipher_suite_scanning_for_{protocol}')
+            sock.close()
+        except ConnectionTimeout:
+            log.warning('Connection timed out, increasing timeout by 0.1s')
+            self.short_timeout += 0.1
+            return bytes(), True
+        if len(response) == 0:
+            log.warning('No received data, increasing timeout by 0.1s')
+            self.short_timeout += 0.1
+            return bytes(), True
+        return response, False
+
     def scan_sslv2_cipher_suites(self):
         """
         Scans the available SSLv2 cipher suites
@@ -93,7 +119,6 @@ class CipherSuites:
         the server sends his supported cipher suites in the ServerHello
         message.
         """
-        logging.debug('cipher_suite_scanning_for_SSLv2')
         sslv2 = SSLv2(self.address, self.timeout)
         sslv2.send_client_hello()
         sslv2.parse_cipher_suite()

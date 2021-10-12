@@ -2,9 +2,10 @@ from .PType import PType
 from .Parameters import Parameters
 from ...utils import read_json
 
+json_data = read_json('cipher_parameters.json')
+
 
 class CipherSuite(Parameters):
-
     def __init__(self, cipher_suite: str, protocol=None):
         super().__init__()
         # Create a dictionary for cipher suite parameters with PType keys
@@ -20,7 +21,7 @@ class CipherSuite(Parameters):
         to categories with the help of a json file. Categories are
         defined in PType.py class.
         """
-        json_data = read_json('cipher_parameters.json')
+
         raw_parameters = self.cipher_suite.split('_')
         if 'TLS' in raw_parameters:
             raw_parameters.remove('TLS')

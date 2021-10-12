@@ -2,6 +2,8 @@ from abc import ABC
 
 from ...utils import read_json
 
+security_levels_json = read_json('security_levels.json')
+
 
 class Parameters(ABC):
     def __init__(self):
@@ -73,7 +75,7 @@ class Parameters(ABC):
             "==": lambda a, b: a == b
         }
         # TODO: All of the algorithms are not yet added to the security_levels.json
-        levels_str = read_json('security_levels.json')[key_len_type.name]
+        levels_str = security_levels_json[key_len_type.name]
         if key_len == 'N/A':
             return '0'
         for idx in range(1, 5):
@@ -97,7 +99,7 @@ class Parameters(ABC):
         :rtype: str
         """
         # TODO: All of the algorithms are not yet added to the security_levels.json
-        security_levels_json = read_json('security_levels.json')
+
         if parameter == 'N/A':
             return '0'
         for idx in range(1, 5):

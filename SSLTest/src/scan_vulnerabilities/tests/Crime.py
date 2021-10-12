@@ -28,8 +28,7 @@ class Crime(VulnerabilityTest):
         sock.close()
         if not is_server_hello(response):
             return False
-        # 0x02 stands for fatal error
-        if response[-2] == 0x02:
+        elif response[-2] == 0x02:  # 0x02 stands for fatal error
             return False
         else:
             return True

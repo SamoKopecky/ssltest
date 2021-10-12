@@ -1,6 +1,9 @@
 import json
+import logging
 
 from ..utils import read_json
+
+log = logging.getLogger(__name__)
 
 
 class TextOutput:
@@ -15,6 +18,7 @@ class TextOutput:
         """
         Call all other text output functions for each port and url
         """
+        log.info("Fomating output")
         if not self.data:
             return
         json_data = json.loads(self.data)

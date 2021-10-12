@@ -39,6 +39,8 @@ class Drown(VulnerabilityTest):
         """
         Scan for the EXPORT cipher suites in SSLv2 support
         """
+        if 'SSLv2' not in self.supported_protocols:
+            return
         sslv2 = SSLv2(self.address, self.timeout)
         sslv2.send_client_hello()
         sslv2.parse_cipher_suite()

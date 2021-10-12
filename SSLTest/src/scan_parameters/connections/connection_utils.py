@@ -19,6 +19,9 @@ class WebServer(NamedTuple):
     protocol: str
 
 
+log = logging.getLogger(__name__)
+
+
 def get_webserver_info(address, supported_protocols, worst, timeout):
     """
     Gather objects required to rate a web server
@@ -33,10 +36,10 @@ def get_webserver_info(address, supported_protocols, worst, timeout):
     :return: Tuple of all the values
     :rtype: WebServer
     """
-    logging.info('Creating main session...')
+    log.info('Creating main session')
     chosen_protocol = choose_protocol(supported_protocols, worst)
     if 'SSL' in chosen_protocol:
-        logging.debug('Connecting with SSL...')
+        log.info('Connecting with SSL')
         ssl_protocols = {
             'SSLv3': SSLv3,
             'SSLv2': SSLv2
@@ -51,7 +54,7 @@ def get_webserver_info(address, supported_protocols, worst, timeout):
         cert_verified = ssl_protocol.cert_verified
         protocol = ssl_protocol.protocol
     else:
-        logging.debug('Connecting with TLS...')
+        log.info('Connecting with TLS')
         context = create_ssl_context(chosen_protocol)
         ssl_socket, cert_verified = create_session(address, True, context, timeout)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
@@ -123,6 +126,7 @@ def create_ssl_context(protocol_version):
     try:
         context.options |= ssl_versions[protocol_version]
     except KeyError:
+        log.warning(f"Unable to create context for {protocol_version}")
         pass
     return context
 
@@ -138,7 +142,7 @@ def get_certificate(ssl_socket):
     return x509.load_der_x509_certificate(certificate_pem, default_backend())
 
 
-def get_cipher_suite_and_protocol(ssl_socket: ssl.SSLSocket):
+def get_cipher_suite_and_protocol(ssl_socket):
     """
     Gather the cipher suite and the protocol from the ssl_socket
 
@@ -175,7 +179,7 @@ def create_session(address, verify_cert, context, timeout):
         sock.settimeout(timeout)  # in seconds
         ssl_socket = context.wrap_socket(sock, server_hostname=address.url)
         try:
-            logging.debug(f'connecting...')
+            log.debug(f'Connecting with TLS protocol')
             ssl_socket.connect(address)
             break
         except ssl.SSLCertVerificationError:
@@ -183,9 +187,9 @@ def create_session(address, verify_cert, context, timeout):
             cert_verified = False
             context.check_hostname = False
             context.verify_mode = ssl.VerifyMode.CERT_NONE
-        except socket.timeout:
-            logging.debug('connection timeout...')
-            raise ConnectionTimeout()
+        except socket.timeout as e:
+            log.warning('Connection timeout, retrying')
+            sleep = incremental_sleep(sleep, e, 3)
         except socket.gaierror:
             raise Exception('DNS record not found')
         except socket.error as e:
@@ -195,8 +199,8 @@ def create_session(address, verify_cert, context, timeout):
                     '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]' in error_str or \
                     '[SSL: TLSV1_ALERT_PROTOCOL_VERSION]' in error_str or \
                     'EOF occurred in violation of protocol' in error_str:
-                logging.debug('protocol unsupported...')
+                log.debug('Protocol unsupported')
                 raise e
-            logging.debug('error occurred...')
+            log.warning('Socket error occurred, retrying')
             sleep = incremental_sleep(sleep, e, 3)
     return ssl_socket, cert_verified

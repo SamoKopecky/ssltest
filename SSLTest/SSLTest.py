@@ -3,6 +3,7 @@
 __version__ = "0.0.2"
 
 import argparse
+import logging
 import os
 import subprocess
 import sys
@@ -21,6 +22,7 @@ class SSLTest:
         self.use_json = self.args.json
 
     def run(self):
+        logging_option(self.args)
         run(self.args)
         ptmisclib.ptprint(ptmisclib.out_if(self.ptjsonlib.get_all_json(), "", self.use_json))
 
@@ -57,7 +59,7 @@ def get_help():
             ["-nd", "--nmap-discover", "", "Use nmap to discover web server ports"],
             ["-w", "--worst", "", "Create a main connection on the worst available protocol version, otherwise servers "
                                   "preferred protocol version is chosen"],
-            ["-i", "--info", "", "Output some internal information about the script functions"],
+            ["-l", "--logging", "", "Enable logging"],
             ["-d", "--debug", "", "Output debug information"],
             ["-v", "--version", "", "Show script version and exit"],
             ["-h", "--help", "", "Show this help message and exit"]
@@ -85,7 +87,7 @@ def parse_args():
     parser.add_argument("-nd", "--nmap-discover", action="store_true", default=False)
     parser.add_argument("-fc", "--fix-conf", action="store_true", default=False)
     parser.add_argument("-w", "--worst", action="store_true", default=False)
-    parser.add_argument("-i", "--info", action="store_true", default=False)
+    parser.add_argument("-l", "--logging", action="store_true", default=False)
     parser.add_argument("-d", "--debug", action="store_true", default=False)
     parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
 
@@ -126,6 +128,26 @@ def fix_conf_option(args):
         try_to_remove_argument('-fc', '--fix-conf')
         # Restarts the program without the fc, st and ss arguments
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+
+
+def logging_option(args):
+    """
+    Handle the debug and information options
+
+    :param Namespace args: Parsed input arguments
+    """
+    logger = logging.getLogger(__package__)
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+
+    if args.debug:
+        ch.setLevel(level=logging.DEBUG)
+    elif args.logging:
+        ch.setLevel(level=logging.INFO)
+
+    formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s: %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 
 def try_to_remove_argument(short_name, full_name):
