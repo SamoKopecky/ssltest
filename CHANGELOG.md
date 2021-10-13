@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+# [0.0.3](https://github.com/SamoKopecky/SSLTest/compare/v0.0.2...v0.0.3) - Oct 13, 2021
+
+### Added
+
+- `-t --timeout` option
+- `-cs --cipher-suites` option to scan for cipher suite support
+- Automatic Cipher suite support scanning for SSLv2 protocol version if chosen as the main protocol
+- Support for symmetric encryption modification values like `EDE3` and `EXPORT40`
+- Expansion of the `ciher_suites.json` file with protocol support for each cipher suite
+    - This is used when creating cipher suites for client hellos in vulnerability tests, SSL protocol scanning and
+      cipher suite scanning
+- `DROWN`, `Sweet32` and `Forward secrecy support` vulnerability tests
+- Split the `run.py` file into two logical sections for code readability
+- Additional logging levels (`Warning`, `Error`) and improve the logging system
+- Creation of backups when modifying the `/etc/ssl/openssl.cnf` file with `-fc` option
+- Properer handling for servers with no HTTPS support
+
+### Changed
+
+- Instead of choosing the best protocol version, protocol is chosen by the server for TLS protocols, for SSL protocols
+  the best SSL protocol is chosen
+- Change `-i --info` option to `-l --logging`
+- Add `-st -sudo--tty` and `-ss -sudo--stdin` options for entering the sudo password instead of automatic detection
+
+### Removed
+
 # [0.0.2](https://github.com/SamoKopecky/SSLTest/compare/v0.0.1...v0.0.2) - Sep 7, 2021
 
 ### Added

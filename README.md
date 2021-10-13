@@ -71,6 +71,7 @@ $ SSLTest.py -u https://example.com -t 1 2 -cs
 ## Version History
 
 * Full changelog [here](/CHANGELOG.md)
+* [0.0.3](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.3)
 * [0.0.2](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.2)
 * [0.0.1](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.1)
 
