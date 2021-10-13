@@ -1,8 +1,12 @@
+import logging
+
 from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
 
 from .PType import PType
 from .Parameters import Parameters
+
+log = logging.getLogger(__name__)
 
 
 class Certificate(Parameters):
@@ -52,6 +56,7 @@ class Certificate(Parameters):
         try:
             extension = self.certificate.extensions.get_extension_for_class(x509.SubjectAlternativeName)
         except x509.extensions.ExtensionNotFound:
+            log.error("No alternative names extension found in certificate")
             return []
         return extension.value.get_values_for_type(x509.DNSName)
 
@@ -95,6 +100,7 @@ class Certificate(Parameters):
         elif isinstance(public_key, ed25519.Ed25519PublicKey) or isinstance(public_key, ed448.Ed448PublicKey):
             return 'ECDSA'
         else:
+            log.error("Unknown type for certificate public key ")
             return 'N/A'
 
     @staticmethod

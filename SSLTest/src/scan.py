@@ -57,7 +57,7 @@ def scan(args, port):
 
     vulnerabilities = test_option(args, address, protocol_support.supported, webserver.protocol)
 
-    log.info(f'Scanning done for {address.url}:{address.port}.')
+    log.info(f'Scanning done for {address.url}:{address.port}')
     return dump_to_dict(address, cipher_suite, certificate, protocol_support, web_server, cipher_suites,
                         vulnerabilities)
 
@@ -120,14 +120,14 @@ def get_tests_switcher():
         0: (None, 'No test'),
         1: (CCSInjection, CCSInjection.test_name),
         2: (Crime, Crime.test_name),
-        3: (FallbackSCSVSupport, FallbackSCSVSupport.test_name),
-        4: (Heartbleed, Heartbleed.test_name),
-        5: (InsecureRenegotiation, InsecureRenegotiation.test_name),
-        6: (RC4Support, RC4Support.test_name),
-        7: (SessionTicketSupport, SessionTicketSupport.test_name),
-        8: (Drown, Drown.test_name),
-        9: (Sweet32, Sweet32.test_name),
-        10: (ForwardSecrecySupport, ForwardSecrecySupport.test_name)
+        3: (Drown, Drown.test_name),
+        4: (FallbackSCSVSupport, FallbackSCSVSupport.test_name),
+        5: (ForwardSecrecySupport, ForwardSecrecySupport.test_name),
+        6: (Heartbleed, Heartbleed.test_name),
+        7: (InsecureRenegotiation, InsecureRenegotiation.test_name),
+        8: (RC4Support, RC4Support.test_name),
+        9: (SessionTicketSupport, SessionTicketSupport.test_name),
+        10: (Sweet32, Sweet32.test_name)
     }
 
 
@@ -201,7 +201,6 @@ def cipher_suites_option(address, args, supported_protocols, protocol):
     """
     cipher_suites = CipherSuites(address, supported_protocols, args.timeout)
     if protocol == 'SSLv2' and not args.cipher_suites:
-        log.info("Scanning for SSLv2 cipher suites")
         cipher_suites.scan_sslv2_cipher_suites()
     elif args.cipher_suites:
         cipher_suites.scan_cipher_suites()

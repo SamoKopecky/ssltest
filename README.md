@@ -11,8 +11,6 @@
 
 Script that scans web servers cryptographic parameters and vulnerabilities
 
-
-
 ## Installation
 
 ```
@@ -35,20 +33,19 @@ $ sudo ptmanager -ut SSLTest
                              written to the given file
 -t  --test      <number ...> Test the server for a specified vulnerability
                              possible vulnerabilities (separate with spaces):
-                                   0: No test
-                                   1: CCS Injection
-                                   2: Crime
-                                   3: No Fallback SCSV Support
-                                   4: Heartbleed
-                                   5: Insecure Renegotiation
-                                   6: RC4 Support
-                                   7: Session Ticket Support
-                                   8: DROWN
-                                   9: Sweet32
-                                   10: No Forward Secrecy Support
+                                    0: No test
+                                    1: CCS Injection
+                                    2: CRIME
+                                    3: DROWN
+                                    4: No Fallback SCSV Support
+                                    5: No Forward Secrecy Support
+                                    6: Heartbleed
+                                    7: Insecure Renegotiation
+                                    8: RC4 Support
+                                    9: Session Ticket Support
+                                    10: Sweet32
                              If this argument isn't specified all tests will be ran
 -fc --fix-conf               Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1) 
-                             protocol versions of TLS protocol (TLSv1 and TLSv1.1)
 -st --sudo-tty               Use the terminal prompt to enter the sudo password
 -ss --sudo-stdin             Use the stdin of the script to enter the sudo password
 -ns --nmap-scan              Use nmap to scan the server version
@@ -59,13 +56,16 @@ $ sudo ptmanager -ut SSLTest
 -v  --version                Show script version and exit
 -h  --help                   Show this help message and exit
 ```
+
 ### -fc argument
-TODO
+
+The `-fc` argument may rewrite the file located at `/etc/ssl/openssl.cnf` that is why a backup file is created with this
+format `{old_file}.backup_{unix_time}` in the same folder as the config file
 
 ## Usage examples
 
 ```
-$ SSLTest.py -u https://example.com -t 1 2
+$ SSLTest.py -u https://example.com -t 1 2 -cs
 ```
 
 ## Version History
@@ -73,7 +73,6 @@ $ SSLTest.py -u https://example.com -t 1 2
 * Full changelog [here](/CHANGELOG.md)
 * [0.0.2](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.2)
 * [0.0.1](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.1)
-
 
 ## Licence
 

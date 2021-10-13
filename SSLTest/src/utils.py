@@ -25,8 +25,8 @@ def read_json(file_name):
     """
     root_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = f"{root_dir}/../../resources/{file_name}"
-    file = open(file_path, 'r')
     log.debug(f"Opening {file_path}")
+    file = open(file_path, 'r')
     json_data = json.loads(file.read())
     file.close()
     return json_data

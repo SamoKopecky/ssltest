@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import time
 
 
 def fix_openssl_config():
@@ -12,6 +13,7 @@ def fix_openssl_config():
     template file
     """
     config_file_name = '/etc/ssl/openssl.cnf'
+    create_backup_config(config_file_name)
     config_file = open(config_file_name, 'r')
     config_content = config_file.read()
     append = [False, False]
@@ -76,6 +78,20 @@ def replace_string(file_name, to_replace, replace_with):
     file_w.flush()
     file_r.close()
     file_w.close()
+
+
+def create_backup_config(file_path):
+    """
+    Back up the old config file
+
+    :param str file_path: Config file path
+    """
+    old_file = open(file_path, "r")
+    backup_file_path = file_path + f".backup_{time.time()}"
+    backup_file = open(backup_file_path, "w")
+    backup_file.write(old_file.read())
+    old_file.close()
+    backup_file.close()
 
 
 if __name__ == '__main__':

@@ -61,21 +61,21 @@ class ProtocolSupport:
         """
         Test for all possible TLS versions which the server supports
         """
-        tls_versions = [
+        tls_protocols = [
             'TLSv1.0',
             'TLSv1.1',
             'TLSv1.2',
             'TLSv1.3'
         ]
-        for version in tls_versions:
-            log.info(f'Scanning for {version}')
-            context = create_ssl_context(version)
+        for protocol in tls_protocols:
+            log.info(f'Scanning for {protocol}')
+            context = create_ssl_context(protocol)
             try:
                 ssl_socket, _ = create_session(self.address, False, context, self.timeout)
                 ssl_socket.close()
-                self.supported.append(version)
+                self.supported.append(protocol)
             except socket.error:
-                self.unsupported.append(version)
+                self.unsupported.append(protocol)
 
     def rate_protocols(self):
         """

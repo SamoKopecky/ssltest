@@ -8,7 +8,6 @@ from cryptography.hazmat.backends import default_backend
 
 from .SSLv2 import SSLv2
 from .SSLv3 import SSLv3
-from ...exceptions.ConnectionTimeout import ConnectionTimeout
 from ...utils import incremental_sleep, convert_cipher_suite, Address
 
 
@@ -75,7 +74,7 @@ def choose_protocol(protocols, worst):
     """
     tls_protocols = list(filter(lambda p: 'TLS' in p, protocols))
     if not worst and len(tls_protocols) != 0:
-        return ''
+        return 'TLSvAUTO'
     return worst_or_best_protocol(protocols, worst)
 
 
@@ -126,7 +125,7 @@ def create_ssl_context(protocol_version):
     try:
         context.options |= ssl_versions[protocol_version]
     except KeyError:
-        log.warning(f"Unable to create context for {protocol_version}")
+        log.debug(f"Unable to create context for {protocol_version}")
         pass
     return context
 
@@ -151,6 +150,7 @@ def get_cipher_suite_and_protocol(ssl_socket):
     """
     cipher_suite = ssl_socket.cipher()[0]
     if '-' in cipher_suite:
+        log.warning(f"{cipher_suite} not in IANA format, converting")
         cipher_suite = convert_cipher_suite(cipher_suite, 'OpenSSL', 'IANA')
     return cipher_suite, ssl_socket.version()
 

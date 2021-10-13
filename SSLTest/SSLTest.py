@@ -60,7 +60,7 @@ def get_help():
             ["-w", "--worst", "", "Create a main connection on the worst available protocol version, otherwise servers "
                                   "preferred protocol version is chosen"],
             ["-l", "--logging", "", "Enable logging"],
-            ["-d", "--debug", "", "Output debug information"],
+            ["-d", "--debug", "", "Log debug information"],
             ["-v", "--version", "", "Show script version and exit"],
             ["-h", "--help", "", "Show this help message and exit"]
         ]}
@@ -167,9 +167,9 @@ def check_test_option(tests):
         print_help()
         if len(unknown_tests) > 1:
             unknown_tests = list(map(str, unknown_tests))
-            print(f"Numbers {','.join(unknown_tests)} are not test numbers.", file=sys.stderr)
+            print(f"Numbers {','.join(unknown_tests)} are not test numbers", file=sys.stderr)
         else:
-            print(f"Number {unknown_tests[0]} is not a test number.", file=sys.stderr)
+            print(f"Number {unknown_tests[0]} is not a test number", file=sys.stderr)
         sys.exit(1)
 
 
