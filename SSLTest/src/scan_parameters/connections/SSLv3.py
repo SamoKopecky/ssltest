@@ -1,19 +1,19 @@
 from struct import unpack
+
 from cryptography.x509 import load_der_x509_certificate
 
+from .ClientHello import ClientHello
 from .SSLvX import SSLvX
-from ...utils import bytes_to_cipher_suite
-from ...scan_vulnerabilities.ClientHello import ClientHello
-from ...scan_vulnerabilities.utils import version_conversion
+from ...utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion
 
 
 class SSLv3(SSLvX):
-    def __init__(self, url, port):
-        super().__init__(url, port)
+    def __init__(self, address, timeout):
+        super().__init__(address, timeout)
         self.protocol = 'SSLv3'
-        self.client_hello = ClientHello(version_conversion(self.protocol, True)).construct_client_hello()
+        self.client_hello = ClientHello(protocol_version_conversion(self.protocol)).construct_client_hello()
 
-    def scan_version_support(self):
+    def scan_protocol_support(self):
         if len(self.response) == 0:
             return False
         # Test if the response is Content type Alert (0x15)
@@ -28,10 +28,8 @@ class SSLv3(SSLvX):
     def parse_cipher_suite(self):
         if len(self.response) == 0:
             return
-        sess_id_len_idx = 43  # Always fixed index
-        cipher_suite_idx = self.response[sess_id_len_idx] + sess_id_len_idx + 1
-        cipher_suites_bytes = self.response[cipher_suite_idx: cipher_suite_idx + 2]
-        self.cipher_suite = bytes_to_cipher_suite(cipher_suites_bytes, 'IANA')
+        cipher_suite_bytes = parse_cipher_suite(self.response)
+        self.cipher_suite = bytes_to_cipher_suite(cipher_suite_bytes, 'IANA')
 
     def parse_certificate(self):
         if len(self.response) == 0:

@@ -1,11 +1,12 @@
-from .Parameters import Parameters
 from .PType import PType
+from .Parameters import Parameters
 from ...utils import read_json
+
+json_data = read_json('cipher_parameters.json')
 
 
 class CipherSuite(Parameters):
-
-    def __init__(self, cipher_suite: str, protocol: str):
+    def __init__(self, cipher_suite: str, protocol=None):
         super().__init__()
         # Create a dictionary for cipher suite parameters with PType keys
         self.parameters = {enum: {} for enum in PType if enum.is_cipher_suite}
@@ -20,10 +21,13 @@ class CipherSuite(Parameters):
         to categories with the help of a json file. Categories are
         defined in PType.py class.
         """
-        json_data = read_json('cipher_parameters.json')
+
         raw_parameters = self.cipher_suite.split('_')
-        if 'TLS' in raw_parameters:
+        try:
             raw_parameters.remove('TLS')
+            raw_parameters.remove('WITH')
+        except ValueError:
+            pass
         parameter_types = list(self.parameters.keys())
         # For each parameter iterate through each enum value until a match is found
         for p_raw in raw_parameters:

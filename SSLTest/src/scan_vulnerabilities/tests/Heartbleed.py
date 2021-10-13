@@ -1,14 +1,13 @@
 from ..VulnerabilityTest import VulnerabilityTest
-from ..ClientHello import ClientHello
-from ..utils import is_server_hello
-from ...utils import receive_data, communicate_data_return_sock
+from ...scan_parameters.connections.ClientHello import ClientHello
+from ...utils import receive_data, send_data_return_sock, is_server_hello
 
 
 class Heartbleed(VulnerabilityTest):
     test_name = 'Heartbleed'
 
-    def __init__(self, supported_protocols, address):
-        super().__init__(supported_protocols, address)
+    def __init__(self, supported_protocols, address, timeout, protocol):
+        super().__init__(supported_protocols, address, timeout, protocol)
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
 
     def test(self, version):
@@ -22,8 +21,8 @@ class Heartbleed(VulnerabilityTest):
         heartbeat_extension = bytearray([0x00, 0x0f, 0x00, 0x01, 0x01])
         client_hello = ClientHello(version)
         client_hello.extensions += heartbeat_extension
-        response, sock = communicate_data_return_sock(self.address, client_hello.construct_client_hello(),
-                                                      self.timeout, self.test_name)
+        response, sock = send_data_return_sock(self.address, client_hello.construct_client_hello(),
+                                               self.timeout, self.test_name)
         if not is_server_hello(response):
             sock.close()
             return False

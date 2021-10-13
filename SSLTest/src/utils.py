@@ -2,8 +2,17 @@ import json
 import logging
 import os
 import socket
-
 from time import sleep, time
+from typing import NamedTuple
+
+from .exceptions.ConnectionTimeout import ConnectionTimeout
+
+log = logging.getLogger(__name__)
+
+
+class Address(NamedTuple):
+    url: str
+    port: int
 
 
 def read_json(file_name):
@@ -15,10 +24,15 @@ def read_json(file_name):
     :rtype: dict
     """
     root_dir = os.path.dirname(os.path.abspath(__file__))
-    file = open(f'{root_dir}/../../resources/{file_name}', 'r')
+    file_path = f"{root_dir}/../../resources/{file_name}"
+    log.debug(f"Opening {file_path}")
+    file = open(file_path, 'r')
     json_data = json.loads(file.read())
     file.close()
     return json_data
+
+
+cipher_suites_json = read_json('cipher_suites.json')
 
 
 def receive_data(sock, timeout, debug_source):
@@ -26,56 +40,61 @@ def receive_data(sock, timeout, debug_source):
     Receive network data in chunks
 
     :param sock: Socket to receive from
-    :param int timeout: Timeout in seconds
+    :param float timeout: Timeout in seconds
     :param str debug_source: Description of the debug source
     :return: Array of bytes of received data
     :rtype: bytes
     """
     all_data = []
     begin = time()
-    while 1:
-        if all_data and time() - begin > timeout:
-            logging.debug(f"({debug_source}) timed out with received data")
-            break
-        elif time() - begin > timeout * 2:
-            logging.debug(f"({debug_source}) timed out with no received data")
-            break
+    while True:
         try:
             data = sock.recv(2048)
             if data:
-                logging.debug(f"({debug_source}) receiving data")
+                log.debug(f"({debug_source}) receiving data")
                 all_data.extend(data)
                 begin = time()
             else:
                 sleep(0.1)
-        except (socket.timeout, ConnectionResetError):
+        except socket.timeout:
+            log.debug("Timeout out while receiving data")
+            break
+        if all_data and time() - begin > timeout:
+            log.debug(f"({debug_source}) finished with received data")
+            break
+        elif time() - begin > timeout:
+            log.debug(f"({debug_source}) finished with no received data")
             break
     return bytes(all_data)
 
 
-def communicate_data_return_sock(address, client_hello, timeout, debug_source):
+def send_data_return_sock(address, client_hello, timeout, debug_source):
     """
     Send client client_hello to the server and catch the response
 
-    :param tuple address: Tuple of an url and port
+    :param Address address: Webserver address
     :param bytes client_hello: client_hello data in bytes
-    :param int timeout: Timeout in seconds
+    :param float timeout: Timeout in seconds
     :param str debug_source: Description of the debug source
     :return: Created socket and received response
     :rtype: bytes or socket
     """
+    sleep_dur = 0
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(timeout)
-    sleep_dur = 0
     while True:
         try:
             sock.connect(address)
+            sock.send(client_hello)
+            response = receive_data(sock, timeout, debug_source)
             break
-        except socket.timeout:
-            logging.debug('connection timeout...')
-            sleep_dur = incremental_sleep(sleep_dur, Exception('Connection timeout'), 3)
-    sock.send(client_hello)
-    response = receive_data(sock, timeout, debug_source)
+        except socket.timeout as e:
+            sock.close()
+            log.warning("Timeout out while creating socket and sending data, retrying")
+            sleep_dur = incremental_sleep(sleep_dur, e, 2)
+        except (socket.error, ConnectionResetError) as e:
+            log.warning('Socket error occurred, retrying')
+            sleep_dur = incremental_sleep(sleep_dur, e, 3)
     return response, sock
 
 
@@ -90,11 +109,10 @@ def incremental_sleep(sleep_dur, exception, max_timeout_dur):
     :rtype: int
     """
     if sleep_dur >= max_timeout_dur:
-        logging.debug('timed out')
+        log.debug('timed out')
         raise exception
-    logging.debug('increasing sleep duration')
     sleep_dur += 1
-    logging.debug(f'sleeping for {sleep_dur}')
+    log.debug(f'increasing sleep duration to {sleep_dur}')
     sleep(sleep_dur)
     return sleep_dur
 
@@ -112,8 +130,7 @@ def convert_cipher_suite(cipher_suite, from_cipher_suite, to_cipher_suite):
     :return: Converted cipher suite
     :rtype: str
     """
-    json_data = read_json('cipher_suites.json')
-    for cipher in json_data.values():
+    for cipher in cipher_suites_json.values():
         if cipher[from_cipher_suite] == cipher_suite:
             return cipher[to_cipher_suite]
     raise Exception(f'No pair found for {cipher_suite}')
@@ -130,9 +147,8 @@ def bytes_to_cipher_suite(bytes_object, string_format):
     """
     if len(bytes_object) != 2:
         raise Exception(f'Can only convert from 2 bytes')
-    bytes_string = f'0x{bytes_object[0]:X},0x{bytes_object[1]:X}'
-    json_data = read_json('cipher_suites.json')
-    for key, value in json_data.items():
+    bytes_string = cs_bytes_to_str(bytes_object)
+    for key, value in cipher_suites_json.items():
         if key == bytes_string:
             return value[string_format]
     raise Exception(f'No cipher suite found for {bytes_string}')
@@ -147,9 +163,106 @@ def cipher_suite_to_bytes(cipher_suite, string_format):
     :return: Two bytes in an bytes object
     :rtype: bytes
     """
-    json_data = read_json('cipher_suites.json')
-    for key, value in json_data.items():
+    for key, value in cipher_suites_json.items():
         if value[string_format] == cipher_suite:
             bytes_list = key.split(',')
             return bytes([int(bytes_list[0], 16), int(bytes_list[1], 16)])
     raise Exception(f'No bytes found for {cipher_suite}')
+
+
+def get_cipher_suite_protocols(cipher_suite):
+    """
+    Get a cipher suites supported protocols
+
+    :param bytearray or bytes or str cipher_suite: cipher suite
+    :return: list of supported protocols
+    :rtype: list
+    """
+    if type(cipher_suite) == str:
+        cipher_suite_to_bytes(cipher_suite, 'IANA')
+    for key, value in cipher_suites_json.items():
+        if key == cs_bytes_to_str(cipher_suite):
+            return value['protocol_version'].split(',')
+
+
+def cs_bytes_to_str(bytes_object):
+    """
+    Convert cipher suite bytes into string bytes
+
+    e.g. bytes([192, 13]) => "0xC0,0x13"
+
+    :param bytearray or bytes bytes_object: Pair of bytes representing a cipher suite
+    :return: Converted string representation
+    :rtype: str
+    """
+    return f'0x{bytes_object[0]:02X},0x{bytes_object[1]:02X}'
+
+
+def filter_cipher_suite_bytes(cipher_suites, filter_fun):
+    """
+    Filters cipher suite bytes with the given filter function
+
+    :param bytearray or bytes cipher_suites: Cipher suites
+    :param lambda filter_fun: Function to filter the cipher suites
+    :return: Filter cipher suites
+    :rtype: bytearray
+    """
+    filtered_suites = bytearray([])
+    for i in range(0, len(cipher_suites), 2):
+        cipher_suite = bytes_to_cipher_suite(cipher_suites[i: i + 2], 'IANA')
+        if filter_fun(cipher_suite):
+            filtered_suites += cipher_suite_to_bytes(cipher_suite, 'IANA')
+    return filtered_suites
+
+
+def parse_cipher_suite(data):
+    """
+    Extract the cipher suite out of a client hello
+
+    :param data: Data to extract from
+    :return: 2 cipher suite bytes
+    :rtype: bytearray
+    """
+    sess_id_len_idx = 43  # Always fixed index
+    cipher_suite_idx = data[sess_id_len_idx] + sess_id_len_idx + 1
+    cipher_suites_bytes = data[cipher_suite_idx: cipher_suite_idx + 2]
+    return bytearray(cipher_suites_bytes)
+
+
+def protocol_version_conversion(version):
+    """
+    Convert SSL/TLS protocol version into the required format
+
+    :param str or int version: SSL/TLS version, either in str or int
+    :return: converted version
+    :rtype: str or int
+    """
+    protocol_version = {
+        "TLSv1.3": 0x04,
+        "TLSv1.2": 0x03,
+        "TLSv1.1": 0x02,
+        "TLSv1.0": 0x01,
+        "SSLv3": 0x00
+    }
+    protocol_type = type(version)
+    if protocol_type is str:
+        return protocol_version[version]
+    elif protocol_type is int:
+        return next(key for key, value in protocol_version.items() if value == version)
+
+
+def is_server_hello(message):
+    """
+    Checks if the message is a server hello
+
+    :param bytes message: Received message
+    :return: Whether the message is a legit server hello msg
+    :rtype: bool
+    """
+    # Server hello content type in record protocol
+    try:
+        if message[5] == 0x02 and message[0] == 0x16:
+            return True
+    except IndexError:
+        return False
+    return False

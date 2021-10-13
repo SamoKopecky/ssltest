@@ -1,15 +1,13 @@
 from ..VulnerabilityTest import VulnerabilityTest
-from ..ClientHello import ClientHello
-from ..utils import is_server_hello
-from ...utils import receive_data, communicate_data_return_sock
+from ...scan_parameters.connections.ClientHello import ClientHello
+from ...utils import receive_data, send_data_return_sock, is_server_hello
 
 
 class CCSInjection(VulnerabilityTest):
     test_name = 'CCS Injection'
 
-    def __init__(self, supported_protocols, address):
-        super().__init__(supported_protocols, address)
-
+    def __init__(self, supported_protocols, address, timeout, protocol):
+        super().__init__(supported_protocols, address, timeout, protocol)
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
 
     def test(self, version):
@@ -21,7 +19,7 @@ class CCSInjection(VulnerabilityTest):
         :rtype: bool
         """
         client_hello = ClientHello(version).construct_client_hello()
-        response, sock = communicate_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
+        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
         if not is_server_hello(response):
             sock.close()
             return False

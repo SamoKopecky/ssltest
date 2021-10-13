@@ -1,5 +1,9 @@
 import json
+import logging
+
 from ..utils import read_json
+
+log = logging.getLogger(__name__)
 
 
 class TextOutput:
@@ -10,22 +14,11 @@ class TextOutput:
         self.data = data
         self.current_data = {}
 
-    def rating_name(self, rating):
-        """
-        Get the rating name according to the rating number
-
-        Method made for better reading of code bellow
-
-        :param int rating: Rating value to be converted to string
-        :return: The rating string
-        :rtype: str
-        """
-        return self.ratings[str(rating)]
-
     def get_formatted_text(self):
         """
         Call all other text output functions for each port and url
         """
+        log.info("Fomating output")
         if not self.data:
             return
         json_data = json.loads(self.data)
@@ -36,6 +29,7 @@ class TextOutput:
             self.format_supported_versions(self.current_data['protocol_support'])
             self.format_certificate_info(self.current_data['certificate_info'])
             self.format_software(self.current_data['web_server_software'])
+            self.format_cipher_suites(self.current_data['cipher_suites'])
             self.format_vulnerabilities(self.current_data['vulnerabilities'])
         self.output = self.output[:-1]
 
@@ -48,11 +42,11 @@ class TextOutput:
         self.output += 'Cryptographic parameters:\n'
         for key, value in list(data.items()):
             if key == 'rating':
-                self.output += f'\t{key}: {self.rating_name(value)}\n'
+                self.output += f'\t{key}: {self.ratings[value]}\n'
                 continue
             values = list(value.items())[0]
             if values[0] != 'N/A':
-                self.output += f'\t{self.type_names[key]}: {values[0]}->{self.rating_name(values[1])}\n'
+                self.output += f'\t{self.type_names[key]}: {values[0]}->{self.ratings[values[1]]}\n'
 
     def format_certificate_info(self, data):
         """
@@ -81,7 +75,7 @@ class TextOutput:
         self.output += 'Protocol support:\n'
         for key, values in list(data.items()):
             if key == 'rating':
-                self.output += f'\t{key}: {self.rating_name(values)}\n'
+                self.output += f'\t{key}: {self.ratings[values]}\n'
                 continue
             if len(values) > 0:
                 versions = []
@@ -101,6 +95,21 @@ class TextOutput:
         self.output += 'Web server software:\n'
         for key, value in list(data.items()):
             self.output += f'\t{self.type_names[key]}: {value}\n'
+
+    def format_cipher_suites(self, data):
+        """
+        Format supported cipher suites
+
+        :param data: Data to format
+        """
+        if not data:
+            return
+        self.output += 'Supported cipher suites:\n'
+        for key, value in data.items():
+            if type(value) is dict:
+                value = list(map(lambda cs: f'\t\t{cs[0]}->{cs[1]}', value.items()))
+                value = '\n'.join(value)
+            self.output += f'\t{key}: \n{value}\n'
 
     def format_vulnerabilities(self, data):
         """

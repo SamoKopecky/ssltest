@@ -81,7 +81,7 @@
     "1": "EC,RSA,ECDSA",
     "2": "DSA,DSS",
     "3": "",
-    "4": ""
+    "4": "anon,KRB5,PSK"
   },
   "cert_verified": {
     "1": "True",

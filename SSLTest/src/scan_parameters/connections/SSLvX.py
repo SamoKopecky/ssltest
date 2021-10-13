@@ -1,20 +1,20 @@
-import requests
 import csv
-
-from ...utils import communicate_data_return_sock
-
 from abc import ABC, abstractmethod
+
+import requests
 from OpenSSL import crypto
+
+from ...utils import send_data_return_sock
 
 
 class SSLvX(ABC):
-    def __init__(self, url, port):
-        self.address = (url, port)
+    def __init__(self, address, timeout):
+        self.address = address
         self.protocol = ''
         self.cipher_suite = None
         self.certificates = []
         self.cert_verified = None
-        self.timeout = 2
+        self.timeout = timeout
         self.response = b''
         self.client_hello = bytes([])
 
@@ -22,8 +22,8 @@ class SSLvX(ABC):
         """
         Send the initial client hello
         """
-        self.response, _ = communicate_data_return_sock(self.address, self.client_hello, self.timeout,
-                                                        self.__class__.__name__)
+        self.response, _ = send_data_return_sock(self.address, self.client_hello, self.timeout,
+                                                 self.__class__.__name__)
 
     def verify_cert(self):
         """
@@ -51,7 +51,7 @@ class SSLvX(ABC):
             self.cert_verified = False
 
     @abstractmethod
-    def scan_version_support(self):
+    def scan_protocol_support(self):
         """
         Check if SSLvX version is supported by the web server
 

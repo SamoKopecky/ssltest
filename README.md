@@ -33,37 +33,45 @@ $ sudo ptmanager -ut SSLTest
                              written to the given file
 -t  --test      <number ...> Test the server for a specified vulnerability
                              possible vulnerabilities (separate with spaces):
-                               0: No test
-                               1: Heartbleed
-                               2: CCS injection
-                               3: Insecure renegotiation
-                               4: ZombiePOODLE/GOLDENDOOLDE
-                               5: Session ticket support
-                               6: CRIME
-                               7: RC4 support
+                                    0: No test
+                                    1: CCS Injection
+                                    2: CRIME
+                                    3: DROWN
+                                    4: No Fallback SCSV Support
+                                    5: No Forward Secrecy Support
+                                    6: Heartbleed
+                                    7: Insecure Renegotiation
+                                    8: RC4 Support
+                                    9: Session Ticket Support
+                                    10: Sweet32
                              If this argument isn't specified all tests will be ran
--fc --fix-conf               Allow the use of older versions of TLS protocol (TLSv1 and TLSv1.1) 
-                             in order to scan a server which still run on these versions. 
-                             !WARNING!: this may rewrite the contents of a configuration file 
-                             located at /etc/ssl/openssl.cnf. Password can be piped to stdin or
-                             entered when prompted at the start of the script if no pipe is present
+-fc --fix-conf               Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1) 
+-st --sudo-tty               Use the terminal prompt to enter the sudo password
+-ss --sudo-stdin             Use the stdin of the script to enter the sudo password
 -ns --nmap-scan              Use nmap to scan the server version
 -nd --nmap-discover          Use nmap to discover web server ports
 -w  --worst                  Create a main connection on the worst available protocol version
--i  --info                   Output some internal information about the script functions
+-l  --logging                Enable logging   
 -d  --debug                  Output debug information
 -v  --version                Show script version and exit
 -h  --help                   Show this help message and exit
 ```
 
+### -fc argument
+
+The `-fc` argument may rewrite the file located at `/etc/ssl/openssl.cnf` that is why a backup file is created with this
+format `{old_file}.backup_{unix_time}` in the same folder as the config file
+
 ## Usage examples
 
 ```
-$ SSLTest.py -u https://example.com -t 1 2
+$ SSLTest.py -u https://example.com -t 1 2 -cs
 ```
 
 ## Version History
 
+* Full changelog [here](/CHANGELOG.md)
+* [0.0.3](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.3)
 * [0.0.2](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.2)
 * [0.0.1](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.1)
 
