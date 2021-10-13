@@ -26,8 +26,6 @@ All notable changes to this project will be documented in this file.
 - Change `-i --info` option to `-l --logging`
 - Add `-st -sudo--tty` and `-ss -sudo--stdin` options for entering the sudo password instead of automatic detection
 
-### Removed
-
 # [0.0.2](https://github.com/SamoKopecky/SSLTest/compare/v0.0.1...v0.0.2) - Sep 7, 2021
 
 ### Added
