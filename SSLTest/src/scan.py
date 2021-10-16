@@ -34,6 +34,7 @@ def scan(args, port):
     """
     address = Address(args.url, port)
     log.info(f'Scanning for {address.url}:{address.port}')
+    print(f'---------------Results for {address.url}:{address.port}---------------')
 
     protocol_support = ProtocolSupport(address, args.timeout)
     protocol_support.scan_protocols()

@@ -91,7 +91,7 @@ def output_option(args, output_data):
     """
     json_output_data = json.dumps(output_data, indent=2)
     if args.json is False:
-        text_output = TextOutput(json_output_data)
+        text_output = TextOutput(output_data)
         text_output.get_formatted_text()
         return text_output.output
     elif args.json is None:
