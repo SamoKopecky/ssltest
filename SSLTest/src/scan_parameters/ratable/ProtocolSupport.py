@@ -20,23 +20,24 @@ class ProtocolSupport:
         self.rating = 0
         self.timeout = timeout
 
-    def scan_protocols(self):
+    def scan(self):
         """
         Test for all possible SSL/TLS versions which the server supports
 
         Convert protocol versions to dict with PType to get them ready for rating
         """
         log.info('Scanning supported SSL/TLS versions')
-        self.scan_ssl_protocols()
-        self.scan_tls_protocols()
+        self.scan_ssl()
+        self.scan_tls()
         for protocol in self.supported:
             self.protocols[PType.protocols][protocol] = 'N/A'
         for no_protocol in self.unsupported:
             self.protocols[PType.no_protocol][no_protocol] = 'N/A'
         if len(self.supported) == 0:
             raise Exception('No SSL/TLS protocol support found')
+        return self
 
-    def scan_ssl_protocols(self):
+    def scan_ssl(self):
         """
         Test for all possible SSL versions which the server supports
         """
@@ -57,7 +58,7 @@ class ProtocolSupport:
             else:
                 self.unsupported.append(ssl_version.protocol)
 
-    def scan_tls_protocols(self):
+    def scan_tls(self):
         """
         Test for all possible TLS versions which the server supports
         """
@@ -77,7 +78,7 @@ class ProtocolSupport:
             except socket.error:
                 self.unsupported.append(protocol)
 
-    def rate_protocols(self):
+    def rate(self):
         """
         Rate the scanned protocols
         """
@@ -89,3 +90,16 @@ class ProtocolSupport:
             return
         ratings = list(self.protocols[PType.protocols].values()) + list(self.protocols[PType.no_protocol].values())
         self.rating = max(ratings)
+        return self
+
+    def get_json(self):
+        """
+        TODO:
+        :return:
+        """
+        protocols = {}
+        keys = {key.name: value for key, value in self.protocols.items()}
+        for key, value in list(keys.items()):
+            protocols[key] = value
+        protocols.update({'rating': self.rating})
+        return {'protocol_support': protocols}

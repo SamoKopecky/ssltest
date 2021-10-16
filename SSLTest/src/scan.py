@@ -18,27 +18,33 @@ from .scan_vulnerabilities.tests.InsecureRenegotiation import InsecureRenegotiat
 from .scan_vulnerabilities.tests.RC4Support import RC4Support
 from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSupport
 from .scan_vulnerabilities.tests.Sweet32 import Sweet32
+from .text_output.TextOutput import TextOutput
 from .utils import Address
 
 log = logging.getLogger(__name__)
 
 
-def scan(args, port):
+# TODO:
+# Add address at the top with the port to know which server is being scanned
+# Add parameters yielding
+# Add Category print in TextOutput (Protocol support no indent)
+# Add filtering so when a category is empty nothing is displayed
+# Maybe implement parsing json from an object in each class
+
+def scan(args, address):
     """
     Call scanning/testing functions for a specific url and port
 
     :param Namespace args: Parsed input arguments
-    :param int port: Port to be scanned
+    :param Address address: Address of the web server
     :return: Single dictionary containing scanned data
     :rtype: dict
     """
-    address = Address(args.url, port)
+
     log.info(f'Scanning for {address.url}:{address.port}')
-    print(f'---------------Results for {address.url}:{address.port}---------------')
 
     protocol_support = ProtocolSupport(address, args.timeout)
-    protocol_support.scan_protocols()
-    protocol_support.rate_protocols()
+    yield protocol_support.scan().rate().get_json()
 
     webserver = get_webserver_info(address, protocol_support.supported, args.worst, args.timeout)
 
@@ -51,35 +57,6 @@ def scan(args, port):
     certificate.parse_certificate()
     certificate.rate_certificate()
 
-    web_server = WebServerSoft(address, args.nmap_scan)
-    web_server.scan_server_software()
-
-    cipher_suites = cipher_suites_option(address, args, protocol_support.supported, webserver.protocol)
-
-    vulnerabilities = test_option(args, address, protocol_support.supported, webserver.protocol)
-
-    log.info(f'Scanning done for {address.url}:{address.port}')
-    return dump_to_dict(address, cipher_suite, certificate, protocol_support, web_server, cipher_suites,
-                        vulnerabilities)
-
-
-def dump_to_dict(address, cipher_suite, certificate, protocol_support, web_server, cipher_suites, vulnerabilities):
-    """
-    Dump web server parameters to a single dictionary
-
-    :param Address address: Webserver address
-    :param CipherSuite cipher_suite: Rated cipher suite parameters and the worst rating
-    :param Certificate certificate: Rated certificate parameters and the worst rating
-    :param ProtocolSupport protocol_support: Supported SSL/TLS protocols
-    :param WebServerSoft web_server: Web server software which hosts the website
-    :param CipherSuites cipher_suites: All scanned cipher suites
-    :param dict vulnerabilities: Results from vulnerability tests
-    :return: A single dictionary created from the parameters
-    :rtype: dict
-    """
-    dump = {}
-
-    # Parameters
     worst_rating = max([cipher_suite.rating, certificate.rating])
     parameters = {key.name: value for key, value in cipher_suite.parameters.items()}
     for key, value in certificate.parameters.items():
@@ -87,24 +64,42 @@ def dump_to_dict(address, cipher_suite, certificate, protocol_support, web_serve
             continue
         parameters.update({key.name: value})
     parameters.update({'rating': worst_rating})
+    yield {'parameters': parameters}
+    yield {'certificate_info': {key.name: value for key, value in certificate.non_parameters.items()}}
 
-    # Non ratable cert info
-    certificate_info = {key.name: value for key, value in certificate.non_parameters.items()}
+    web_server_soft = WebServerSoft(address, args.nmap_scan)
+    web_server_soft.scan_server_software()
+    yield {'web_server_software': web_server_soft.software}
 
-    # Protocol support
-    protocols = {}
-    keys = {key.name: value for key, value in protocol_support.protocols.items()}
-    for key, value in list(keys.items()):
-        protocols[key] = value
-    protocols.update({'rating': protocol_support.rating})
+    cipher_suites = cipher_suites_option(address, args, protocol_support.supported, webserver.protocol)
+    yield {'cipher_suites': cipher_suites.supported}
 
-    dump.update({'parameters': parameters})
-    dump.update({'certificate_info': certificate_info})
-    dump.update({'protocol_support': protocols})
-    dump.update({'web_server_software': web_server.software})
-    dump.update({'cipher_suites': cipher_suites.supported})
-    dump.update({'vulnerabilities': vulnerabilities})
-    return {f'{address.url}:{address.port}': dump}
+    vulnerabilities = test_option(args, address, protocol_support.supported, webserver.protocol)
+    yield {'vulnerabilities': vulnerabilities}
+
+    log.info(f'Scanning done for {address.url}:{address.port}')
+
+
+def handle_scan_output(args, port, only_json):
+    """
+    TODO:
+    :param args:
+    :param port:
+    :param only_json:
+    :return:
+    """
+    address = Address(args.url, port)
+    address_str = f"{address.url}:{address.port}"
+    json_data = {address_str: {}}
+    handlers = []
+    if not only_json:
+        text_output = TextOutput(address)
+        text_output.print_address()
+        handlers.append(text_output.print_data)
+    handlers.append(json_data[address_str].update)
+    for json_output in scan(args, address):
+        [handler(json_output) for handler in handlers]
+    return json_data
 
 
 # Vulnerability Tests

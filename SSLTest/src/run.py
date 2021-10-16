@@ -4,9 +4,8 @@ import re
 import sys
 import traceback
 
-from .scan import scan
+from .scan import handle_scan_output
 from .scan_parameters.non_ratable.port_discovery import discover_ports
-from .text_output.TextOutput import TextOutput
 
 log = logging.getLogger(__name__)
 
@@ -20,9 +19,9 @@ def run(args):
     if '/' in args.url:
         args.url = fix_url(args.url)
     nmap_discover_option(args)
-    output_data = scan_all_ports(args)
-    out = output_option(args, output_data)
-    if out: print(out)
+    json_data = scan_all_ports(args)
+    if json_data:
+        json_option(args, json_data)
 
 
 def fix_url(url):
@@ -72,9 +71,13 @@ def scan_all_ports(args):
     :rtype: dict
     """
     output_data = {}
+    if args.json is None:
+        only_json = True
+    else:
+        only_json = False
     for port in args.port:
         try:
-            output_data.update(scan(args, port))
+            output_data.update(handle_scan_output(args, port, only_json))
         except Exception as ex:
             tb = traceback.format_exc()
             log.debug(tb)
@@ -82,21 +85,17 @@ def scan_all_ports(args):
     return output_data
 
 
-def output_option(args, output_data):
+def json_option(args, json_data):
     """
-    Handle output depending on the input options
+    Handle json option
 
     :param Namespace args: Parsed input arguments
-    :param dict output_data: Collected data from scanning/testing
+    :param dict json_data: Collected data from scanning/testing
     """
-    json_output_data = json.dumps(output_data, indent=2)
-    if args.json is False:
-        text_output = TextOutput(output_data)
-        text_output.get_formatted_text()
-        return text_output.output
-    elif args.json is None:
-        return json_output_data
-    else:
+    json_output_data = json.dumps(json_data, indent=2)
+    if args.json is None:
+        print(json_output_data)
+    elif bool(args.json):
         file = open(args.json, 'w')
         file.write(json_output_data)
         file.close()

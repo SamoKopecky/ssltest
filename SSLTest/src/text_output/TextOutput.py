@@ -1,4 +1,3 @@
-import json
 import logging
 
 from ..utils import read_json
@@ -11,24 +10,26 @@ def printn(string):
 
 
 class TextOutput:
-    def __init__(self, data: dict):
-        self.output = ''
+    def __init__(self, address):
+        self.address = address
         self.ratings = read_json('security_levels_names.json')
         self.english = read_json('english_strings.json')
-        self.data = data
+        self.data = None
 
-    def get_formatted_text(self):
+    def print_data(self, data):
         """
         Call all other text output functions for each port and url
         """
         log.info("Fomating output")
+        self.data = data
         self.filter_data()
-        self.recursive_print(self.data, -1)
+        self.write_title()
+        self.recursive_print(self.data, 0)
         print()
 
     def filter_data(self):
         # TEMP:
-        self.data = next(iter(self.data.values()))
+        # self.data = next(iter(self.data.values()))
         pass
 
     def recursive_print(self, data, indent):
@@ -48,15 +49,20 @@ class TextOutput:
                 return
             for v in data:
                 printn(":\n" + "\t" * indent + v)
-        elif type(data) != dict and type(data) != list:
+        else:
             printn(f": {data}")
 
-    @staticmethod
-    def print_parameters(data, indent):
+    def print_parameters(self, data, indent):
         indent = indent + 1
         for k, v in data.items():
-            printn("\n" + "\t" * indent + f"{k}: ")
+            printn("\n" + "\t" * indent + f"{self.english[k]}: ")
             if type(v) != dict:
                 printn(v)
                 continue
             printn(f"{next(iter(v.values()))}  ({next(iter(v.keys()))})")
+
+    def print_address(self):
+        print(f"scan for {self.address.url}:{self.address.port}")
+
+    def write_title(self):
+        pass
