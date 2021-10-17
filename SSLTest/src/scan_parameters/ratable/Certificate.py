@@ -115,3 +115,6 @@ class Certificate(Parameters):
         values = list(x509.SignatureAlgorithmOID.__dict__.values())
         keys = list(x509.SignatureAlgorithmOID.__dict__.keys())
         return keys[values.index(oid)].split('_')[0]
+
+    def get_json(self):
+        return {key.name: value for key, value in self.non_parameters.items()}

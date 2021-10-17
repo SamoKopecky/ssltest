@@ -21,7 +21,7 @@ class WebServer(NamedTuple):
 log = logging.getLogger(__name__)
 
 
-def get_webserver_info(address, supported_protocols, worst, timeout):
+def get_web_server_info(address, supported_protocols, worst, timeout):
     """
     Gather objects required to rate a web server
 

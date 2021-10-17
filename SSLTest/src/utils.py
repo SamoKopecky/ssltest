@@ -5,8 +5,6 @@ import socket
 from time import sleep, time
 from typing import NamedTuple
 
-from .exceptions.ConnectionTimeout import ConnectionTimeout
-
 log = logging.getLogger(__name__)
 
 

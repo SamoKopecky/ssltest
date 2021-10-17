@@ -22,22 +22,24 @@ class CipherSuites:
         self.supported_protocols = supported_protocols
         self.tested_cipher_suites = bytearray()
 
-    def scan_cipher_suites(self):
+    def scan_cipher_suites(self, only_sslv2):
         """
         Scan the supported cipher suites by the web server
 
         For each protocol a client hello is sent with all of the
         possible cipher suites. When the server response with a valid
-        message like ServerHello a cipher suite chosen by the server is
-        removed from the possible cipher suites that the client sends.
-        If the server response with an error of some kind the supported cipher
-        suites are those which the server chose before.
+        message a cipher suite chosen by the server is removed from the
+        possible cipher suites that the client sends. If the server response
+        with an error of some kind the supported cipher suites are those
+        which the server chose before.
         """
         log.info('Scanning for cipher suite support')
         if 'SSLv2' in self.supported_protocols:
             log.info("Scanning SSLv2 cipher suites")
             self.supported_protocols.remove('SSLv2')
             self.scan_sslv2_cipher_suites()
+            if only_sslv2:
+                return
 
         for protocol in self.supported_protocols:
             log.info(f"Scanning {protocol} cipher suites")

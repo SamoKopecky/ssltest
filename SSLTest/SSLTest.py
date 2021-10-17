@@ -11,7 +11,7 @@ import sys
 from ptlibs import ptjsonlib, ptmisclib
 
 from src.run import run
-from src.scan import get_tests_switcher
+from src.scan_vulnerabilities.TestRunner import TestRunner
 
 
 class SSLTest:
@@ -30,7 +30,7 @@ class SSLTest:
 def get_tests_help():
     tests_help = 'test the server for a specified vulnerability' \
                  'possible vulnerabilities (separate with spaces):\n'
-    for key, value in get_tests_switcher().items():
+    for key, value in TestRunner.get_tests_switcher().items():
         test_number = key
         test_desc = value[1]
         tests_help += f'{" " * 30}{test_number}: {test_desc}\n'
@@ -160,7 +160,7 @@ def try_to_remove_argument(short_name, full_name):
 def check_test_option(tests):
     if not tests:
         return
-    tests_switcher = get_tests_switcher()
+    tests_switcher = TestRunner.get_tests_switcher()
     test_numbers = [test for test in tests_switcher.keys()]
     unknown_tests = list(filter(lambda t: t not in test_numbers, tests))
     if unknown_tests:
