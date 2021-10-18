@@ -84,6 +84,8 @@ class ProtocolSupport:
             self.protocols[PType.protocols][protocol] = Parameters.rate_parameter(PType.protocol, protocol)
         for no_protocol in list(self.protocols[PType.no_protocol].keys()):
             self.protocols[PType.no_protocol][no_protocol] = Parameters.rate_parameter(PType.no_protocol, no_protocol)
+        if ["TLSv1.3"] == list(self.protocols[PType.protocols].keys()):
+            self.protocols[PType.no_protocol]["TLSv1.2"] = "1"
         if not self.protocols:
             return
         ratings = list(self.protocols[PType.protocols].values()) + list(self.protocols[PType.no_protocol].values())
