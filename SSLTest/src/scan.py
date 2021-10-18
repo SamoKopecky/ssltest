@@ -9,6 +9,16 @@ from .scan_parameters.ratable.Parameters import Parameters
 from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
 from .scan_vulnerabilities.TestRunner import TestRunner
 from .text_output.TextOutput import TextOutput
+from .scan_vulnerabilities.tests.CCSInjection import CCSInjection
+from .scan_vulnerabilities.tests.Crime import Crime
+from .scan_vulnerabilities.tests.Drown import Drown
+from .scan_vulnerabilities.tests.FallbackSCSVSupport import FallbackSCSVSupport
+from .scan_vulnerabilities.tests.ForwardSecrecySupport import ForwardSecrecySupport
+from .scan_vulnerabilities.tests.Heartbleed import Heartbleed
+from .scan_vulnerabilities.tests.InsecureRenegotiation import InsecureRenegotiation
+from .scan_vulnerabilities.tests.RC4Support import RC4Support
+from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSupport
+from .scan_vulnerabilities.tests.Sweet32 import Sweet32
 from .utils import Address
 
 log = logging.getLogger(__name__)
@@ -27,13 +37,16 @@ def handle_scan_output(args, port, only_json):
     address_str = f"{address.url}:{address.port}"
     json_data = {address_str: {}}
     handlers = []
+    text_output = None
     if not only_json:
         text_output = TextOutput(address)
         text_output.print_address()
-        handlers.append(text_output.print_data)
+        handlers.append(text_output.print_category)
     handlers.append(json_data[address_str].update)
     for json_output in scan(args, address):
         [handler(json_output) for handler in handlers]
+    if text_output is not None:
+        del text_output
     return json_data
 
 
@@ -72,7 +85,7 @@ def scan(args, address):
     web_server_soft.scan_server_software()
     yield {'web_server_software': web_server_soft.software}
 
-    test_runner = TestRunner(args, address, protocol_support.supported, web_server.protocol)
+    test_runner = TestRunner(address, args.timeout, web_server.protocol, protocol_support.supported)
     yield {'vulnerabilities': test_runner.run_tests(test_option(args))}
 
     cipher_suites = CipherSuites(address, protocol_support.supported, args.timeout)

@@ -81,7 +81,7 @@ def scan_all_ports(args):
         except Exception as ex:
             tb = traceback.format_exc()
             log.debug(tb)
-            print(f'Unexpected exception occurred: {ex}', file=sys.stderr)
+            print(f'\n\nUnexpected exception occurred: {ex}', file=sys.stderr)
     return output_data
 
 
