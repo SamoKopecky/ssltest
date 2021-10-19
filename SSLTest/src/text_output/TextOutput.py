@@ -14,7 +14,6 @@ def printn(string):
 class TextOutput:
     def __init__(self, address):
         self.address = address
-        self.ratings = read_json('security_levels_names.json')
         self.english = read_json('english_strings.json')
         self.data = None
         self.category_title = ""
