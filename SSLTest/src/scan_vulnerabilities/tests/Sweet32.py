@@ -1,3 +1,5 @@
+"""Vulnerability test for SWEET 32"""
+
 from ..VulnerabilityTest import VulnerabilityTest
 from ...scan_parameters.connections.ClientHello import ClientHello
 from ...utils import send_data_return_sock, is_server_hello, filter_cipher_suite_bytes

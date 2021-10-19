@@ -1,7 +1,8 @@
 import concurrent.futures as cf
-import importlib
+import importlib.util
 import inspect
 import logging
+import sys
 
 log = logging.getLogger(__name__)
 
@@ -55,9 +56,9 @@ class TestRunner:
         switcher = {
             0: (None, 'No test')
         }
-        idx = 0
-        for name, obj in inspect.getmembers(TestRunner.test_module):
-            if not inspect.ismodule(obj):
+        idx = 1
+        for name, obj in inspect.getmembers(TestRunner.test_module, inspect.ismodule):
+            if "Vulnerability test" not in inspect.getdoc(obj):
                 continue
             test_class = next(m[1] for m in inspect.getmembers(obj) if m[0] == name)
             switcher.update({idx: (test_class, test_class.test_name)})

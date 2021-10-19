@@ -1,3 +1,5 @@
+"""Vulnerability test for DROWN"""
+
 from ..VulnerabilityTest import VulnerabilityTest
 from ...scan_parameters.connections.ClientHello import ClientHello
 from ...scan_parameters.connections.SSLv2 import SSLv2

@@ -11,6 +11,13 @@
 
 Script that scans web servers cryptographic parameters and vulnerabilities
 
+## Dependencies
+Dependencies are listed in the `requirements.txt` file, to install them use this:
+```
+$ pip3 install -r requirements.txt
+```
+
+
 ## Installation
 
 ```

@@ -9,16 +9,6 @@ from .scan_parameters.ratable.Parameters import Parameters
 from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
 from .scan_vulnerabilities.TestRunner import TestRunner
 from .text_output.TextOutput import TextOutput
-from .scan_vulnerabilities.tests.CCSInjection import CCSInjection
-from .scan_vulnerabilities.tests.Crime import Crime
-from .scan_vulnerabilities.tests.Drown import Drown
-from .scan_vulnerabilities.tests.FallbackSCSVSupport import FallbackSCSVSupport
-from .scan_vulnerabilities.tests.ForwardSecrecySupport import ForwardSecrecySupport
-from .scan_vulnerabilities.tests.Heartbleed import Heartbleed
-from .scan_vulnerabilities.tests.InsecureRenegotiation import InsecureRenegotiation
-from .scan_vulnerabilities.tests.RC4Support import RC4Support
-from .scan_vulnerabilities.tests.SessionTicketSupport import SessionTicketSupport
-from .scan_vulnerabilities.tests.Sweet32 import Sweet32
 from .utils import Address
 
 log = logging.getLogger(__name__)
