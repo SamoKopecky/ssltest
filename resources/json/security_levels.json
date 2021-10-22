@@ -12,22 +12,22 @@
     "4": ""
   },
   "sym_enc_algorithm": {
-    "1": "AES",
+    "1": "AES,CAMELLIA,SEED",
     "2": "",
-    "3": "DES,IDEA",
-    "4": "SKIPJACK,RC4,RC2"
+    "3": "DES,IDEA,3DES",
+    "4": "SKIPJACK,RC4,RC2,DES40"
   },
   "sym_enc_algorithm_mod": {
     "1": "",
     "2": "",
-    "3": "EDE3",
+    "3": "EDE3,EDE",
     "4": "EXPORT40"
   },
   "sym_enc_algorithm_key_length": {
-    "1": "AES,>=128",
+    "1": "AES,>=128,CAMELLIA,>=128,SEED,>=128",
     "2": "",
     "3": "DES,>=192,IDEA,>=128",
-    "4": "AES,<<128,RC4,>=0,DES,<<192,RC2,>=0"
+    "4": "AES,<<128,RC4,>=0,DES,<<192,RC2,>=0,CAMELLIA,<<128,SEED,<<128"
   },
   "sym_enc_algorithm_block_mode": {
     "1": "GCM,CCM",

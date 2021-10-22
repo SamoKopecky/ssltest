@@ -9,14 +9,31 @@
 
 # SSLTest
 
-Script that scans web servers cryptographic parameters and vulnerabilities
+A Python script that scans web servers cryptographic parameters and vulnerabilities. All available Vulnerability tests
+can be found in the `help` output of the script or in the [options](#Options) section.
+
+## Main features
+
+- Supported SSL/TLS protocols
+- Detailed information about the certificate
+- Detailed information about the cipher suite the connection was made with
+- Web server software used by the server
+- Chosen vulnerability tests
+- Supported cipher suites for all SSL/TLS protocols
 
 ## Dependencies
+
 Dependencies are listed in the `requirements.txt` file, to install them use this:
+
 ```
 $ pip3 install -r requirements.txt
 ```
 
+Nmap is required for some functions of the script, install on ubuntu-like distros with:
+
+```
+$ sudo apt-get install -y nmap
+```
 
 ## Installation
 

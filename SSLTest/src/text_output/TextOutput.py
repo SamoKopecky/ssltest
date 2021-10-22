@@ -18,7 +18,7 @@ class TextOutput:
         self.data = None
         self.category_title = ""
         self.address_filler = "="
-        self.title_filler = "-"
+        self.category_title_filter = "-"
 
     def __del__(self):
         print()
@@ -56,7 +56,7 @@ class TextOutput:
         self.data = self.data[title]
 
         printn("\n")
-        self.print_title(4, self.english[title], self.title_filler)
+        self.print_title(4, self.english[title], self.category_title_filter)
 
     def recursive_print(self, data, indent):
         """

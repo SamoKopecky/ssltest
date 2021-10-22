@@ -2,7 +2,6 @@ import concurrent.futures as cf
 import importlib.util
 import inspect
 import logging
-import sys
 
 log = logging.getLogger(__name__)
 
