@@ -2,7 +2,7 @@ import logging
 
 from ptlibs.ptmisclib import get_colored_text, terminal_width
 
-from ..utils import read_json
+from ..utils import read_json, Address
 
 log = logging.getLogger(__name__)
 
@@ -13,6 +13,11 @@ def printn(string):
 
 class TextOutput:
     def __init__(self, address):
+        """
+        Constructor
+
+        :param Address address: Webserver address
+        """
         self.address = address
         self.english = read_json('english_strings.json')
         self.data = None

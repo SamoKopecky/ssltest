@@ -3,6 +3,8 @@ import importlib.util
 import inspect
 import logging
 
+from ..utils import Address
+
 log = logging.getLogger(__name__)
 
 
@@ -10,6 +12,14 @@ class TestRunner:
     test_module = importlib.import_module(".tests", __package__)
 
     def __init__(self, address, timeout, protocol, supported_protocols):
+        """
+        Constructor
+
+        :param Address address: Webserver address
+        :param int timeout: Timeout
+        :param str protocol: SSL/TLS protocol
+        :param list supported_protocols: Webservers supported SSL/TLS protocols
+        """
         self.address = address
         self.timeout = timeout
         self.protocol = protocol

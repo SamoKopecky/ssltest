@@ -13,7 +13,7 @@ A Python script that scans web servers cryptographic parameters and vulnerabilit
 can be found in the `help` output of the script or in the [options](#Options) section.
 
 ## Main features
-
+Scan or test:
 - Supported SSL/TLS protocols
 - Detailed information about the certificate
 - Detailed information about the cipher suite the connection was made with

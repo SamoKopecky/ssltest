@@ -6,13 +6,19 @@ from .Parameters import Parameters
 from ..connections.SSLv2 import SSLv2
 from ..connections.SSLv3 import SSLv3
 from ..connections.connection_utils import create_session, create_ssl_context
+from ...utils import Address
 
 log = logging.getLogger(__name__)
 
 
 class ProtocolSupport:
-
     def __init__(self, address, timeout):
+        """
+        Constructor
+
+        :param Address address: Webserver address
+        :param int timeout: Timeout
+        """
         self.protocols = {PType.protocols: {}, PType.no_protocol: {}}
         self.supported = []
         self.unsupported = []

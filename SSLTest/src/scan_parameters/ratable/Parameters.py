@@ -8,6 +8,9 @@ security_levels_json = read_json('security_levels.json')
 
 class Parameters(ABC):
     def __init__(self):
+        """
+        Constructor
+        """
         self.parameters = {}
         self.rating = 0
 

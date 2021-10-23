@@ -3,12 +3,19 @@ import logging
 import nmap3
 import requests
 
+from ...utils import Address
+
 log = logging.getLogger(__name__)
 
 
 class WebServerSoft:
+    def __init__(self, address, scan_nmap):
+        """
+        Constructor
 
-    def __init__(self, address, scan_nmap: bool):
+        :param Address address: Web server address
+        :param bool scan_nmap: Scan with nmap
+        """
         self.address = address
         self.scan_nmap = scan_nmap
         self.scans = []

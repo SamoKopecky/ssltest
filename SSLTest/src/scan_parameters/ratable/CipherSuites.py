@@ -7,13 +7,20 @@ from ..connections.ClientHello import ClientHello
 from ..connections.SSLv2 import SSLv2
 from ...exceptions.ConnectionTimeout import ConnectionTimeout
 from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
-    is_server_hello, get_cipher_suite_protocols
+    is_server_hello, get_cipher_suite_protocols, Address
 
 log = logging.getLogger(__name__)
 
 
 class CipherSuites:
     def __init__(self, address, supported_protocols, timeout):
+        """
+        Constructor
+
+        :param Address address: Webserver address
+        :param list supported_protocols: Webserver supported SSL/TLS protocols
+        :param int timeout: Timeout
+        """
         self.short_timeout = 0.1
         self.timeout = timeout
         self.address = address

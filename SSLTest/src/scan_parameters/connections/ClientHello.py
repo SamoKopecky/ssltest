@@ -8,6 +8,13 @@ json_ciphers = read_json('cipher_suites.json')
 
 class ClientHello:
     def __init__(self, protocol, cipher_suites=None, fill_cipher_suites=True):
+        """
+        Constructor
+
+        :param int protocol: SSL/TLS protocol version
+        :param bytes cipher_suites: Custom cipher suites
+        :param bool fill_cipher_suites: Fill with default cipher suites
+        """
         self.protocol = protocol
         self.str_protocol = protocol_version_conversion(protocol)
         self.record_protocol = bytearray([

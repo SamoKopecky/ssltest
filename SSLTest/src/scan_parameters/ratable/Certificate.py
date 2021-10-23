@@ -10,8 +10,13 @@ log = logging.getLogger(__name__)
 
 
 class Certificate(Parameters):
+    def __init__(self, certificate, cert_verified):
+        """
+        Constructor
 
-    def __init__(self, certificate: x509.Certificate, cert_verified: bool):
+        :param x509.Certificate certificate: Certificate
+        :param bool cert_verified: Is certificate verified
+        """
         super().__init__()
         self.verified = cert_verified
         # Create a dictionary for certificate parameters with PType keys
