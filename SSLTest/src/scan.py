@@ -64,7 +64,7 @@ def scan(args, address):
     cipher_suite.parse_protocol_version()
     cipher_suite.rate_cipher_suite()
 
-    certificate = Certificate(web_server.certificate, web_server.cert_verified)
+    certificate = Certificate(web_server.certificate, web_server.cert_verified, args.short_cert)
     certificate.parse_certificate()
     certificate.rate_certificate()
 
@@ -121,5 +121,5 @@ def cipher_suites_option(args, protocol):
     if protocol == 'SSLv2' and not args.cipher_suites:
         return_val[1] = True
     elif args.cipher_suites:
-        return_val = [True, False]
+        return_val[0] = True
     return return_val

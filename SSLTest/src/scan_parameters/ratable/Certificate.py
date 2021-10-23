@@ -10,12 +10,13 @@ log = logging.getLogger(__name__)
 
 
 class Certificate(Parameters):
-    def __init__(self, certificate, cert_verified):
+    def __init__(self, certificate, cert_verified, short_cert):
         """
         Constructor
 
         :param x509.Certificate certificate: Certificate
         :param bool cert_verified: Is certificate verified
+        :param bool short_cert: Limit alternative names output
         """
         super().__init__()
         self.verified = cert_verified
@@ -25,6 +26,7 @@ class Certificate(Parameters):
         # Parameters that can't be rated (Subject, Issuer, ...)
         self.non_parameters = {p_type: [] for p_type in PType if p_type.is_certificate and not p_type.is_ratable}
         self.certificate = certificate
+        self.short_cert = short_cert
 
     def parse_certificate(self):
         """
@@ -63,7 +65,10 @@ class Certificate(Parameters):
         except x509.extensions.ExtensionNotFound:
             log.error("No alternative names extension found in certificate")
             return []
-        return extension.value.get_values_for_type(x509.DNSName)
+        alternative_names: list = extension.value.get_values_for_type(x509.DNSName)
+        if self.short_cert:
+            return alternative_names[:5] + ["..."]
+        return alternative_names
 
     @staticmethod
     def parse_name(name):

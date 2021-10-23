@@ -1,4 +1,6 @@
 import logging
+import sys
+import time
 
 from ptlibs.ptmisclib import get_colored_text, terminal_width
 
@@ -60,7 +62,7 @@ class TextOutput:
         self.category_title = title
         self.data = self.data[title]
 
-        printn("\n")
+        print()
         self.print_title(4, self.english[title], self.category_title_filter)
 
     def recursive_print(self, data, indent):

@@ -50,6 +50,7 @@ def get_help():
              "Change output to json format, if a file name is specified output is written to the given file"],
             ["-t", "--test", "<number ...>", get_tests_help()],
             ["-to", "--timeout", "<duration>", "Set a duration for the timeout of connections"],
+            ["-sc", "--short-cert", "", "Limit alternative names to first 5"],
             ["-cs", "--cipher-suites", "", "Scan all supported cipher suites by the server"],
             ["-fc", "--fix-conf", "", "Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols"
                                       " (TLSv1 and TLSv1.1)"],
@@ -82,6 +83,7 @@ def parse_args():
     parser.add_argument("-j", "--json", action="store", metavar="output_file", required=False, nargs="?", default=False)
     parser.add_argument("-t", "--test", type=int, metavar="test_num", nargs="+")
     parser.add_argument("-to", "--timeout", type=int, nargs="?", default=1)
+    parser.add_argument("-sc", "--short-cert", action="store_true", default=False)
     parser.add_argument("-cs", "--cipher-suites", action="store_true", default=False)
     parser.add_argument("-ns", "--nmap-scan", action="store_true", default=False)
     parser.add_argument("-nd", "--nmap-discover", action="store_true", default=False)
