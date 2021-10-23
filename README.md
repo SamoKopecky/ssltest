@@ -69,6 +69,9 @@ $ sudo ptmanager -ut SSLTest
                                     9: Session Ticket Support
                                     10: Sweet32
                              If this argument isn't specified all tests will be ran
+-to  --timeout  <duration>   Set a duration for the timeout of connections
+-sc  --short-cert            Limit alternative names to first 5
+-cs  --cipher-suites         Scan all supported cipher suites by the server
 -fc --fix-conf               Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1) 
 -st --sudo-tty               Use the terminal prompt to enter the sudo password
 -ss --sudo-stdin             Use the stdin of the script to enter the sudo password
