@@ -1,0 +1,14 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: "- All the changes can be found in the [changelog](CHANGELOG.md) file"

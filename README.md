@@ -23,7 +23,8 @@ Scan or test:
 
 ## Dependencies
 
-Dependencies are listed in the `requirements.txt` file, to install them use this:
+Dependencies are listed in the `requirements.txt` file, if you don't want to install with `setup.py` 
+and just want to run the script install them like this:
 
 ```
 $ pip3 install -r requirements.txt

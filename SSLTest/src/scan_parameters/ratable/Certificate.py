@@ -66,7 +66,7 @@ class Certificate(Parameters):
             log.error("No alternative names extension found in certificate")
             return []
         alternative_names: list = extension.value.get_values_for_type(x509.DNSName)
-        if self.short_cert:
+        if self.short_cert and len(alternative_names) > 5:
             return alternative_names[:5] + ["..."]
         return alternative_names
 
