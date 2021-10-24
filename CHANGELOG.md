@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+# [0.1.0](https://github.com/SamoKopecky/SSLTest/compare/v0.0.3...v0.1.0) - Oct 24, 2021
+
+### Added
+- Improved text output in console
+- `-sc --short-cert` option to shorten alternative names output
+
+### Changed
+- Vulnerability tests no longer need to be hardcoded in a dictionary to run, they are automatically parsed
+from the tests module
+
 # [0.0.3](https://github.com/SamoKopecky/SSLTest/compare/v0.0.2...v0.0.3) - Oct 13, 2021
 
 ### Added
