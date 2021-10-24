@@ -1,5 +1,6 @@
 from abc import ABC
 
+from .PType import PType
 from ...utils import read_json
 
 security_levels_json = read_json('security_levels.json')
@@ -7,6 +8,9 @@ security_levels_json = read_json('security_levels.json')
 
 class Parameters(ABC):
     def __init__(self):
+        """
+        Constructor
+        """
         self.parameters = {}
         self.rating = 0
 
@@ -106,3 +110,14 @@ class Parameters(ABC):
             if parameter in security_levels_json[p_type.name][str(idx)].split(','):
                 return str(idx)
         return '0'
+
+    @staticmethod
+    def get_params_json(cipher_suite, certificate):
+        worst_rating = max([cipher_suite.rating, certificate.rating])
+        parameters = {key.name: value for key, value in cipher_suite.parameters.items()}
+        for key, value in certificate.parameters.items():
+            if key == PType.cert_pub_key_algorithm and not parameters[key.name] == {'N/A': '0'}:
+                continue
+            parameters.update({key.name: value})
+        parameters.update({'rating': worst_rating})
+        return parameters

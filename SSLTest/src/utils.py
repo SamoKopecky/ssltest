@@ -5,8 +5,6 @@ import socket
 from time import sleep, time
 from typing import NamedTuple
 
-from .exceptions.ConnectionTimeout import ConnectionTimeout
-
 log = logging.getLogger(__name__)
 
 
@@ -24,7 +22,7 @@ def read_json(file_name):
     :rtype: dict
     """
     root_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = f"{root_dir}/../../resources/{file_name}"
+    file_path = f"{root_dir}/../../resources/json/{file_name}"
     log.debug(f"Opening {file_path}")
     file = open(file_path, 'r')
     json_data = json.loads(file.read())

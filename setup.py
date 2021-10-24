@@ -3,7 +3,7 @@ import setuptools
 setuptools.setup(
     name="SSLTest",
     description="",
-    version="0.0.3",
+    version="0.1.0",
     author="Penterep",
     author_email="",
     url="https://www.penterep.com/",
@@ -15,7 +15,7 @@ setuptools.setup(
         "Environment :: Console"
     ],
     python_requires='>=3.6',
-    install_requires=["ptlibs", ""],
+    install_requires=["ptlibs", "cryptography", "pyOpenSSL", "python3-nmap", "requests", "urllib3"],
     entry_points={'console_scripts': ['scriptname = SSLTest.SSLTest:main']},
     include_package_data=True
 )

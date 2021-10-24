@@ -6,13 +6,19 @@ from .Parameters import Parameters
 from ..connections.SSLv2 import SSLv2
 from ..connections.SSLv3 import SSLv3
 from ..connections.connection_utils import create_session, create_ssl_context
+from ...utils import Address
 
 log = logging.getLogger(__name__)
 
 
 class ProtocolSupport:
-
     def __init__(self, address, timeout):
+        """
+        Constructor
+
+        :param Address address: Webserver address
+        :param int timeout: Timeout
+        """
         self.protocols = {PType.protocols: {}, PType.no_protocol: {}}
         self.supported = []
         self.unsupported = []
@@ -23,7 +29,6 @@ class ProtocolSupport:
     def scan_protocols(self):
         """
         Test for all possible SSL/TLS versions which the server supports
-
         Convert protocol versions to dict with PType to get them ready for rating
         """
         log.info('Scanning supported SSL/TLS versions')
@@ -85,7 +90,21 @@ class ProtocolSupport:
             self.protocols[PType.protocols][protocol] = Parameters.rate_parameter(PType.protocol, protocol)
         for no_protocol in list(self.protocols[PType.no_protocol].keys()):
             self.protocols[PType.no_protocol][no_protocol] = Parameters.rate_parameter(PType.no_protocol, no_protocol)
+        if ["TLSv1.3"] == list(self.protocols[PType.protocols].keys()):
+            self.protocols[PType.no_protocol]["TLSv1.2"] = "1"
         if not self.protocols:
             return
         ratings = list(self.protocols[PType.protocols].values()) + list(self.protocols[PType.no_protocol].values())
         self.rating = max(ratings)
+
+    def get_json(self):
+        """
+        TODO:
+        :return:
+        """
+        protocols = {}
+        keys = {key.name: value for key, value in self.protocols.items()}
+        for key, value in list(keys.items()):
+            protocols[key] = value
+        protocols.update({'rating': self.rating})
+        return protocols

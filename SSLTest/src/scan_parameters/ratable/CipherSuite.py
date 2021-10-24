@@ -6,7 +6,13 @@ json_data = read_json('cipher_parameters.json')
 
 
 class CipherSuite(Parameters):
-    def __init__(self, cipher_suite: str, protocol=None):
+    def __init__(self, cipher_suite, protocol=None):
+        """
+        Constructor
+
+        :param str cipher_suite: Webserver cipher suite
+        :param str protocol: SSL/TLS Protocol string
+        """
         super().__init__()
         # Create a dictionary for cipher suite parameters with PType keys
         self.parameters = {enum: {} for enum in PType if enum.is_cipher_suite}

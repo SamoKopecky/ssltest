@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = "0.0.3"
+__version__ = "0.1.0"
 
 import argparse
 import logging
@@ -11,7 +11,7 @@ import sys
 from ptlibs import ptjsonlib, ptmisclib
 
 from src.run import run
-from src.scan import get_tests_switcher
+from src.scan_vulnerabilities.TestRunner import TestRunner
 
 
 class SSLTest:
@@ -30,7 +30,7 @@ class SSLTest:
 def get_tests_help():
     tests_help = 'test the server for a specified vulnerability' \
                  'possible vulnerabilities (separate with spaces):\n'
-    for key, value in get_tests_switcher().items():
+    for key, value in TestRunner.get_tests_switcher().items():
         test_number = key
         test_desc = value[1]
         tests_help += f'{" " * 30}{test_number}: {test_desc}\n'
@@ -50,6 +50,7 @@ def get_help():
              "Change output to json format, if a file name is specified output is written to the given file"],
             ["-t", "--test", "<number ...>", get_tests_help()],
             ["-to", "--timeout", "<duration>", "Set a duration for the timeout of connections"],
+            ["-sc", "--short-cert", "", "Limit alternative names to first 5"],
             ["-cs", "--cipher-suites", "", "Scan all supported cipher suites by the server"],
             ["-fc", "--fix-conf", "", "Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols"
                                       " (TLSv1 and TLSv1.1)"],
@@ -82,6 +83,7 @@ def parse_args():
     parser.add_argument("-j", "--json", action="store", metavar="output_file", required=False, nargs="?", default=False)
     parser.add_argument("-t", "--test", type=int, metavar="test_num", nargs="+")
     parser.add_argument("-to", "--timeout", type=int, nargs="?", default=1)
+    parser.add_argument("-sc", "--short-cert", action="store_true", default=False)
     parser.add_argument("-cs", "--cipher-suites", action="store_true", default=False)
     parser.add_argument("-ns", "--nmap-scan", action="store_true", default=False)
     parser.add_argument("-nd", "--nmap-discover", action="store_true", default=False)
@@ -160,7 +162,7 @@ def try_to_remove_argument(short_name, full_name):
 def check_test_option(tests):
     if not tests:
         return
-    tests_switcher = get_tests_switcher()
+    tests_switcher = TestRunner.get_tests_switcher()
     test_numbers = [test for test in tests_switcher.keys()]
     unknown_tests = list(filter(lambda t: t not in test_numbers, tests))
     if unknown_tests:

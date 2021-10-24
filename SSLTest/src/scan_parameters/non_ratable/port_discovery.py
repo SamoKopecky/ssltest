@@ -41,6 +41,6 @@ def discover_ports(url):
             except (requests.exceptions.ReadTimeout, requests.exceptions.Timeout):
                 usable_ports.append(int(port))
                 break
-            except requests.exceptions.ConnectionError as exception:
-                sleep = incremental_sleep(sleep, exception, 5)
+            except requests.exceptions.ConnectionError:
+                break
     return usable_ports

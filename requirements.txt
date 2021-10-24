@@ -3,5 +3,4 @@ pyOpenSSL
 python3-nmap
 requests
 urllib3
-Flask
-flask-restful
+ptlibs

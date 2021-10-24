@@ -10,8 +10,14 @@ log = logging.getLogger(__name__)
 
 
 class Certificate(Parameters):
+    def __init__(self, certificate, cert_verified, short_cert):
+        """
+        Constructor
 
-    def __init__(self, certificate: x509.Certificate, cert_verified: bool):
+        :param x509.Certificate certificate: Certificate
+        :param bool cert_verified: Is certificate verified
+        :param bool short_cert: Limit alternative names output
+        """
         super().__init__()
         self.verified = cert_verified
         # Create a dictionary for certificate parameters with PType keys
@@ -20,6 +26,7 @@ class Certificate(Parameters):
         # Parameters that can't be rated (Subject, Issuer, ...)
         self.non_parameters = {p_type: [] for p_type in PType if p_type.is_certificate and not p_type.is_ratable}
         self.certificate = certificate
+        self.short_cert = short_cert
 
     def parse_certificate(self):
         """
@@ -58,7 +65,10 @@ class Certificate(Parameters):
         except x509.extensions.ExtensionNotFound:
             log.error("No alternative names extension found in certificate")
             return []
-        return extension.value.get_values_for_type(x509.DNSName)
+        alternative_names: list = extension.value.get_values_for_type(x509.DNSName)
+        if self.short_cert and len(alternative_names) > 5:
+            return alternative_names[:5] + ["..."]
+        return alternative_names
 
     @staticmethod
     def parse_name(name):
@@ -71,7 +81,7 @@ class Certificate(Parameters):
         """
         name_info = []
         for attribute in name:
-            name_info.append(f'{attribute.oid._name}={attribute.value}')
+            name_info.append(f'{attribute.oid._name}: {attribute.value}')
         return name_info
 
     def rate_certificate(self):
@@ -115,3 +125,6 @@ class Certificate(Parameters):
         values = list(x509.SignatureAlgorithmOID.__dict__.values())
         keys = list(x509.SignatureAlgorithmOID.__dict__.keys())
         return keys[values.index(oid)].split('_')[0]
+
+    def get_json(self):
+        return {key.name: value for key, value in self.non_parameters.items()}

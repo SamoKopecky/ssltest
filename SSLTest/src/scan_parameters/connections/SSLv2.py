@@ -5,11 +5,17 @@ from struct import unpack
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
-from ...utils import read_json
+from ...utils import read_json, Address
 
 
 class SSLv2(SSLvX):
     def __init__(self, address, timeout):
+        """
+        Constructor
+
+        :param Address address: Webserver address
+        :param int timeout: Timout for connections
+        """
         super().__init__(address, timeout)
         self.protocol = 'SSLv2'
         self.server_cipher_suites = []

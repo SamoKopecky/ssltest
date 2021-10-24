@@ -4,11 +4,17 @@ from abc import ABC, abstractmethod
 import requests
 from OpenSSL import crypto
 
-from ...utils import send_data_return_sock
+from ...utils import send_data_return_sock, Address
 
 
 class SSLvX(ABC):
     def __init__(self, address, timeout):
+        """
+        Constructor
+
+        :param Address address: Webserver address
+        :param int timeout: Timout for connections
+        """
         self.address = address
         self.protocol = ''
         self.cipher_suite = None

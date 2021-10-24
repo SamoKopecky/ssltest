@@ -4,11 +4,17 @@ from cryptography.x509 import load_der_x509_certificate
 
 from .ClientHello import ClientHello
 from .SSLvX import SSLvX
-from ...utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion
+from ...utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion, Address
 
 
 class SSLv3(SSLvX):
     def __init__(self, address, timeout):
+        """
+        Constructor
+
+        :param Address address: Webserver address
+        :param int timeout: Timout for connections
+        """
         super().__init__(address, timeout)
         self.protocol = 'SSLv3'
         self.client_hello = ClientHello(protocol_version_conversion(self.protocol)).construct_client_hello()

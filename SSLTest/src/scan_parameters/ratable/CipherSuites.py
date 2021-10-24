@@ -7,13 +7,20 @@ from ..connections.ClientHello import ClientHello
 from ..connections.SSLv2 import SSLv2
 from ...exceptions.ConnectionTimeout import ConnectionTimeout
 from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
-    is_server_hello, get_cipher_suite_protocols
+    is_server_hello, get_cipher_suite_protocols, Address
 
 log = logging.getLogger(__name__)
 
 
 class CipherSuites:
     def __init__(self, address, supported_protocols, timeout):
+        """
+        Constructor
+
+        :param Address address: Webserver address
+        :param list supported_protocols: Webserver supported SSL/TLS protocols
+        :param int timeout: Timeout
+        """
         self.short_timeout = 0.1
         self.timeout = timeout
         self.address = address
@@ -22,22 +29,24 @@ class CipherSuites:
         self.supported_protocols = supported_protocols
         self.tested_cipher_suites = bytearray()
 
-    def scan_cipher_suites(self):
+    def scan_cipher_suites(self, only_sslv2):
         """
         Scan the supported cipher suites by the web server
 
         For each protocol a client hello is sent with all of the
         possible cipher suites. When the server response with a valid
-        message like ServerHello a cipher suite chosen by the server is
-        removed from the possible cipher suites that the client sends.
-        If the server response with an error of some kind the supported cipher
-        suites are those which the server chose before.
+        message a cipher suite chosen by the server is removed from the
+        possible cipher suites that the client sends. If the server response
+        with an error of some kind the supported cipher suites are those
+        which the server chose before.
         """
         log.info('Scanning for cipher suite support')
         if 'SSLv2' in self.supported_protocols:
             log.info("Scanning SSLv2 cipher suites")
             self.supported_protocols.remove('SSLv2')
             self.scan_sslv2_cipher_suites()
+            if only_sslv2:
+                return
 
         for protocol in self.supported_protocols:
             log.info(f"Scanning {protocol} cipher suites")

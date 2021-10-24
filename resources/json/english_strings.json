@@ -29,5 +29,6 @@
   "vulnerabilities": "Vulnerabilities",
   "http_header": "HTTP Header",
   "certificate_info": "Certificate information",
-  "nmap": "Nmap"
+  "nmap": "Nmap",
+  "cipher_suites": "Cipher Suites"
 }

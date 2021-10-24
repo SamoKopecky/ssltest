@@ -9,7 +9,32 @@
 
 # SSLTest
 
-Script that scans web servers cryptographic parameters and vulnerabilities
+A Python script that scans web servers cryptographic parameters and vulnerabilities. All available Vulnerability tests
+can be found in the `help` output of the script or in the [options](#Options) section.
+
+## Main features
+Scan or test:
+- Supported SSL/TLS protocols
+- Detailed information about the certificate
+- Detailed information about the cipher suite the connection was made with
+- Web server software used by the server
+- Chosen vulnerability tests
+- Supported cipher suites for all SSL/TLS protocols
+
+## Dependencies
+
+Dependencies are listed in the `requirements.txt` file, if you don't want to install with `setup.py` 
+and just want to run the script install them like this:
+
+```
+$ pip3 install -r requirements.txt
+```
+
+Nmap is required for some functions of the script, install on ubuntu-like distros with:
+
+```
+$ sudo apt-get install -y nmap
+```
 
 ## Installation
 
@@ -45,6 +70,9 @@ $ sudo ptmanager -ut SSLTest
                                     9: Session Ticket Support
                                     10: Sweet32
                              If this argument isn't specified all tests will be ran
+-to  --timeout  <duration>   Set a duration for the timeout of connections
+-sc  --short-cert            Limit alternative names to first 5
+-cs  --cipher-suites         Scan all supported cipher suites by the server
 -fc --fix-conf               Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1) 
 -st --sudo-tty               Use the terminal prompt to enter the sudo password
 -ss --sudo-stdin             Use the stdin of the script to enter the sudo password
@@ -71,6 +99,7 @@ $ SSLTest.py -u https://example.com -t 1 2 -cs
 ## Version History
 
 * Full changelog [here](/CHANGELOG.md)
+* [0.1.0](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.1.0)  
 * [0.0.3](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.3)
 * [0.0.2](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.2)
 * [0.0.1](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.1)

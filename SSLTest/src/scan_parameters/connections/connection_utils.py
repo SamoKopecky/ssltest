@@ -21,14 +21,14 @@ class WebServer(NamedTuple):
 log = logging.getLogger(__name__)
 
 
-def get_webserver_info(address, supported_protocols, worst, timeout):
+def get_web_server_info(address, supported_protocols, worst, timeout):
     """
     Gather objects required to rate a web server
 
     Uses functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
 
-    :param Address address:
+    :param Address address: Webserver address
     :param list supported_protocols: Supported SSL/TLS protocol versions
     :param bool worst: Whether to connect with the worst available protocol
     :param int timeout: Timeout in seconds
@@ -159,7 +159,7 @@ def create_session(address, verify_cert, context, timeout):
     """
     Create a secure connection to any server on any port with a defined context
 
-    :param Address address:
+    :param Address address: Webserver address
     :param bool verify_cert: Whether to verify the certificate or not
     :param ssl.SSLContext context: ssl context
     :param int timeout: Timeout in seconds
