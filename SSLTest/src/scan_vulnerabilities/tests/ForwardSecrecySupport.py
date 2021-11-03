@@ -23,7 +23,7 @@ class ForwardSecrecySupport(VulnerabilityTest):
 
         """
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
-        sixty_four_bit_ciphers = filter_cipher_suite_bytes(cipher_suite_bytes, lambda cs: 'ECDHE' in cs or 'DHE' in cs)
+        sixty_four_bit_ciphers = filter_cipher_suite_bytes(cipher_suite_bytes, "ECDHE|DHE")
         client_hello = ClientHello(version, sixty_four_bit_ciphers, False).construct_client_hello()
         response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
         sock.close()

@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import socket
 from time import sleep, time
 from typing import NamedTuple
@@ -196,20 +197,22 @@ def cs_bytes_to_str(bytes_object):
     return f'0x{bytes_object[0]:02X},0x{bytes_object[1]:02X}'
 
 
-def filter_cipher_suite_bytes(cipher_suites, filter_fun):
+def filter_cipher_suite_bytes(cipher_suites, filter_regex):
     """
     Filters cipher suite bytes with the given filter function
 
     :param bytearray or bytes cipher_suites: Cipher suites
-    :param lambda filter_fun: Function to filter the cipher suites
+    :param lambda filter_regex: Regex to find the required cipher suites
     :return: Filter cipher suites
     :rtype: bytearray
     """
     filtered_suites = bytearray([])
     for i in range(0, len(cipher_suites), 2):
-        cipher_suite = bytes_to_cipher_suite(cipher_suites[i: i + 2], 'IANA')
-        if filter_fun(cipher_suite):
-            filtered_suites += cipher_suite_to_bytes(cipher_suite, 'IANA')
+        cipher_suite_bytes = cipher_suites[i: i + 2]
+        cipher_suite = bytes_to_cipher_suite(cipher_suite_bytes, 'IANA')
+        regex_find = re.findall(filter_regex, cipher_suite)
+        if len(regex_find) != 0:
+            filtered_suites += cipher_suite_bytes
     return filtered_suites
 
 

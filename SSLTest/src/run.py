@@ -6,6 +6,7 @@ import traceback
 
 from .scan import handle_scan_output
 from .scan_parameters.non_ratable.port_discovery import discover_ports
+from .scan_parameters.ratable.CipherSuite import CipherSuite
 
 log = logging.getLogger(__name__)
 

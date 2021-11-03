@@ -11,6 +11,12 @@
     "3": "",
     "4": ""
   },
+  "kex_algorithm_mod": {
+    "1": "",
+    "2": "",
+    "3": "",
+    "4": "EXPORT"
+  },
   "sym_enc_algorithm": {
     "1": "AES,CAMELLIA,SEED",
     "2": "",

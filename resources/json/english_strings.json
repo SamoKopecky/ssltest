@@ -30,5 +30,6 @@
   "http_header": "HTTP Header",
   "certificate_info": "Certificate information",
   "nmap": "Nmap",
-  "cipher_suites": "Cipher Suites"
+  "cipher_suites": "Cipher Suites",
+  "kex_algorithm_mod": "Key exchange algorithm modification"
 }
