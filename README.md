@@ -61,19 +61,20 @@ $ sudo ptmanager -ut SSLTest
 -t  --test      <number ...> Test the server for a specified vulnerability
                              possible vulnerabilities (separate with spaces):
                                     0: No test
-                                    1: CCS Injection
-                                    2: CRIME
-                                    3: DROWN
-                                    4: No Fallback SCSV Support
-                                    5: No Forward Secrecy Support
-                                    6: FREAK
-                                    7: No HSTS Support
-                                    8: Heartbleed
-                                    9: Insecure Renegotiation
-                                    10: LOGJAM
-                                    11: RC4 Support
-                                    12: Session Ticket Support
-                                    13: Sweet32
+                                    1: BREACH
+                                    2: CCS Injection
+                                    3: CRIME
+                                    4: DROWN
+                                    5: No Fallback SCSV Support
+                                    6: No Forward Secrecy Support
+                                    7: FREAK
+                                    8: No HSTS Support
+                                    9: Heartbleed
+                                    10: Insecure Renegotiation
+                                    11: LOGJAM
+                                    12: RC4 Support
+                                    13: Session Ticket Support
+                                    14: Sweet32
                              If this argument isn't specified all tests will be ran
 -to  --timeout  <duration>   Set a duration for the timeout of connections
 -sc  --short-cert            Limit alternative names to first 5
