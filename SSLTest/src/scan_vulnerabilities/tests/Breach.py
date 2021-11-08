@@ -11,7 +11,6 @@ class Breach(VulnerabilityTest):
         super().__init__(supported_protocols, address, timeout, protocol)
         self.valid_protocols = ['TLSv1.3', 'TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3', 'SSLv2']
         self.encoding_key_string = "Content-Encoding"
-        self.scan_once = False
 
     def test(self, version):
         # TODO: Test
@@ -22,7 +21,7 @@ class Breach(VulnerabilityTest):
         if self.encoding_key_string not in response.headers.keys():
             return False
         encoding = response.headers[self.encoding_key_string]
-        # TODO: change to regex
+        # TODO: change to regex and add comments on positives
         if "deflate" in encoding or "gzip" in encoding:
             return True
         return False
