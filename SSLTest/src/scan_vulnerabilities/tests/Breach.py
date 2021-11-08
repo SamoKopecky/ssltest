@@ -11,6 +11,7 @@ class Breach(VulnerabilityTest):
         super().__init__(supported_protocols, address, timeout, protocol)
         self.valid_protocols = ['TLSv1.3', 'TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3', 'SSLv2']
         self.encoding_key_string = "Content-Encoding"
+        self.scan_once = False
 
     def test(self, version):
         # TODO: Test
