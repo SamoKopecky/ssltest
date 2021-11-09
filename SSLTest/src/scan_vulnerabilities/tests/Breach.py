@@ -1,5 +1,6 @@
 """Vulnerability test for BREACH"""
 import requests
+import re
 
 from ..VulnerabilityTest import VulnerabilityTest
 
@@ -13,7 +14,6 @@ class Breach(VulnerabilityTest):
         self.encoding_key_string = "Content-Encoding"
 
     def test(self, version):
-        # TODO: Test
         header = {
             "Accept-Encoding": "gzip,deflate"
         }
@@ -21,7 +21,13 @@ class Breach(VulnerabilityTest):
         if self.encoding_key_string not in response.headers.keys():
             return False
         encoding = response.headers[self.encoding_key_string]
-        # TODO: change to regex and add comments on positives
-        if "deflate" in encoding or "gzip" in encoding:
-            return True
+        regex_match = re.findall("gzip|deflate", encoding)
+
+        if len(regex_match) > 1:
+            return True, "gzip and deflate encodings found"
+        else:
+            if "gzip" in regex_match:
+                return True, "gzip encoding found"
+            elif "gzip" in regex_match:
+                return True, "deflate encoding found"
         return False

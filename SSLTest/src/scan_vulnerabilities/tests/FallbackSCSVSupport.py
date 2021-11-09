@@ -32,7 +32,7 @@ class FallbackSCSVSupport(VulnerabilityTest):
         sock.close()
         # If server doesn't respond with an alert, it doesn't support SCSV fallback
         if is_server_hello(response):
-            return True
+            return True, "Server didn't respond with an alert"
         elif not response:
             return True
         # 0x15 for Content Type: Alert, 0x56 for Inappropriate Fallback

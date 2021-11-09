@@ -67,7 +67,7 @@ class TestRunner:
         }
         idx = 1
         for name, obj in inspect.getmembers(TestRunner.test_module, inspect.ismodule):
-            if "Vulnerability test" not in inspect.getdoc(obj):
+            if "Vulnerability test for" not in inspect.getdoc(obj):
                 continue
             test_class = next(m[1] for m in inspect.getmembers(obj) if m[0] == name)
             switcher.update({idx: (test_class, test_class.test_name)})
