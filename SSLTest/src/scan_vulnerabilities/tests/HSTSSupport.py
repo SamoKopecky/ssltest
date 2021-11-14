@@ -7,7 +7,9 @@ from ..VulnerabilityTest import VulnerabilityTest
 
 
 class HSTSSupport(VulnerabilityTest):
-    test_name = "No HSTS Support"
+    name = "No HSTS Support"
+    short_name = "HSTS"
+    description = "Test for HTTP Strict Transport Security support"
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)

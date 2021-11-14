@@ -43,10 +43,9 @@ class TestRunner:
         log.info(f"Creating {classes_len} threads for vulnerability tests")
         with cf.ThreadPoolExecutor(max_workers=classes_len) as executor:
             for test_class in tests:
-                # 0th index is the function, 1st index is the function name
-                scan_class = test_class[0](self.supported_protocols, self.address, self.timeout, self.protocol)
+                scan_class = test_class(self.supported_protocols, self.address, self.timeout, self.protocol)
                 execution = executor.submit(scan_class.scan)
-                futures.update({execution: test_class[1]})
+                futures.update({execution: test_class.name})
             for execution in cf.as_completed(futures):
                 function_name = futures[execution]
                 data = execution.result()
@@ -62,14 +61,14 @@ class TestRunner:
         :return: All available tests
         :rtype: dict
         """
-        switcher = {
-            0: (None, 'No test')
+        tests = {
+            0: None
         }
         idx = 1
         for name, obj in inspect.getmembers(TestRunner.test_module, inspect.ismodule):
             if "Vulnerability test for" not in inspect.getdoc(obj):
                 continue
             test_class = next(m[1] for m in inspect.getmembers(obj) if m[0] == name)
-            switcher.update({idx: (test_class, test_class.test_name)})
+            tests.update({idx: test_class})
             idx += 1
-        return switcher
+        return tests

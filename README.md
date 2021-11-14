@@ -54,41 +54,38 @@ $ sudo ptmanager -ut SSLTest
 ## Options
 
 ```
--u  --url       <url>        Url to scan, required option
--p  --port      <port ...>   Port or ports (separate with spaces) to scan on (default: [443])
--j  --json      <file>       change output to json format, if a file name is specified output is 
-                             written to the given file
--t  --test      <number ...> Test the server for a specified vulnerability
-                             possible vulnerabilities (separate with spaces):
-                                    0: No test
-                                    1: BREACH
-                                    2: CCS Injection
-                                    3: CRIME
-                                    4: DROWN
-                                    5: No Fallback SCSV Support
-                                    6: No Forward Secrecy Support
-                                    7: FREAK
-                                    8: No HSTS Support
-                                    9: Heartbleed
-                                    10: Insecure Renegotiation
-                                    11: LOGJAM
-                                    12: RC4 Support
-                                    13: Session Ticket Support
-                                    14: Sweet32
-                             If this argument isn't specified all tests will be ran
--to  --timeout  <duration>   Set a duration for the timeout of connections
--sc  --short-cert            Limit alternative names to first 5
--cs  --cipher-suites         Scan all supported cipher suites by the server
--fc --fix-conf               Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1) 
--st --sudo-tty               Use the terminal prompt to enter the sudo password
--ss --sudo-stdin             Use the stdin of the script to enter the sudo password
--ns --nmap-scan              Use nmap to scan the server version
--nd --nmap-discover          Use nmap to discover web server ports
--w  --worst                  Create a main connection on the worst available protocol version
--l  --logging                Enable logging   
--d  --debug                  Output debug information
--v  --version                Show script version and exit
--h  --help                   Show this help message and exit
+   -u    --url            <url>       Url to scan, required option
+   -p    --port           <port ...>  Port or ports (separate with spaces) to scan on (default: 443)
+   -j    --json           <file>      Change output to json format, if a file name is specified output is written to the given file
+   -t    --test           <num ...>   Run specified vulnerability tests (numbers) separated with spaces, if unspecified all tests are ran
+     0   No tests                     Dont run any tests
+     1   BREACH                       Test for https encoding methods
+     2   CCS Injection                Test for Change Cipher Spec injection
+     3   CRIME                        Test for ssl/tls encoding methods
+     4   DROWN                        Test for rsa key exchange suites with ssl2 support
+     5   Fallback SCSV                Test if fallback Signaling Cipher Suite Value is available
+     6   Foward Secrecy               Test for forward secrecy cipher suites
+     7   FREAK                        Test for RSA + EXPORT cipher suites
+     8   HSTS                         Test for HTTP Strict Transport Security support
+     9   Heartbleed                   Test for Heartbleed vulnerability
+     10  Renegotiation                Test for insecure renegotiation (secure renegotiation extension)
+     11  LOGJAM                       Test for DH + EXPORT cipher suites
+     12  RC4 Support                  Test for RC4 cipher suites
+     13  Session Ticket               Test for session ticket support
+     14  SWEET32                      Test support for 64-bit key length encryption
+   -to   --timeout        <dur>       Set a duration for the timeout of connections in seconds
+   -sc   --short-cert                 Limit alternative names to first 5
+   -cs   --cipher-suites              Scan all supported cipher suites by the server
+   -fc   --fix-conf                   Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1)
+   -st   --sudo-tty                   Use the terminal prompt to enter the sudo password
+   -ss   --sudo-stdin                 Use the stdin of the script to enter the sudo password
+   -ns   --nmap-scan                  Use nmap to scan the server version
+   -nd   --nmap-discover              Use nmap to discover web server ports
+   -w    --worst                      Create a main connection on the worst available protocol version, otherwise servers preferred protocol version is chosen
+   -l    --logging                    Enable logging
+   -d    --debug                      Log debug information
+   -v    --version                    Show script version and exit
+   -h    --help                       Show this help message and exit
 ```
 
 ### -fc argument

@@ -6,7 +6,8 @@ from ...utils import send_data_return_sock, is_server_hello, filter_cipher_suite
 
 
 class RC4Support(VulnerabilityTest):
-    test_name = 'RC4 Support'
+    name = short_name = 'RC4 Support'
+    description = "Test for RC4 cipher suites"
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -26,7 +27,7 @@ class RC4Support(VulnerabilityTest):
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
         rc4_cipher_suites = filter_cipher_suite_bytes(cipher_suite_bytes, "RC4")
         client_hello = ClientHello(version, rc4_cipher_suites, False).construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
+        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
         sock.close()
         if not is_server_hello(response):
             return False

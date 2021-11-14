@@ -6,7 +6,8 @@ from ..VulnerabilityTest import VulnerabilityTest
 
 
 class Breach(VulnerabilityTest):
-    test_name = "BREACH"
+    name = short_name = "BREACH"
+    description = "Test for https encoding methods"
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
