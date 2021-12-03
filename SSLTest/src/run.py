@@ -6,7 +6,6 @@ import traceback
 
 from .scan import handle_scan_output
 from .scan_parameters.non_ratable.port_discovery import discover_ports
-from .scan_parameters.ratable.CipherSuite import CipherSuite
 
 log = logging.getLogger(__name__)
 
@@ -54,13 +53,17 @@ def nmap_discover_option(args):
     if args.nmap_discover:
         try:
             scanned_ports = discover_ports(args.url)
-            log.info(f"Found ports: {scanned_ports}")
         except Exception as ex:
             tb = traceback.format_exc()
             log.debug(tb)
             print(f'Unexpected exception occurred: {ex}', file=sys.stderr)
         scanned_ports = list(filter(lambda p: p not in args.port, scanned_ports))
-        args.port.extend(scanned_ports)
+        # Hacky way to check if default value was used with -p option
+        if 443 in args.port and any(scanned_ports):
+            args.port = scanned_ports
+        else:
+            args.port.extend(scanned_ports)
+        log.info(f"Ports to scan: {args.port}")
 
 
 def scan_all_ports(args):

@@ -76,11 +76,11 @@ $ sudo ptmanager -ut SSLTest
    -to   --timeout        <dur>       Set a duration for the timeout of connections in seconds
    -sc   --short-cert                 Limit alternative names to first 5
    -cs   --cipher-suites              Scan all supported cipher suites by the server
-   -fc   --fix-conf                   Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1)
+   -fc   --fix-conf                   Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols (TLSv1 and TLSv1.1), requires root privileges (see -st and -ss options)
    -st   --sudo-tty                   Use the terminal prompt to enter the sudo password
    -ss   --sudo-stdin                 Use the stdin of the script to enter the sudo password
    -ns   --nmap-scan                  Use nmap to scan the server version
-   -nd   --nmap-discover              Use nmap to discover web server ports
+   -nd   --nmap-discover              Use nmap to discover web server ports, requires root privileges, (see -st and -ss options)
    -w    --worst                      Create a main connection on the worst available protocol version, otherwise servers preferred protocol version is chosen
    -l    --logging                    Enable logging
    -d    --debug                      Log debug information

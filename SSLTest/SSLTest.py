@@ -22,7 +22,6 @@ class SSLTest:
         self.use_json = self.args.json
 
     def run(self):
-        logging_option(self.args)
         run(self.args)
         ptmisclib.ptprint(ptmisclib.out_if(self.ptjsonlib.get_all_json(), "", self.use_json))
 
@@ -58,11 +57,12 @@ def get_help():
         ["-sc", "--short-cert", "", "Limit alternative names to first 5"],
         ["-cs", "--cipher-suites", "", "Scan all supported cipher suites by the server"],
         ["-fc", "--fix-conf", "", "Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols"
-                                  " (TLSv1 and TLSv1.1)"],
+                                  " (TLSv1 and TLSv1.1), requires root privileges (see -st and -ss options)"],
         ["-st", "--sudo-tty", "", "Use the terminal prompt to enter the sudo password"],
         ["-ss", "--sudo-stdin", "", "Use the stdin of the script to enter the sudo password"],
         ["-ns", "--nmap-scan", "", "Use nmap to scan the server version"],
-        ["-nd", "--nmap-discover", "", "Use nmap to discover web server ports"],
+        ["-nd", "--nmap-discover", "", "Use nmap to discover web server ports, requires root privileges,"
+                                       " (see -st and -ss options)"],
         ["-w", "--worst", "", "Create a main connection on the worst available protocol version, otherwise servers "
                               "preferred protocol version is chosen"],
         ["-l", "--logging", "", "Enable logging"],
@@ -103,13 +103,23 @@ def parse_args():
         print_help()
         sys.exit(0)
     args = parser.parse_args()
-    if not args.fix_conf and (args.sudo_tty or args.sudo_stdin):
-        parser.error('argument -fc/--fix-conf needs to be used to use -st/--sudo-tty or -ss/--sudo-stdin')
-    elif args.fix_conf and (not args.sudo_tty and not args.sudo_stdin):
-        parser.error('argument -fc/--fix-conf needs -st/--sudo-tty or -ss/--sudo-stdin to be present')
-    fix_conf_option(args)
+    # TODO: Merge with defines in the parser
+    fc_option = "-fc/--fix-conf"
+    nd_option = "-nd/--nmap-discover"
+    ss_option = "-ss/--sudo-stdin"
+    st_option = "-st/--sudo-tty"
+
+    error_string = "option {error_option} needs " + st_option + " or " + ss_option + " to be present"
+
+    if (args.sudo_tty or args.sudo_stdin) and not (args.nmap_discover or args.fix_conf):
+        parser.error(f"options {st_option} and {ss_option} can only be used with {fc_option} or {nd_option}")
+    elif not (args.sudo_tty or args.sudo_stdin):
+        if args.fix_conf:
+            parser.error(error_string.format(error_option=fc_option))
+        elif args.nmap_discover:
+            parser.error(error_string.format(error_option=nd_option))
     check_test_option(args.test, parser.format_usage())
-    if '-j' not in sys.argv:
+    if '-j' not in sys.argv and '-fc' not in sys.argv:
         ptmisclib.print_banner(SCRIPTNAME, __version__, args.json)
     return args
 
@@ -121,21 +131,40 @@ def fix_conf_option(args):
     :param Namespace args: Parsed input arguments
     """
     if args.fix_conf:
-        if args.sudo_tty:
-            try_to_remove_argument('-st', '--sudo-ttv')
-            return_code = subprocess.run(
-                ['sudo', '-k', '-p', '[sudo] password for %H to fix config file: ', './src/fix_openssl_config.py']
-            ).returncode
-        elif args.sudo_stdin:
-            try_to_remove_argument('-ss', '--sudo-stdin')
-            return_code = subprocess.run(['sudo', '-k', '-S', '-p', '', './src/fix_openssl_config.py']).returncode
-        else:
-            return_code = 1
-        if return_code == 1:
-            exit(1)
-        try_to_remove_argument('-fc', '--fix-conf')
+        try_remove_argument('-fc', '--fix-conf')
         # Restarts the program without the fc, st and ss arguments
+        logging.info("Running fix config script")
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+
+
+def make_root(args):
+    if not (args.sudo_tty or args.sudo_stdin):
+        return
+    reasons = []
+    # TODO: Try to do differently
+    if args.fix_conf: reasons.append("to fix config file")
+    if args.nmap_discover: reasons.append("to use nmap")
+    reason_str = " and ".join(reasons)
+    if args.sudo_tty:
+        try_remove_argument('-st', '--sudo-ttv')
+        return_code = subprocess.run(
+            ['sudo', '-p', f'[sudo] password for %u {reason_str}: ', './src/fix_openssl_config.py']
+        ).returncode
+    elif args.sudo_stdin:
+        try_remove_argument('-ss', '--sudo-stdin')
+        return_code = subprocess.run(['sudo', '-S', '-p', '', './src/fix_openssl_config.py']).returncode
+    else:
+        return_code = 1
+    if return_code == 1:
+        exit(1)
+    return return_code
+
+
+def try_remove_argument(short_name, full_name):
+    try:
+        sys.argv.remove(short_name)
+    except ValueError:
+        sys.argv.remove(full_name)
 
 
 def logging_option(args):
@@ -158,13 +187,6 @@ def logging_option(args):
     logger.addHandler(ch)
 
 
-def try_to_remove_argument(short_name, full_name):
-    try:
-        sys.argv.remove(short_name)
-    except ValueError:
-        sys.argv.remove(full_name)
-
-
 def check_test_option(tests, usage):
     if not tests:
         return
@@ -185,6 +207,9 @@ def main():
     global SCRIPTNAME
     SCRIPTNAME = "SSLTest"
     args = parse_args()
+    logging_option(args)
+    make_root(args)
+    fix_conf_option(args)
     script = SSLTest(args)
     script.run()
 
