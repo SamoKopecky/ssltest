@@ -134,6 +134,9 @@ def fix_conf_option(args):
         try_remove_argument('-fc', '--fix-conf')
         # Restarts the program without the fc, st and ss arguments
         logging.info("Running fix config script")
+        return_code = subprocess.run(['sudo', './src/fix_openssl_config.py']).returncode
+        if return_code == 1:
+            exit(1)
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
 
 
@@ -147,12 +150,10 @@ def make_root(args):
     reason_str = " and ".join(reasons)
     if args.sudo_tty:
         try_remove_argument('-st', '--sudo-ttv')
-        return_code = subprocess.run(
-            ['sudo', '-p', f'[sudo] password for %u {reason_str}: ', './src/fix_openssl_config.py']
-        ).returncode
+        return_code = subprocess.run(['sudo', '-p', f'[sudo] password for %u {reason_str}: ', '-v']).returncode
     elif args.sudo_stdin:
         try_remove_argument('-ss', '--sudo-stdin')
-        return_code = subprocess.run(['sudo', '-S', '-p', '', './src/fix_openssl_config.py']).returncode
+        return_code = subprocess.run(['sudo', '-S', '-p', '-v']).returncode
     else:
         return_code = 1
     if return_code == 1:
