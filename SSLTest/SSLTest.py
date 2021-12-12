@@ -131,7 +131,7 @@ def fix_conf_option(args):
     :param Namespace args: Parsed input arguments
     """
     if args.fix_conf:
-        try_remove_argument('-fc', '--fix-conf')
+        remove_arguemnt('-fc', '--fix-conf')
         # Restarts the program without the fc, st and ss arguments
         logging.info("Running fix config script")
         return_code = subprocess.run(['sudo', './src/fix_openssl_config.py']).returncode
@@ -149,10 +149,10 @@ def make_root(args):
     if args.nmap_discover: reasons.append("to use nmap")
     reason_str = " and ".join(reasons)
     if args.sudo_tty:
-        try_remove_argument('-st', '--sudo-ttv')
+        remove_arguemnt('-st', '--sudo-ttv')
         return_code = subprocess.run(['sudo', '-p', f'[sudo] password for %u {reason_str}: ', '-v']).returncode
     elif args.sudo_stdin:
-        try_remove_argument('-ss', '--sudo-stdin')
+        remove_arguemnt('-ss', '--sudo-stdin')
         return_code = subprocess.run(['sudo', '-S', '-p', '-v']).returncode
     else:
         return_code = 1
@@ -161,7 +161,7 @@ def make_root(args):
     return return_code
 
 
-def try_remove_argument(short_name, full_name):
+def remove_arguemnt(short_name, full_name):
     try:
         sys.argv.remove(short_name)
     except ValueError:
