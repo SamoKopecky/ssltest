@@ -78,6 +78,15 @@ def print_help():
 
 
 def parse_args():
+    sudo_ops = {
+        "fc": ["-fc", "--fix-conf"],
+        "nd": ["-nd", "--nmap-discover"],
+        "ss": ["-ss", "--sudo-stdin"],
+        "st": ["-st", "--sudo-tty"],
+    }
+    for key in sudo_ops.keys():
+        sudo_ops[key].append("/".join(sudo_ops[key]))
+
     parser = argparse.ArgumentParser(add_help=False)
     required = parser.add_argument_group("required arguments")
     fix_config = parser.add_mutually_exclusive_group()
@@ -90,10 +99,10 @@ def parse_args():
     parser.add_argument("-sc", "--short-cert", action="store_true", default=False)
     parser.add_argument("-cs", "--cipher-suites", action="store_true", default=False)
     parser.add_argument("-ns", "--nmap-scan", action="store_true", default=False)
-    parser.add_argument("-nd", "--nmap-discover", action="store_true", default=False)
-    parser.add_argument("-fc", "--fix-conf", action="store_true", default=False)
-    fix_config.add_argument("-st", "--sudo-tty", action="store_true", default=False)
-    fix_config.add_argument("-ss", "--sudo-stdin", action="store_true", default=False)
+    parser.add_argument(sudo_ops["nd"][0], sudo_ops["nd"][1], action="store_true", default=False)
+    parser.add_argument(sudo_ops["fc"][0], sudo_ops["fc"][1], action="store_true", default=False)
+    fix_config.add_argument(sudo_ops["st"][0], sudo_ops["st"][1], action="store_true", default=False)
+    fix_config.add_argument(sudo_ops["ss"][0], sudo_ops["ss"][1], action="store_true", default=False)
     parser.add_argument("-w", "--worst", action="store_true", default=False)
     parser.add_argument("-l", "--logging", action="store_true", default=False)
     parser.add_argument("-d", "--debug", action="store_true", default=False)
@@ -103,21 +112,17 @@ def parse_args():
         print_help()
         sys.exit(0)
     args = parser.parse_args()
-    # TODO: Merge with defines in the parser
-    fc_option = "-fc/--fix-conf"
-    nd_option = "-nd/--nmap-discover"
-    ss_option = "-ss/--sudo-stdin"
-    st_option = "-st/--sudo-tty"
 
-    error_string = "option {error_option} needs " + st_option + " or " + ss_option + " to be present"
+    error_string = "option {error_option} needs " + f"{sudo_ops['st'][2]} or {sudo_ops['ss'][2]} to be present"
 
     if (args.sudo_tty or args.sudo_stdin) and not (args.nmap_discover or args.fix_conf):
-        parser.error(f"options {st_option} and {ss_option} can only be used with {fc_option} or {nd_option}")
+        parser.error(f"options {sudo_ops['st'][2]} and {sudo_ops['ss'][2]} can only be used with {sudo_ops['fc'][2]} "
+                     f"or {sudo_ops['nd'][2]}")
     elif not (args.sudo_tty or args.sudo_stdin):
         if args.fix_conf:
-            parser.error(error_string.format(error_option=fc_option))
+            parser.error(error_string.format(error_option=sudo_ops['fc'][2]))
         elif args.nmap_discover:
-            parser.error(error_string.format(error_option=nd_option))
+            parser.error(error_string.format(error_option=sudo_ops['nd'][2]))
     check_test_option(args.test, parser.format_usage())
     if '-j' not in sys.argv and '-fc' not in sys.argv:
         ptmisclib.print_banner(SCRIPTNAME, __version__, args.json)
