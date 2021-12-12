@@ -136,7 +136,7 @@ def fix_conf_option(args):
     :param Namespace args: Parsed input arguments
     """
     if args.fix_conf:
-        remove_arguemnt('-fc', '--fix-conf')
+        remove_argument('-fc', '--fix-conf')
         # Restarts the program without the fc, st and ss arguments
         logging.info("Running fix config script")
         return_code = subprocess.run(['sudo', './src/fix_openssl_config.py']).returncode
@@ -148,17 +148,19 @@ def fix_conf_option(args):
 def make_root(args):
     if not (args.sudo_tty or args.sudo_stdin):
         return
-    reasons = []
-    # TODO: Try to do differently
-    if args.fix_conf: reasons.append("to fix config file")
-    if args.nmap_discover: reasons.append("to use nmap")
+    var_args = vars(args)
+    reasons_switch = {
+        "fix_conf": "to fix config file",
+        "nmap_discover": "to use nmap"
+    }
+    reasons = [v for k, v in reasons_switch.items() if var_args[k]]
     reason_str = " and ".join(reasons)
     if args.sudo_tty:
-        remove_arguemnt('-st', '--sudo-ttv')
+        remove_argument('-st', '--sudo-ttv')
         return_code = subprocess.run(['sudo', '-p', f'[sudo] password for %u {reason_str}: ', '-v']).returncode
     elif args.sudo_stdin:
-        remove_arguemnt('-ss', '--sudo-stdin')
-        return_code = subprocess.run(['sudo', '-S', '-p', '-v']).returncode
+        remove_argument('-ss', '--sudo-stdin')
+        return_code = subprocess.run(['sudo', '-S', '-p', '', '-v']).returncode
     else:
         return_code = 1
     if return_code == 1:
@@ -166,7 +168,7 @@ def make_root(args):
     return return_code
 
 
-def remove_arguemnt(short_name, full_name):
+def remove_argument(short_name, full_name):
     try:
         sys.argv.remove(short_name)
     except ValueError:
