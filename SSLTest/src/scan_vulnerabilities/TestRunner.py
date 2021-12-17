@@ -66,7 +66,7 @@ class TestRunner:
         }
         idx = 1
         for name, obj in inspect.getmembers(TestRunner.test_module, inspect.ismodule):
-            if "Vulnerability test for" not in inspect.getdoc(obj):
+            if not inspect.getdoc(obj).startswith("Vulnerability test for"):
                 continue
             test_class = next(m[1] for m in inspect.getmembers(obj) if m[0] == name)
             tests.update({idx: test_class})

@@ -12,11 +12,8 @@ You can contribute by making new vulnerability tests.
 3. The variable `valid_protocols` has to be set to a list of SSL/TLS protocols you want the test to run on
 4. Static variables `name`, `short_name` and `description` have to be defined
 6. Test class has to be in `SSLTest/SSLtest/src/scan_vulnerabilities/tests`
-5. The first line of the file that hosts the test class has to have this format:
+5. The doc of the file that hosts the test class has to start with this string `Vulnerability test for`
 
-```
-"""Vulnerability test for {AnyTestName}"""
-```
 Template vulnerability test class can be found in `SSLTest/SSLtest/src/scan_vulnerabilities/tests/TestTemplate.py`
 
 ### Other useful tools for implementing tests

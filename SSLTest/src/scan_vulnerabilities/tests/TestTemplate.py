@@ -1,5 +1,4 @@
-# Delete this to to be able to run this test
-"""Vulnerability test for {Test name}"""
+"""{Delete this to to be able to run this test}Vulnerability test for {Test name}"""
 
 from ..VulnerabilityTest import VulnerabilityTest
 
