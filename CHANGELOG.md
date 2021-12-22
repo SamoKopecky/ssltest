@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-#[0.1.1](https://github.com/SamoKopecky/SSLTest/compare/v0.1.0...v0.1.1) - Dec 22, 2021
+# [0.1.1](https://github.com/SamoKopecky/SSLTest/compare/v0.1.0...v0.1.1) - Dec 22, 2021
 ### Added
 - Vulnerability test for HSTS support, FREAK, LOGJAM, BREACH
 - Symmetric algorithm mod category for EXPORT cipher suites
