@@ -6,6 +6,7 @@ class PType(Enum):
     protocols = auto()
     no_protocol = auto()
     kex_algorithm = auto()
+    kex_algorithm_mod = auto()
     cert_pub_key_algorithm = auto()
     cert_pub_key_length = auto()
     sym_enc_algorithm = auto()
@@ -51,6 +52,7 @@ class PType(Enum):
         """
         cipher_suite_parameters = [
             self.kex_algorithm,
+            self.kex_algorithm_mod,
             self.sym_enc_algorithm,
             self.sym_enc_algorithm_mod,
             self.sym_enc_algorithm_key_length,
@@ -96,6 +98,7 @@ class PType(Enum):
         """
         rateable_parameters = [
             self.kex_algorithm,
+            self.kex_algorithm_mod,
             self.sym_enc_algorithm,
             self.sym_enc_algorithm_mod,
             self.sym_enc_algorithm_key_length,

@@ -6,7 +6,8 @@ from ...utils import receive_data, send_data_return_sock, is_server_hello
 
 
 class CCSInjection(VulnerabilityTest):
-    test_name = 'CCS Injection'
+    name = short_name = 'CCS Injection'
+    description = "Test for Change Cipher Spec injection"
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -14,19 +15,19 @@ class CCSInjection(VulnerabilityTest):
 
     def test(self, version):
         """
-        Scan the webserver for CSS injection vulnerability (CVE-2014-0224)
+        Scan the webserver for CCS injection vulnerability (CVE-2014-0224)
 
         :param int version: SSL/TLS version
         :return: Whether the server is vulnerable
         :rtype: bool
         """
         client_hello = ClientHello(version).construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
+        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
         if not is_server_hello(response):
             sock.close()
             return False
         sock.send(self.construct_ccs_message(version))
-        server_response = receive_data(sock, self.timeout, self.test_name)
+        server_response = receive_data(sock, self.timeout, self.name)
         sock.close()
         # No response from server means the CSS message is accepted
         if not server_response:

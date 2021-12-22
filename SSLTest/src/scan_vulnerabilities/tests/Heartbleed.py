@@ -6,7 +6,8 @@ from ...utils import receive_data, send_data_return_sock, is_server_hello
 
 
 class Heartbleed(VulnerabilityTest):
-    test_name = 'Heartbleed'
+    name = short_name = 'Heartbleed'
+    description = "Test for Heartbleed vulnerability"
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -24,12 +25,12 @@ class Heartbleed(VulnerabilityTest):
         client_hello = ClientHello(version)
         client_hello.extensions += heartbeat_extension
         response, sock = send_data_return_sock(self.address, client_hello.construct_client_hello(),
-                                               self.timeout, self.test_name)
+                                               self.timeout, self.name)
         if not is_server_hello(response):
             sock.close()
             return False
         sock.send(self.construct_heartbeat_request(version))
-        heartbeat_response = receive_data(sock, self.timeout, self.test_name)
+        heartbeat_response = receive_data(sock, self.timeout, self.name)
         sock.close()
         # Server ignores heartbeat request
         if not heartbeat_response:

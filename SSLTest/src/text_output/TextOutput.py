@@ -85,6 +85,9 @@ class TextOutput:
                 return
             for value in data:
                 printn("\n" + "\t" * indent + value)
+        elif type(data) == tuple:
+            row = " ".join(map(self.get_color_for_value, data))
+            printn(": " + row)
         else:
             printn(f": {self.get_color_for_value(data)}")
 

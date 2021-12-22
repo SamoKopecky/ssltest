@@ -6,7 +6,9 @@ from ...utils import send_data_return_sock, is_server_hello, filter_cipher_suite
 
 
 class ForwardSecrecySupport(VulnerabilityTest):
-    test_name = "No Forward Secrecy Support"
+    name = "No Forward Secrecy Support"
+    short_name = "Foward Secrecy"
+    description = "Test for forward secrecy cipher suites"
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -23,9 +25,9 @@ class ForwardSecrecySupport(VulnerabilityTest):
 
         """
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
-        sixty_four_bit_ciphers = filter_cipher_suite_bytes(cipher_suite_bytes, lambda cs: 'ECDHE' in cs or 'DHE' in cs)
+        sixty_four_bit_ciphers = filter_cipher_suite_bytes(cipher_suite_bytes, "ECDHE|DHE")
         client_hello = ClientHello(version, sixty_four_bit_ciphers, False).construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.test_name)
+        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
         sock.close()
         if is_server_hello(response):
             return False
