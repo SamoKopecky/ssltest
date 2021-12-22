@@ -3,7 +3,7 @@ import setuptools
 setuptools.setup(
     name="SSLTest",
     description="",
-    version="0.1.0",
+    version="0.1.1",
     author="Penterep",
     author_email="",
     url="https://www.penterep.com/",
