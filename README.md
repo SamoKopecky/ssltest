@@ -94,7 +94,8 @@ The `-fc` argument may rewrite the file located at `/etc/ssl/openssl.cnf` that i
 format `{old_file}.backup_{unix_time}` in the same folder as the config file
 
 ## Contributing
-Check the [CONTRIBUTING.MD](CONTRIBUTING.md) file
+- Check the [CONTRIBUTING.MD](CONTRIBUTING.md) file
+- Development board can be see [here](https://trello.com/b/7XxY6gFy/ssltest)
 
 ## Usage examples
 
