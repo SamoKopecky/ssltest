@@ -165,6 +165,8 @@ def create_session(address, verify_cert, context, timeout):
     :param int timeout: Timeout in seconds
     :return: Created secure socket, that needs to be closed
     """
+    correct_errors = ['[SSL: NO_PROTOCOLS_AVAILABLE]', '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]',
+                      '[SSL: TLSV1_ALERT_PROTOCOL_VERSION]', 'EOF occurred in violation of protocol']
     cert_verified = True
     if not verify_cert:
         context.check_hostname = False
@@ -195,12 +197,10 @@ def create_session(address, verify_cert, context, timeout):
         except socket.error as e:
             error_str = e.args[1]
             # Protocol not supported, no need to sleep
-            if '[SSL: UNSUPPORTED_PROTOCOL]' in error_str or \
-                    '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]' in error_str or \
-                    '[SSL: TLSV1_ALERT_PROTOCOL_VERSION]' in error_str or \
-                    'EOF occurred in violation of protocol' in error_str:
+            if any([m for m in correct_errors if m in error_str]):
                 log.debug('Protocol unsupported')
                 raise e
-            log.warning('Socket error occurred, retrying')
-            sleep = incremental_sleep(sleep, e, 3)
+            # Dunno why this is here, remove after connection lib rework
+            # log.warning('Socket error occurred, retrying')
+            # sleep = incremental_sleep(sleep, e, 3)
     return ssl_socket, cert_verified
