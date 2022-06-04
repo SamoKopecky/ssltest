@@ -7,13 +7,13 @@ All notable changes to this project will be documented in this file.
 - Vulnerability test for HSTS support, FREAK, LOGJAM, BREACH
 - Symmetric algorithm mod category for EXPORT cipher suites
 - Vulnerability tests can also return a string description of the test result
-- Contributing information for implementing new vulnerability tests and Vulnerability test class template 
-- Requirement of `-st` or `-ss` option for `-nd` or `--nmap-discover` option since the reworked function now requires 
+- Contributing information for implementing new vulnerability tests and Vulnerability test class template
+- Requirement of `-st` or `-ss` option for `-nd` or `--nmap-discover` option since the reworked function now requires
 root privileges
-  
+
 ### Changed
 - The format vulnerability tests are displayed in the `--help` or `-h` output
-- Function of the `-nd` or `--nmap-discover` option 
+- Function of the `-nd` or `--nmap-discover` option
 
 # [0.1.0](https://github.com/SamoKopecky/SSLTest/compare/v0.0.3...v0.1.0) - Oct 24, 2021
 
@@ -99,5 +99,3 @@ from the tests module
 ### Removed
 
 - Removed the web server GUI/rest API functionality
-
- 

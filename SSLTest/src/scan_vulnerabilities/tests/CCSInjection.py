@@ -7,7 +7,7 @@ from ...utils import receive_data, send_data_return_sock, is_server_hello
 
 class CCSInjection(VulnerabilityTest):
     name = short_name = 'CCS Injection'
-    description = "Test for Change Cipher Spec injection"
+    description = 'Test for Change Cipher Spec injection'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -22,7 +22,8 @@ class CCSInjection(VulnerabilityTest):
         :rtype: bool
         """
         client_hello = ClientHello(version).construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
+        response, sock = send_data_return_sock(
+            self.address, client_hello, self.timeout, self.name)
         if not is_server_hello(response):
             sock.close()
             return False

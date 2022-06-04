@@ -7,7 +7,7 @@ from ...utils import send_data_return_sock, is_server_hello
 
 class Crime(VulnerabilityTest):
     name = short_name = 'CRIME'
-    description = "Test for ssl/tls encoding methods"
+    description = 'Test for ssl/tls encoding methods'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -27,7 +27,8 @@ class Crime(VulnerabilityTest):
             0x01  # Compression method (deflate)
         ])
         client_hello = client_hello.construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
+        response, sock = send_data_return_sock(
+            self.address, client_hello, self.timeout, self.name)
         sock.close()
         if not is_server_hello(response):
             return False

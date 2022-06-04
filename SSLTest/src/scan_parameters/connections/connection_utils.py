@@ -55,11 +55,13 @@ def get_web_server_info(address, supported_protocols, worst, timeout):
     else:
         log.info('Connecting with TLS')
         context = create_ssl_context(chosen_protocol)
-        ssl_socket, cert_verified = create_session(address, True, context, timeout)
+        ssl_socket, cert_verified = create_session(
+            address, True, context, timeout)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificate = get_certificate(ssl_socket)
         ssl_socket.close()
-    webserver_info = WebServer(certificate, cert_verified, cipher_suite, protocol)
+    webserver_info = WebServer(
+        certificate, cert_verified, cipher_suite, protocol)
     return webserver_info
 
 
@@ -102,7 +104,8 @@ def worst_or_best_protocol(protocols, worst):
         False: max
     }
     # Filter out the unsupported protocols
-    filtered_protocol_strengths = {k: v for k, v in protocol_strengths.items() if k in protocols}
+    filtered_protocol_strengths = {
+        k: v for k, v in protocol_strengths.items() if k in protocols}
     return switcher[worst](filtered_protocol_strengths)
 
 
@@ -125,7 +128,7 @@ def create_ssl_context(protocol_version):
     try:
         context.options |= ssl_versions[protocol_version]
     except KeyError:
-        log.debug(f"Unable to create context for {protocol_version}")
+        log.debug(f'Unable to create context for {protocol_version}')
         pass
     return context
 
@@ -150,7 +153,7 @@ def get_cipher_suite_and_protocol(ssl_socket):
     """
     cipher_suite = ssl_socket.cipher()[0]
     if '-' in cipher_suite:
-        log.warning(f"{cipher_suite} not in IANA format, converting")
+        log.warning(f'{cipher_suite} not in IANA format, converting')
         cipher_suite = convert_cipher_suite(cipher_suite, 'OpenSSL', 'IANA')
     return cipher_suite, ssl_socket.version()
 

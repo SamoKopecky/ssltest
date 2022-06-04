@@ -6,8 +6,8 @@ from ...utils import send_data_return_sock, is_server_hello, filter_cipher_suite
 
 
 class Sweet32(VulnerabilityTest):
-    name = short_name = "SWEET32"
-    description = "Test support for 64-bit key length encryption"
+    name = short_name = 'SWEET32'
+    description = 'Test support for 64-bit key length encryption'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -23,9 +23,12 @@ class Sweet32(VulnerabilityTest):
         :rtype: bool
         """
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
-        sixty_four_bit_ciphers = filter_cipher_suite_bytes(cipher_suite_bytes, "DES")
-        client_hello = ClientHello(version, sixty_four_bit_ciphers, False).construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
+        sixty_four_bit_ciphers = filter_cipher_suite_bytes(
+            cipher_suite_bytes, 'DES')
+        client_hello = ClientHello(
+            version, sixty_four_bit_ciphers, False).construct_client_hello()
+        response, sock = send_data_return_sock(
+            self.address, client_hello, self.timeout, self.name)
         sock.close()
         if not is_server_hello(response):
             return False

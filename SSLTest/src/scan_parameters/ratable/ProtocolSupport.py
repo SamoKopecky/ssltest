@@ -76,7 +76,8 @@ class ProtocolSupport:
             log.info(f'Scanning for {protocol}')
             context = create_ssl_context(protocol)
             try:
-                ssl_socket, _ = create_session(self.address, False, context, self.timeout)
+                ssl_socket, _ = create_session(
+                    self.address, False, context, self.timeout)
                 ssl_socket.close()
                 self.supported.append(protocol)
             except socket.error:
@@ -87,14 +88,17 @@ class ProtocolSupport:
         Rate the scanned protocols
         """
         for protocol in list(self.protocols[PType.protocols].keys()):
-            self.protocols[PType.protocols][protocol] = Parameters.rate_parameter(PType.protocol, protocol)
+            self.protocols[PType.protocols][protocol] = Parameters.rate_parameter(
+                PType.protocol, protocol)
         for no_protocol in list(self.protocols[PType.no_protocol].keys()):
-            self.protocols[PType.no_protocol][no_protocol] = Parameters.rate_parameter(PType.no_protocol, no_protocol)
-        if ["TLSv1.3"] == list(self.protocols[PType.protocols].keys()):
-            self.protocols[PType.no_protocol]["TLSv1.2"] = "1"
+            self.protocols[PType.no_protocol][no_protocol] = Parameters.rate_parameter(
+                PType.no_protocol, no_protocol)
+        if ['TLSv1.3'] == list(self.protocols[PType.protocols].keys()):
+            self.protocols[PType.no_protocol]['TLSv1.2'] = '1'
         if not self.protocols:
             return
-        ratings = list(self.protocols[PType.protocols].values()) + list(self.protocols[PType.no_protocol].values())
+        ratings = list(self.protocols[PType.protocols].values()) + \
+            list(self.protocols[PType.no_protocol].values())
         self.rating = max(ratings)
 
     def get_json(self):

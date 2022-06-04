@@ -8,7 +8,7 @@ from ...utils import filter_cipher_suite_bytes, send_data_return_sock, is_server
 
 class Drown(VulnerabilityTest):
     name = short_name = 'DROWN'
-    description = "Test for rsa key exchange suites with ssl2 support"
+    description = 'Test for rsa key exchange suites with ssl2 support'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -29,10 +29,12 @@ class Drown(VulnerabilityTest):
             return False
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
         # All cipher suites that use RSA for kex
-        rsa_cipher_suites = filter_cipher_suite_bytes(cipher_suite_bytes, 'TLS_RSA')
+        rsa_cipher_suites = filter_cipher_suite_bytes(
+            cipher_suite_bytes, 'TLS_RSA')
         client_hello = ClientHello(version, rsa_cipher_suites, False)
         client_hello = client_hello.construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
+        response, sock = send_data_return_sock(
+            self.address, client_hello, self.timeout, self.name)
         sock.close()
         if not is_server_hello(response):
             return False
@@ -47,6 +49,7 @@ class Drown(VulnerabilityTest):
         sslv2 = SSLv2(self.address, self.timeout)
         sslv2.send_client_hello()
         sslv2.parse_cipher_suite()
-        export_cipher_suites = list(filter(lambda cs: 'EXPORT' in cs, sslv2.server_cipher_suites))
+        export_cipher_suites = list(
+            filter(lambda cs: 'EXPORT' in cs, sslv2.server_cipher_suites))
         if len(export_cipher_suites) == 0:
             self.sslv2_vulnerable = False
