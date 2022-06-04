@@ -7,8 +7,8 @@ from ...utils import send_data_return_sock, is_server_hello
 
 class FallbackSCSVSupport(VulnerabilityTest):
     name = 'No Fallback SCSV Support'
-    short_name = "Fallback SCSV"
-    description = "Test if fallback Signaling Cipher Suite Value is available"
+    short_name = 'Fallback SCSV'
+    description = 'Test if fallback Signaling Cipher Suite Value is available'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -23,14 +23,17 @@ class FallbackSCSVSupport(VulnerabilityTest):
         :return: Whether the server don't support fallback SCSV
         :rtype: bool
         """
-        usable_protocols = list(filter(lambda p: p in self.valid_protocols, self.supported_protocols))
+        usable_protocols = list(
+            filter(lambda p: p in self.valid_protocols, self.supported_protocols))
         if len(usable_protocols) == 1:
             return False
         usable_protocols = sorted(usable_protocols)
-        second_worst_protocol = protocol_version_conversion(usable_protocols[-2])
+        second_worst_protocol = protocol_version_conversion(
+            usable_protocols[-2])
         client_hello = ClientHello(second_worst_protocol, self.fallback_scsv)
         client_hello = client_hello.construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
+        response, sock = send_data_return_sock(
+            self.address, client_hello, self.timeout, self.name)
         sock.close()
         # If server doesn't respond with an alert, it doesn't support SCSV fallback
         if is_server_hello(response):

@@ -42,40 +42,45 @@ class CipherSuites:
         """
         log.info('Scanning for cipher suite support')
         if 'SSLv2' in self.supported_protocols:
-            log.info("Scanning SSLv2 cipher suites")
+            log.info('Scanning SSLv2 cipher suites')
             self.supported_protocols.remove('SSLv2')
             self.scan_sslv2_cipher_suites()
             if only_sslv2:
                 return
 
         for protocol in self.supported_protocols:
-            log.info(f"Scanning {protocol} cipher suites")
+            log.info(f'Scanning {protocol} cipher suites')
             # Ignore TLSv1.1 since the same cipher suites apply for TLSv1.0
             if protocol == 'TLSv1.1' and 'TLSv1.0' in self.supported_protocols:
                 continue
 
             # Init
-            to_test_cipher_suites = ClientHello.get_cipher_suites_for_version(protocol)
+            to_test_cipher_suites = ClientHello.get_cipher_suites_for_version(
+                protocol)
             accepted_cipher_suites = bytearray()
 
             # Skip already tested cipher suites from previous protocol versions if applicable
             for i in range(0, len(self.tested_cipher_suites), 2):
                 tested_cipher_suite = self.tested_cipher_suites[i: i + 2]
-                cipher_suite_protocols = get_cipher_suite_protocols(tested_cipher_suite)
+                cipher_suite_protocols = get_cipher_suite_protocols(
+                    tested_cipher_suite)
                 if protocol in cipher_suite_protocols:
                     to_test_cipher_suites.remove(tested_cipher_suite[0])
                     to_test_cipher_suites.remove(tested_cipher_suite[1])
                     accepted_cipher_suites.extend(tested_cipher_suite)
-            client_hello = ClientHello(protocol_version_conversion(protocol), to_test_cipher_suites, False)
+            client_hello = ClientHello(protocol_version_conversion(protocol),
+                                       to_test_cipher_suites, False)
             while True:
                 client_hello_bytes = client_hello.construct_client_hello()
-                response, try_again = self.try_receive_data(client_hello_bytes, protocol)
+                response, try_again = self.try_receive_data(
+                    client_hello_bytes, protocol)
                 if try_again:
                     continue
                 if not is_server_hello(response):
                     break
                 # Register accepted cipher suite
-                cipher_suite_index = to_test_cipher_suites.find(parse_cipher_suite(response))
+                cipher_suite_index = to_test_cipher_suites.find(
+                    parse_cipher_suite(response))
                 cipher_suite = to_test_cipher_suites[cipher_suite_index: cipher_suite_index + 2]
                 accepted_cipher_suites.extend(cipher_suite)
                 if cipher_suite not in self.tested_cipher_suites:
@@ -88,7 +93,8 @@ class CipherSuites:
             # Convert to cipher suite to string
             string_cipher_suites = []
             for i in range(0, len(accepted_cipher_suites), 2):
-                string_cipher_suites.append(bytes_to_cipher_suite(accepted_cipher_suites[i:i + 2], 'IANA'))
+                string_cipher_suites.append(bytes_to_cipher_suite(
+                    accepted_cipher_suites[i:i + 2], 'IANA'))
             if protocol == 'TLSv1.0':
                 protocol = 'TLSv1.0/TLSv1.1'
             self.unrated.update({protocol: string_cipher_suites})

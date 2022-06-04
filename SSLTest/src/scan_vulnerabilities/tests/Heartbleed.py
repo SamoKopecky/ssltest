@@ -7,7 +7,7 @@ from ...utils import receive_data, send_data_return_sock, is_server_hello
 
 class Heartbleed(VulnerabilityTest):
     name = short_name = 'Heartbleed'
-    description = "Test for Heartbleed vulnerability"
+    description = 'Test for Heartbleed vulnerability'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)

@@ -35,7 +35,8 @@ def fix_openssl_config():
 
     if append[0] or append[1]:
         root_dir = os.path.dirname(os.path.abspath(__file__))
-        correct_config_file = open(f'{root_dir}/../../resources/correct_openssl_conf.txt', 'r')
+        correct_config_file = open(
+            f'{root_dir}/../../resources/correct_openssl_conf.txt', 'r')
         correct_config = correct_config_file.read()
         with open(config_file_name, 'w') as f:
             f.seek(0, 0)
@@ -86,9 +87,9 @@ def create_backup_config(file_path):
 
     :param str file_path: Config file path
     """
-    old_file = open(file_path, "r")
-    backup_file_path = file_path + f".backup_{time.time()}"
-    backup_file = open(backup_file_path, "w")
+    old_file = open(file_path, 'r')
+    backup_file_path = file_path + f'.backup_{time.time()}'
+    backup_file = open(backup_file_path, 'w')
     backup_file.write(old_file.read())
     old_file.close()
     backup_file.close()

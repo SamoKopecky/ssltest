@@ -24,7 +24,7 @@ def handle_scan_output(args, port, only_json):
     :return:
     """
     address = Address(args.url, port)
-    address_str = f"{address.url}:{address.port}"
+    address_str = f'{address.url}:{address.port}'
     json_data = {address_str: {}}
     handlers = []
     text_output = None
@@ -57,14 +57,16 @@ def scan(args, address):
     protocol_support.rate_protocols()
     yield {'protocol_support': protocol_support.get_json()}
 
-    web_server = get_web_server_info(address, protocol_support.supported, args.worst, args.timeout)
+    web_server = get_web_server_info(
+        address, protocol_support.supported, args.worst, args.timeout)
 
     cipher_suite = CipherSuite(web_server.cipher_suite, web_server.protocol)
     cipher_suite.parse_cipher_suite()
     cipher_suite.parse_protocol_version()
     cipher_suite.rate_cipher_suite()
 
-    certificate = Certificate(web_server.certificate, web_server.cert_verified, args.short_cert)
+    certificate = Certificate(web_server.certificate,
+                              web_server.cert_verified, args.short_cert)
     certificate.parse_certificate()
     certificate.rate_certificate()
 
@@ -75,10 +77,12 @@ def scan(args, address):
     web_server_soft.scan_server_software()
     yield {'web_server_software': web_server_soft.software}
 
-    test_runner = TestRunner(address, args.timeout, web_server.protocol, protocol_support.supported)
+    test_runner = TestRunner(address, args.timeout,
+                             web_server.protocol, protocol_support.supported)
     yield {'vulnerabilities': test_runner.run_tests(test_option(args))}
 
-    cipher_suites = CipherSuites(address, protocol_support.supported, args.timeout)
+    cipher_suites = CipherSuites(
+        address, protocol_support.supported, args.timeout)
     option_result = cipher_suites_option(args, web_server.protocol)
     if option_result[0]:
         cipher_suites.scan_cipher_suites(option_result[1])

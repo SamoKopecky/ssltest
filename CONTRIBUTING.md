@@ -3,7 +3,7 @@
 You can contribute by making new vulnerability tests.
 
 ## Contribute a new Vulnerability test
- 
+
 6 conditions have to be met for a test to be a valid vulnerability test:
 
 1. The test class has to inherit from the `VulnerablityTest` class and implement required abstract methods and call the
@@ -24,4 +24,3 @@ Template vulnerability test class can be found in `SSLTest/SSLtest/src/scan_vuln
   the parallel run of tests on multiple protocols (e.g. `Drown`).
 - The `ClientHello` class can be used to create the initial client hello message, where every client hello field can be
   customized such as cipher suites or TLS extensions.
-  

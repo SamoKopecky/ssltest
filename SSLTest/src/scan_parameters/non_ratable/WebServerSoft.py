@@ -31,7 +31,8 @@ class WebServerSoft:
         keys = ['product', 'version']
         nmap = nmap3.Nmap()
         log.info('Scanning webserver for version with nmap')
-        result = nmap.scan_top_ports(self.address.url, args=f"-sV -p {self.address.port}")
+        result = nmap.scan_top_ports(
+            self.address.url, args=f'-sV -p {self.address.port}')
 
         values = []
         service = list(result.items())[0][1]['ports'][0]['service']
@@ -39,7 +40,7 @@ class WebServerSoft:
             try:
                 values.append(service[key])
             except KeyError:
-                log.warning("Unable to find any software versions")
+                log.warning('Unable to find any software versions')
         self.software['nmap'] = ' '.join(values)
 
     def scan_software_http(self):
@@ -47,21 +48,22 @@ class WebServerSoft:
         Get web server software from HEAD response header
         """
         log.info('Scanning webserver for version using http headers')
-        value = ""
+        value = ''
         try:
             response = requests.head(f'https://{self.address.url}:{self.address.port}', timeout=3,
                                      headers={'Connection': 'close'},
                                      verify=False)
-            value = response.headers["server"]
+            value = response.headers['server']
         except KeyError:
-            log.warning("Unable to find server software")
+            log.warning('Unable to find server software')
         except (requests.exceptions.InvalidSchema,
                 requests.exceptions.SSLError,
                 requests.exceptions.ConnectionError,
                 requests.exceptions.Timeout,
                 requests.exceptions.ReadTimeout):
-            log.warning("Unable to connect to scan for server software (probably not supported protocol version)")
-        self.software["http_header"] = value
+            log.warning(
+                'Unable to connect to scan for server software (probably not supported protocol version)')
+        self.software['http_header'] = value
 
     def scan_server_software(self):
         """

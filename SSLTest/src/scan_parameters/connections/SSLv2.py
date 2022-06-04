@@ -62,13 +62,15 @@ class SSLv2(SSLvX):
                     f'{SSLv2.int_to_hex_str(self.response[idx + 1])},'
                     f'{SSLv2.int_to_hex_str(self.response[idx + 2])}'
                 ])
-        random_number = int(random.randint(0, len(self.server_cipher_suites) - 1))
+        random_number = int(random.randint(
+            0, len(self.server_cipher_suites) - 1))
         self.cipher_suite = self.server_cipher_suites[random_number]
 
     def parse_certificate(self):
         certificate_length = unpack('>H', self.response[7:9])[0]
         certificate_in_bytes = self.response[13:certificate_length + 13]
-        self.certificates.append(load_der_x509_certificate(certificate_in_bytes))
+        self.certificates.append(
+            load_der_x509_certificate(certificate_in_bytes))
 
     @staticmethod
     def int_to_hex_str(number):

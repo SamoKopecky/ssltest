@@ -23,8 +23,8 @@ def read_json(file_name):
     :rtype: dict
     """
     root_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = f"{root_dir}/../../resources/json/{file_name}"
-    log.debug(f"Opening {file_path}")
+    file_path = f'{root_dir}/../../resources/json/{file_name}'
+    log.debug(f'Opening {file_path}')
     file = open(file_path, 'r')
     json_data = json.loads(file.read())
     file.close()
@@ -50,19 +50,19 @@ def receive_data(sock, timeout, debug_source):
         try:
             data = sock.recv(2048)
             if data:
-                log.debug(f"({debug_source}) receiving data")
+                log.debug(f'({debug_source}) receiving data')
                 all_data.extend(data)
                 begin = time()
             else:
                 sleep(0.1)
         except socket.timeout:
-            log.debug("Timeout out while receiving data")
+            log.debug('Timeout out while receiving data')
             break
         if all_data and time() - begin > timeout:
-            log.debug(f"({debug_source}) finished with received data")
+            log.debug(f'({debug_source}) finished with received data')
             break
         elif time() - begin > timeout:
-            log.debug(f"({debug_source}) finished with no received data")
+            log.debug(f'({debug_source}) finished with no received data')
             break
     return bytes(all_data)
 
@@ -89,7 +89,8 @@ def send_data_return_sock(address, client_hello, timeout, debug_source):
             break
         except socket.timeout as e:
             sock.close()
-            log.warning("Timeout out while creating socket and sending data, retrying")
+            log.warning(
+                'Timeout out while creating socket and sending data, retrying')
             sleep_dur = incremental_sleep(sleep_dur, e, 2)
         except (socket.error, ConnectionResetError) as e:
             log.warning('Socket error occurred, retrying')
@@ -239,11 +240,11 @@ def protocol_version_conversion(version):
     :rtype: str or int
     """
     protocol_version = {
-        "TLSv1.3": 0x04,
-        "TLSv1.2": 0x03,
-        "TLSv1.1": 0x02,
-        "TLSv1.0": 0x01,
-        "SSLv3": 0x00
+        'TLSv1.3': 0x04,
+        'TLSv1.2': 0x03,
+        'TLSv1.1': 0x02,
+        'TLSv1.0': 0x01,
+        'SSLv3': 0x00
     }
     protocol_type = type(version)
     if protocol_type is str:

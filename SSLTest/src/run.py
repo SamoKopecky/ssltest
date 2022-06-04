@@ -57,13 +57,14 @@ def nmap_discover_option(args):
             tb = traceback.format_exc()
             log.debug(tb)
             print(f'Unexpected exception occurred: {ex}', file=sys.stderr)
-        scanned_ports = list(filter(lambda p: p not in args.port, scanned_ports))
+        scanned_ports = list(
+            filter(lambda p: p not in args.port, scanned_ports))
         # Hacky way to check if default value was used with -p option
         if 443 in args.port and any(scanned_ports):
             args.port = scanned_ports
         else:
             args.port.extend(scanned_ports)
-        log.info(f"Ports to scan: {args.port}")
+        log.info(f'Ports to scan: {args.port}')
 
 
 def scan_all_ports(args):
@@ -103,4 +104,4 @@ def json_option(args, json_data):
         file = open(args.json, 'w')
         file.write(json_output_data)
         file.close()
-        log.info(f"Output writen to {args.json}")
+        log.info(f'Output writen to {args.json}')

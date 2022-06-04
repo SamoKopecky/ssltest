@@ -31,7 +31,8 @@ class Parameters(ABC):
                 )
                 continue
             # normal parameters
-            self.parameters[p_type][parameter] = self.rate_parameter(p_type, parameter)
+            self.parameters[p_type][parameter] = self.rate_parameter(
+                p_type, parameter)
         self.rating = self.get_worst_rating()
 
     def get_worst_rating(self):
@@ -72,11 +73,11 @@ class Parameters(ABC):
         :rtype: str
         """
         functions = {
-            ">=": lambda a, b: a >= b,
-            ">>": lambda a, b: a > b,
-            "<=": lambda a, b: a <= b,
-            "<<": lambda a, b: a < b,
-            "==": lambda a, b: a == b
+            '>=': lambda a, b: a >= b,
+            '>>': lambda a, b: a > b,
+            '<=': lambda a, b: a <= b,
+            '<<': lambda a, b: a < b,
+            '==': lambda a, b: a == b
         }
         # TODO: All of the algorithms are not yet added to the security_levels.json
         levels_str = security_levels_json[key_len_type.name]
@@ -114,7 +115,8 @@ class Parameters(ABC):
     @staticmethod
     def get_params_json(cipher_suite, certificate):
         worst_rating = max([cipher_suite.rating, certificate.rating])
-        parameters = {key.name: value for key, value in cipher_suite.parameters.items()}
+        parameters = {key.name: value
+                      for key, value in cipher_suite.parameters.items()}
         for key, value in certificate.parameters.items():
             if key == PType.cert_pub_key_algorithm and not parameters[key.name] == {'N/A': '0'}:
                 continue

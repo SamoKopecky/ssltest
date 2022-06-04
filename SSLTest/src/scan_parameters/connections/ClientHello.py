@@ -37,7 +37,8 @@ class ClientHello:
         ])
         # Fill random bytes
         self.handshake_protocol[2:34] = secrets.token_bytes(32)
-        self.cipher_suites = self.pack_cipher_suite_bytes(cipher_suites, fill_cipher_suites)
+        self.cipher_suites = self.pack_cipher_suite_bytes(
+            cipher_suites, fill_cipher_suites)
         self.compression = bytearray([
             0x01,  # Compression method length
             0x00  # Compression method
@@ -116,7 +117,8 @@ class ClientHello:
         if custom_cipher_suites is not None:
             cipher_suites += custom_cipher_suites
         if fill_cipher_suites:
-            cipher_suites += self.get_cipher_suites_for_version(self.str_protocol)
+            cipher_suites += self.get_cipher_suites_for_version(
+                self.str_protocol)
         return pack('>H', len(cipher_suites)) + cipher_suites
 
     @staticmethod
@@ -136,5 +138,6 @@ class ClientHello:
         for key, value in json_ciphers.items():
             if version in value['protocol_version']:
                 cs_bytes = key.split(',')
-                ciphers += bytearray([int(cs_bytes[0], 16), int(cs_bytes[1], 16)])
+                ciphers += bytearray([int(cs_bytes[0], 16),
+                                     int(cs_bytes[1], 16)])
         return ciphers

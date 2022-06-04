@@ -38,7 +38,8 @@ class SSLvX(ABC):
         OpenSSL lib is used to verify the certificate or the certificate chain
         """
         store = crypto.X509Store()
-        ssl_certificates = [crypto.X509.from_cryptography(cert) for cert in self.certificates]
+        ssl_certificates = [crypto.X509.from_cryptography(cert)
+                            for cert in self.certificates]
         # Just one certificate present in the response
         endpoint_certificate = ssl_certificates[0]
         # A certificate chain is present in the response
@@ -101,6 +102,7 @@ class SSLvX(ABC):
             if len(row) == 0:
                 continue
             certificate_data = row[0].replace('\'', '')
-            ssl_certificate = crypto.load_certificate(crypto.FILETYPE_PEM, certificate_data.encode())
+            ssl_certificate = crypto.load_certificate(
+                crypto.FILETYPE_PEM, certificate_data.encode())
             certs.append(ssl_certificate)
         return certs

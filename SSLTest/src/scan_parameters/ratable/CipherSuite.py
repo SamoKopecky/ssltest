@@ -52,7 +52,8 @@ class CipherSuite(Parameters):
         Rate all cipher suite parameters
         """
         rateable_parameters = list(self.parameters.keys())
-        key_types = [PType.sym_enc_algorithm_key_length, PType.sym_ecn_algorithm_block_mode_number]
+        key_types = [PType.sym_enc_algorithm_key_length,
+                     PType.sym_ecn_algorithm_block_mode_number]
         self.rate_parameters(rateable_parameters, key_types)
 
     def parse_protocol_version(self):

@@ -7,8 +7,8 @@ from ...utils import send_data_return_sock, is_server_hello
 
 class SessionTicketSupport(VulnerabilityTest):
     name = 'Session Ticket Support'
-    short_name = "Session Ticket"
-    description = "Test for session ticket support"
+    short_name = 'Session Ticket'
+    description = 'Test for session ticket support'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -29,7 +29,8 @@ class SessionTicketSupport(VulnerabilityTest):
         client_hello = ClientHello(version)
         client_hello.extensions += self.session_ticket_extension
         client_hello = client_hello.construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
+        response, sock = send_data_return_sock(
+            self.address, client_hello, self.timeout, self.name)
         sock.close()
         if not is_server_hello(response):
             return False

@@ -7,8 +7,8 @@ from ...utils import send_data_return_sock, is_server_hello
 
 class InsecureRenegotiation(VulnerabilityTest):
     name = 'Insecure Renegotiation'
-    short_name = "Renegotiation"
-    description = "Test for insecure renegotiation (secure renegotiation extension)"
+    short_name = 'Renegotiation'
+    description = 'Test for insecure renegotiation (secure renegotiation extension)'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -29,7 +29,8 @@ class InsecureRenegotiation(VulnerabilityTest):
         client_hello = ClientHello(version)
         client_hello.extensions += self.renegotiation_extension
         client_hello = client_hello.construct_client_hello()
-        response, sock = send_data_return_sock(self.address, client_hello, self.timeout, self.name)
+        response, sock = send_data_return_sock(
+            self.address, client_hello, self.timeout, self.name)
         sock.close()
         if not is_server_hello(response):
             return False
