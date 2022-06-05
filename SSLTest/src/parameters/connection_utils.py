@@ -8,7 +8,7 @@ from cryptography.hazmat.backends import default_backend
 
 from .SSLv2 import SSLv2
 from .SSLv3 import SSLv3
-from ...utils import incremental_sleep, convert_cipher_suite, Address
+from ..utils import incremental_sleep, convert_cipher_suite, Address
 
 
 class WebServer(NamedTuple):

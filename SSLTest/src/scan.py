@@ -1,14 +1,14 @@
 import logging
 
-from .scan_parameters.connections.connection_utils import get_web_server_info
-from .scan_parameters.non_ratable.WebServerSoft import WebServerSoft
-from .scan_parameters.ratable.Certificate import Certificate
-from .scan_parameters.ratable.CipherSuite import CipherSuite
-from .scan_parameters.ratable.CipherSuites import CipherSuites
-from .scan_parameters.ratable.Parameters import Parameters
-from .scan_parameters.ratable.ProtocolSupport import ProtocolSupport
-from .scan_vulnerabilities.TestRunner import TestRunner
-from .text_output.TextOutput import TextOutput
+from .parameters.connection_utils import get_web_server_info
+from .parameters.WebServerSoft import WebServerSoft
+from .parameters.Certificate import Certificate
+from .parameters.CipherSuite import CipherSuite
+from .parameters.CipherSuites import CipherSuites
+from .parameters.Parameters import Parameters
+from .parameters.ProtocolSupport import ProtocolSupport
+from .vulnerabilities.TestRunner import TestRunner
+from .output.TextOutput import TextOutput
 from .utils import Address
 
 log = logging.getLogger(__name__)

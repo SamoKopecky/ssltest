@@ -4,7 +4,7 @@ from cryptography.x509 import load_der_x509_certificate
 
 from .ClientHello import ClientHello
 from .SSLvX import SSLvX
-from ...utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion, Address
+from ..utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion, Address
 
 
 class SSLv3(SSLvX):

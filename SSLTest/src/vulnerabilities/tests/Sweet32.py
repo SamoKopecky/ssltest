@@ -1,34 +1,32 @@
-"""Vulnerability test for RC4 Support"""
+"""Vulnerability test for SWEET 32"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...scan_parameters.connections.ClientHello import ClientHello
+from ...parameters.ClientHello import ClientHello
 from ...utils import send_data_return_sock, is_server_hello, filter_cipher_suite_bytes
 
 
-class RC4Support(VulnerabilityTest):
-    name = short_name = 'RC4 Support'
-    description = 'Test for RC4 cipher suites'
+class Sweet32(VulnerabilityTest):
+    name = short_name = 'SWEET32'
+    description = 'Test support for 64-bit key length encryption'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
-        if 'TLSv1.0' in self.supported_protocols and 'TLSv1.1' in supported_protocols:
-            self.valid_protocols.remove('TLSv1.1')
         self.scan_once = False
 
     def test(self, version):
         """
-        Scan for rc4 cipher support
+        Scan for SWEET32 vulnerability (CVE-2016-2183)
 
         :param int version: SSL/TLS version
         :return: Whether the server is vulnerable
         :rtype: bool
         """
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
-        rc4_cipher_suites = filter_cipher_suite_bytes(
-            cipher_suite_bytes, 'RC4')
+        sixty_four_bit_ciphers = filter_cipher_suite_bytes(
+            cipher_suite_bytes, 'DES')
         client_hello = ClientHello(
-            version, rc4_cipher_suites, False).construct_client_hello()
+            version, sixty_four_bit_ciphers, False).construct_client_hello()
         response, sock = send_data_return_sock(
             self.address, client_hello, self.timeout, self.name)
         sock.close()

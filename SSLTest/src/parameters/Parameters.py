@@ -1,7 +1,7 @@
 from abc import ABC
 
 from .PType import PType
-from ...utils import read_json
+from ..utils import read_json
 
 security_levels_json = read_json('security_levels.json')
 

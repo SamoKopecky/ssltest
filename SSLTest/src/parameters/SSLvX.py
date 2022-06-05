@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import requests
 from OpenSSL import crypto
 
-from ...utils import send_data_return_sock, Address
+from ..utils import send_data_return_sock, Address
 
 
 class SSLvX(ABC):

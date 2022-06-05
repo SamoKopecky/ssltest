@@ -3,10 +3,10 @@ import socket
 
 from .PType import PType
 from .Parameters import Parameters
-from ..connections.SSLv2 import SSLv2
-from ..connections.SSLv3 import SSLv3
-from ..connections.connection_utils import create_session, create_ssl_context
-from ...utils import Address
+from .SSLv2 import SSLv2
+from .SSLv3 import SSLv3
+from .connection_utils import create_session, create_ssl_context
+from ..utils import Address
 
 log = logging.getLogger(__name__)
 

@@ -3,7 +3,7 @@ import logging
 import nmap3
 import requests
 
-from ...utils import Address
+from ..utils import Address
 
 log = logging.getLogger(__name__)
 
