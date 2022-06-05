@@ -16,7 +16,7 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     install_requires=['ptlibs', 'cryptography',
-                      'pyOpenSSL', 'python3-nmap', 'requests', 'urllib3'],
-    entry_points={'console_scripts': ['scriptname = ssltest.Script:main']},
+                      'pyOpenSSL', 'python3-nmap', 'requests', 'urllib3', 'Click'],
+    entry_points={'console_scripts': ['ssltest = ssltest.src.main.__main__']},
     include_package_data=True
 )

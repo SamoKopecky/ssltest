@@ -3,7 +3,7 @@ import importlib.util
 import inspect
 import logging
 
-from ..utils import Address
+from ..main.utils import Address
 
 log = logging.getLogger(__name__)
 

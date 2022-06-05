@@ -1,14 +1,14 @@
 import logging
 
-from .parameters.connection_utils import get_web_server_info
-from .parameters.WebServerSoft import WebServerSoft
-from .parameters.Certificate import Certificate
-from .parameters.CipherSuite import CipherSuite
-from .parameters.CipherSuites import CipherSuites
-from .parameters.Parameters import Parameters
-from .parameters.ProtocolSupport import ProtocolSupport
-from .vulnerabilities.TestRunner import TestRunner
-from .output.TextOutput import TextOutput
+from ..core.connection_utils import get_web_server_info
+from ..core.WebServerSoft import WebServerSoft
+from ..core.Certificate import Certificate
+from ..core.CipherSuite import CipherSuite
+from ..core.CipherSuites import CipherSuites
+from ..core.Parameters import Parameters
+from ..core.ProtocolSupport import ProtocolSupport
+from ..vulnerabilities.TestRunner import TestRunner
+from ..output.TextOutput import TextOutput
 from .utils import Address
 
 log = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ def scan(args, address):
     certificate.parse_certificate()
     certificate.rate_certificate()
 
-    yield {'parameters': Parameters.get_params_json(cipher_suite, certificate)}
+    yield {'core': Parameters.get_params_json(cipher_suite, certificate)}
     yield {'certificate_info': certificate.get_json()}
 
     web_server_soft = WebServerSoft(address, args.nmap_scan)

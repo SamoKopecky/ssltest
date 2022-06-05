@@ -1,7 +1,7 @@
 from abc import ABC
 
 from .PType import PType
-from ..utils import read_json
+from ..main.utils import read_json
 
 security_levels_json = read_json('security_levels.json')
 
@@ -37,7 +37,7 @@ class Parameters(ABC):
 
     def get_worst_rating(self):
         """
-        Return the worse rating from all of the parameters
+        Return the worse rating from all the parameters
 
         :return: Worst rating
         :rtype: int

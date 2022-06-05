@@ -1,8 +1,8 @@
 """Vulnerability test for FREAK vulnerability"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...parameters.ClientHello import ClientHello
-from ...utils import filter_cipher_suite_bytes, send_data_return_sock, is_server_hello
+from ...core.ClientHello import ClientHello
+from ...main.utils import filter_cipher_suite_bytes, send_data_return_sock, is_server_hello
 
 
 class Freak(VulnerabilityTest):

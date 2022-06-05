@@ -5,7 +5,7 @@ from struct import unpack
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
-from ..utils import read_json, Address
+from ..main.utils import read_json, Address
 
 
 class SSLv2(SSLvX):

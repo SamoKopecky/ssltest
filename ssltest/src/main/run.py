@@ -5,7 +5,7 @@ import sys
 import traceback
 
 from .scan import handle_scan_output
-from .parameters.port_discovery import discover_ports
+from ..core.port_discovery import discover_ports
 
 log = logging.getLogger(__name__)
 

@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 __version__ = '0.1.1'
 
 import argparse
@@ -10,8 +8,10 @@ import sys
 
 from ptlibs import ptjsonlib, ptmisclib
 
-from src.run import run
-from src.vulnerabilities.TestRunner import TestRunner
+from .run import run
+from ..vulnerabilities.TestRunner import TestRunner
+
+script_name = 'ssltest'
 
 
 class Script:
@@ -37,7 +37,7 @@ def get_tests_help():
 
 
 def get_usage():
-    return f'{SCRIPTNAME}.py <options>'
+    return f'{script_name}.py <options>'
 
 
 def get_help():
@@ -45,7 +45,7 @@ def get_help():
         {'description': [
             'Script that scans web servers cryptographic parameters and vulnerabilities ']},
         {'usage': [get_usage()]},
-        {'usage_example': [f'{SCRIPTNAME}.py -u https://example.com -t 1 2']},
+        {'usage_example': [f'{script_name}.py -u https://example.com -t 1 2']},
         {'options': [
             ['-u', '--url', '<url>', 'Url to scan, required option'],
             ['-p', '--port', '<port ...>',
@@ -80,7 +80,7 @@ def get_help():
 
 
 def print_help():
-    ptmisclib.help_print(get_help(), SCRIPTNAME, __version__)
+    ptmisclib.help_print(get_help(), script_name, __version__)
 
 
 def parse_args():
@@ -144,7 +144,7 @@ def parse_args():
             parser.error(error_string.format(error_option=sudo_ops['nd'][2]))
     check_test_option(args.test, parser.format_usage())
     if '-j' not in sys.argv and '-fc' not in sys.argv:
-        ptmisclib.print_banner(SCRIPTNAME, __version__, args.json)
+        ptmisclib.print_banner(script_name, __version__, args.json)
     return args
 
 
@@ -235,16 +235,10 @@ def check_test_option(tests, usage):
         sys.exit(1)
 
 
-def main():
-    global SCRIPTNAME
-    SCRIPTNAME = 'ssltest'
+def run_script():
     args = parse_args()
     logging_option(args)
     make_root(args)
     fix_conf_option(args)
     script = Script(args)
     script.run()
-
-
-if __name__ == '__main__':
-    main()
