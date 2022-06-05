@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name='SSLTest',
+    name='ssltest',
     description='',
     version='0.1.1',
     author='Penterep, Samuel Kopecky',
@@ -17,6 +17,6 @@ setuptools.setup(
     python_requires='>=3.6',
     install_requires=['ptlibs', 'cryptography',
                       'pyOpenSSL', 'python3-nmap', 'requests', 'urllib3'],
-    entry_points={'console_scripts': ['scriptname = SSLTest.SSLTest:main']},
+    entry_points={'console_scripts': ['scriptname = ssltest.Script:main']},
     include_package_data=True
 )
