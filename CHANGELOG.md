@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-# [0.1.1](https://github.com/SamoKopecky/SSLTest/compare/v0.1.0...v0.1.1) - Dec 22, 2021
+# [0.1.1](https://github.com/SamoKopecky/ssltest/compare/v0.1.0...v0.1.1) - Dec 22, 2021
 ### Added
 - Vulnerability test for HSTS support, FREAK, LOGJAM, BREACH
 - Symmetric algorithm mod category for EXPORT cipher suites
@@ -15,7 +15,7 @@ root privileges
 - The format vulnerability tests are displayed in the `--help` or `-h` output
 - Function of the `-nd` or `--nmap-discover` option
 
-# [0.1.0](https://github.com/SamoKopecky/SSLTest/compare/v0.0.3...v0.1.0) - Oct 24, 2021
+# [0.1.0](https://github.com/SamoKopecky/ssltest/compare/v0.0.3...v0.1.0) - Oct 24, 2021
 
 ### Added
 - Improved text output in console
@@ -25,7 +25,7 @@ root privileges
 - Vulnerability tests no longer need to be hardcoded in a dictionary to run, they are automatically parsed
 from the tests module
 
-# [0.0.3](https://github.com/SamoKopecky/SSLTest/compare/v0.0.2...v0.0.3) - Oct 13, 2021
+# [0.0.3](https://github.com/SamoKopecky/ssltest/compare/v0.0.2...v0.0.3) - Oct 13, 2021
 
 ### Added
 
@@ -49,7 +49,7 @@ from the tests module
 - Change `-i --info` option to `-l --logging`
 - Add `-st -sudo--tty` and `-ss -sudo--stdin` options for entering the sudo password instead of automatic detection
 
-# [0.0.2](https://github.com/SamoKopecky/SSLTest/compare/v0.0.1...v0.0.2) - Sep 7, 2021
+# [0.0.2](https://github.com/SamoKopecky/ssltest/compare/v0.0.1...v0.0.2) - Sep 7, 2021
 
 ### Added
 
@@ -72,11 +72,11 @@ from the tests module
   instead of [pyOpenSSL](https://www.pyopenssl.org/en/stable/), which fixed many bugs
 - Script no longer needs to be run as root to run the OpenSSL config file fix
 - SSLv2 cipher suite is now chosen at
-  random ([why](https://github.com/SamoKopecky/SSLTest/commit/cbc230ddffbf07a900345533fbea823cdcc36de5))
+  random ([why](https://github.com/SamoKopecky/ssltest/commit/cbc230ddffbf07a900345533fbea823cdcc36de5))
 - Chosen cipher suites for client hellos in vulnerability tests are generated using the
   python [ssl](https://docs.python.org/3/library/ssl.html) library to improve compatibility
 
-# [0.0.1](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.1) - Aug 10, 2021
+# [0.0.1](https://github.com/SamoKopecky/ssltest/releases/tag/v0.0.1) - Aug 10, 2021
 
 ### Added
 
@@ -84,7 +84,7 @@ from the tests module
 - SSLv3 protocol support scanning, cipher suite and endpoint certificate scanning
 - SSLv2 protocol support scanning, endpoint certificate scanning
 - Fixed cipher suite while connecting on
-  SSLv2 ([why](https://github.com/SamoKopecky/SSLTest/commit/7140c464696112cefb63862961f82adee043ca38))
+  SSLv2 ([why](https://github.com/SamoKopecky/ssltest/commit/7140c464696112cefb63862961f82adee043ca38))
 - Option `-t 0` for not running any tests, if no `-t` option is present all tests are ran
 - Script integration with the `penterep tools` template
 - `-v --version` option to show tool version

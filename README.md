@@ -7,7 +7,7 @@
                                  |_|
 ```
 
-# SSLTest
+# ssltest
 
 A Python script that scans web servers cryptographic parameters and vulnerabilities. All available Vulnerability tests
 can be found in the `help` output of the script or in the [options](#Options) section.
@@ -41,14 +41,14 @@ $ sudo apt-get install -y nmap
 ## Installation
 
 ```
-$ git clone SSLTest
-$ cd SSLTest && sudo pip install .
+$ git clone ssltest
+$ cd ssltest && sudo pip install .
 ```
 
 ## Installation (ptmanager)
 
 ```
-$ sudo ptmanager -ut SSLTest
+$ sudo ptmanager -ut ssltest
 ```
 
 ## Options
@@ -100,17 +100,17 @@ format `{old_file}.backup_{unix_time}` in the same folder as the config file
 ## Usage examples
 
 ```
-$ ./SSLTest.py -u https://example.com -t 1 2 -cs
+$ ./ssltest.py -u https://example.com -t 1 2 -cs
 ```
 
 ## Version History
 
 * Full changelog [here](/CHANGELOG.md)
-* [0.1.1](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.1.1)
-* [0.1.0](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.1.0)
-* [0.0.3](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.3)
-* [0.0.2](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.2)
-* [0.0.1](https://github.com/SamoKopecky/SSLTest/releases/tag/v0.0.1)
+* [0.1.1](https://github.com/SamoKopecky/ssltest/releases/tag/v0.1.1)
+* [0.1.0](https://github.com/SamoKopecky/ssltest/releases/tag/v0.1.0)
+* [0.0.3](https://github.com/SamoKopecky/ssltest/releases/tag/v0.0.3)
+* [0.0.2](https://github.com/SamoKopecky/ssltest/releases/tag/v0.0.2)
+* [0.0.1](https://github.com/SamoKopecky/ssltest/releases/tag/v0.0.1)
 
 ## Licence
 

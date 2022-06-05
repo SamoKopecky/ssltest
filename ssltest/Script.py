@@ -14,11 +14,11 @@ from src.run import run
 from src.vulnerabilities.TestRunner import TestRunner
 
 
-class SSLTest:
+class Script:
     def __init__(self, args):
         self.args = args
         self.ptjsonlib = ptjsonlib.ptjsonlib(self.args.json)
-        self.json_no = self.ptjsonlib.add_json('SSLTest')
+        self.json_no = self.ptjsonlib.add_json('ssltest')
         self.use_json = self.args.json
 
     def run(self):
@@ -237,12 +237,12 @@ def check_test_option(tests, usage):
 
 def main():
     global SCRIPTNAME
-    SCRIPTNAME = 'SSLTest'
+    SCRIPTNAME = 'ssltest'
     args = parse_args()
     logging_option(args)
     make_root(args)
     fix_conf_option(args)
-    script = SSLTest(args)
+    script = Script(args)
     script.run()
 
 
