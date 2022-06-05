@@ -1,8 +1,8 @@
 """Vulnerability test for CCS Injection"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...parameters.ClientHello import ClientHello
-from ...utils import receive_data, send_data_return_sock, is_server_hello
+from ...core.ClientHello import ClientHello
+from ...main.utils import receive_data, send_data_return_sock, is_server_hello
 
 
 class CCSInjection(VulnerabilityTest):

@@ -6,7 +6,7 @@ from .Parameters import Parameters
 from .SSLv2 import SSLv2
 from .SSLv3 import SSLv3
 from .connection_utils import create_session, create_ssl_context
-from ..utils import Address
+from ..main.utils import Address
 
 log = logging.getLogger(__name__)
 

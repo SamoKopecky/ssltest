@@ -1,9 +1,9 @@
 """Vulnerability test for DROWN"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...parameters.ClientHello import ClientHello
-from ...parameters.SSLv2 import SSLv2
-from ...utils import filter_cipher_suite_bytes, send_data_return_sock, is_server_hello
+from ...core.ClientHello import ClientHello
+from ...core.SSLv2 import SSLv2
+from ...main.utils import filter_cipher_suite_bytes, send_data_return_sock, is_server_hello
 
 
 class Drown(VulnerabilityTest):

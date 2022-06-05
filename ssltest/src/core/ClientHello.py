@@ -1,7 +1,7 @@
 import secrets
 from struct import pack
 
-from ..utils import read_json, protocol_version_conversion
+from ..main.utils import read_json, protocol_version_conversion
 
 json_ciphers = read_json('cipher_suites.json')
 

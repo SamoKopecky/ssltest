@@ -1,8 +1,8 @@
 """Vulnerability test for Fallback SCSV Support"""
 
 from ..VulnerabilityTest import VulnerabilityTest, protocol_version_conversion
-from ...parameters.ClientHello import ClientHello
-from ...utils import send_data_return_sock, is_server_hello
+from ...core.ClientHello import ClientHello
+from ...main.utils import send_data_return_sock, is_server_hello
 
 
 class FallbackSCSVSupport(VulnerabilityTest):

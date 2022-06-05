@@ -1,8 +1,8 @@
 """Vulnerability test for SWEET 32"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...parameters.ClientHello import ClientHello
-from ...utils import send_data_return_sock, is_server_hello, filter_cipher_suite_bytes
+from ...core.ClientHello import ClientHello
+from ...main.utils import send_data_return_sock, is_server_hello, filter_cipher_suite_bytes
 
 
 class Sweet32(VulnerabilityTest):

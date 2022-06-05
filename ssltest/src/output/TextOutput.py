@@ -1,10 +1,8 @@
 import logging
-import sys
-import time
 
 from ptlibs.ptmisclib import get_colored_text, terminal_width
 
-from ..utils import read_json, Address
+from ..main.utils import read_json, Address
 
 log = logging.getLogger(__name__)
 

@@ -1,8 +1,8 @@
 """Vulnerability test for CRIME"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...parameters.ClientHello import ClientHello
-from ...utils import send_data_return_sock, is_server_hello
+from ...core.ClientHello import ClientHello
+from ...main.utils import send_data_return_sock, is_server_hello
 
 
 class Crime(VulnerabilityTest):
