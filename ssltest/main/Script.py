@@ -159,7 +159,7 @@ def fix_conf_option(args):
         # Restarts the program without the fc, st and ss arguments
         logging.info('Running fix config script')
         return_code = subprocess.run(
-            ['sudo', './src/fix_openssl_config.py']).returncode
+            ['sudo', './ssltest/fix_openssl_config.py']).returncode
         if return_code == 1:
             exit(1)
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)

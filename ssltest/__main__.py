@@ -1,4 +1,4 @@
-from .Script import run_script
+from .main.Script import run_script
 
 
 def main():
