@@ -3,10 +3,10 @@ import logging
 from typing import Tuple
 
 from .CipherSuite import CipherSuite
-from ..connections.ClientHello import ClientHello
-from ..connections.SSLv2 import SSLv2
-from ...exceptions.ConnectionTimeout import ConnectionTimeout
-from ...utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
+from .ClientHello import ClientHello
+from .SSLv2 import SSLv2
+from ..exceptions.ConnectionTimeout import ConnectionTimeout
+from ..utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
     is_server_hello, get_cipher_suite_protocols, Address
 
 log = logging.getLogger(__name__)

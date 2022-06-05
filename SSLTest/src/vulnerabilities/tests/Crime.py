@@ -1,7 +1,7 @@
 """Vulnerability test for CRIME"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...scan_parameters.connections.ClientHello import ClientHello
+from ...parameters.ClientHello import ClientHello
 from ...utils import send_data_return_sock, is_server_hello
 
 

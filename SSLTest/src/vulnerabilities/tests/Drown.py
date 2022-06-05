@@ -1,8 +1,8 @@
 """Vulnerability test for DROWN"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...scan_parameters.connections.ClientHello import ClientHello
-from ...scan_parameters.connections.SSLv2 import SSLv2
+from ...parameters.ClientHello import ClientHello
+from ...parameters.SSLv2 import SSLv2
 from ...utils import filter_cipher_suite_bytes, send_data_return_sock, is_server_hello
 
 

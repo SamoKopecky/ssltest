@@ -1,6 +1,6 @@
 from .PType import PType
 from .Parameters import Parameters
-from ...utils import read_json
+from ..utils import read_json
 
 json_data = read_json('cipher_parameters.json')
 

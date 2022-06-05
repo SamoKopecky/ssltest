@@ -1,13 +1,13 @@
-"""Vulnerability test for LOGJAM vulnerability"""
+"""Vulnerability test for FREAK vulnerability"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...scan_parameters.connections.ClientHello import ClientHello
+from ...parameters.ClientHello import ClientHello
 from ...utils import filter_cipher_suite_bytes, send_data_return_sock, is_server_hello
 
 
-class Logjam(VulnerabilityTest):
-    name = short_name = 'LOGJAM'
-    description = 'Test for DH + EXPORT cipher suites'
+class Freak(VulnerabilityTest):
+    name = short_name = 'FREAK'
+    description = 'Test for RSA + EXPORT cipher suites'
 
     def __init__(self, supported_protocols, address, timeout, protocol):
         super().__init__(supported_protocols, address, timeout, protocol)
@@ -16,10 +16,10 @@ class Logjam(VulnerabilityTest):
 
     def test(self, version):
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
-        dh_export_cipher_suites = filter_cipher_suite_bytes(
-            cipher_suite_bytes, 'DH.*EXPORT')
+        rsa_export_cipher_suites = filter_cipher_suite_bytes(
+            cipher_suite_bytes, 'RSA.*EXPORT')
         client_hello = ClientHello(
-            version, dh_export_cipher_suites, False).construct_client_hello()
+            version, rsa_export_cipher_suites, False).construct_client_hello()
         response, sock = send_data_return_sock(
             self.address, client_hello, self.timeout, self.name)
         sock.close()

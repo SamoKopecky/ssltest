@@ -11,7 +11,7 @@ import sys
 from ptlibs import ptjsonlib, ptmisclib
 
 from src.run import run
-from src.scan_vulnerabilities.TestRunner import TestRunner
+from src.vulnerabilities.TestRunner import TestRunner
 
 
 class SSLTest:
