@@ -70,7 +70,7 @@ def scan(args, address):
     certificate.parse_certificate()
     certificate.rate_certificate()
 
-    yield {'core': Parameters.get_params_json(cipher_suite, certificate)}
+    yield {'parameters': Parameters.get_params_json(cipher_suite, certificate)}
     yield {'certificate_info': certificate.get_json()}
 
     web_server_soft = WebServerSoft(address, args.nmap_scan)
