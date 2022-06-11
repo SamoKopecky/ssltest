@@ -1,29 +1,36 @@
+import logging
+
 from importlib.resources import path
-import os
-import shutil
-from sys import platform
-from os import sep
+from os import sep, mkdir
+from os.path import exists
+from pathlib import Path
+from shutil import copy
 
 configs = ['cipher_parameters.json', 'cipher_suites.json',
            'cipher_suites_sslv2.json', 'english_strings.json',
            'security_levels.json']
-linux_install_location = f'{os.getenv("HOME")}/.config/ssltest'
+
+log = logging.getLogger(__name__)
 
 
 def install_configs():
+    """
+    Install config files to the config dir
+    """
     install_location = get_config_location()
-    if not os.path.exists(install_location):
-        os.mkdir(install_location)
+    if not exists(install_location):
+        mkdir(install_location)
     resource_dir = str(path('configs', configs[0]).parent)
     for file in configs:
-        file_path = f'{install_location}{sep}{file}'
-        if not os.path.exists(file_path):
-            shutil.copy(f'{resource_dir}{sep}{file}', file_path)
+        config_dest = f'{install_location}{sep}{file}'
+        if not exists(config_dest):
+            config_file = f'{resource_dir}{sep}{file}'
+            log.debug(f'Copying {config_file} to {config_dest}')
+            copy(config_file, config_dest)
 
 
 def get_config_location():
-    if platform == 'linux' or platform == 'linux2':
-        return linux_install_location
-    else:
-        # TODO: Windows, macOS
-        return ''
+    """
+    Get the config location
+    """
+    return f'{str(Path.home())}{sep}.config{sep}ssltest'

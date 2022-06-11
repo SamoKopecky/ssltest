@@ -3,17 +3,18 @@ __version__ = '0.1.1'
 import argparse
 import logging
 import os
-import subprocess
 import shutil
+import subprocess
 import sys
 
-from importlib.resources import path
 from ptlibs import ptjsonlib, ptmisclib
 
 from .run import run
 from ..vulnerabilities.TestRunner import TestRunner
 
 script_name = 'ssltest'
+
+log = logging.getLogger(__name__)
 
 
 class Script:
@@ -30,6 +31,9 @@ class Script:
 
 
 def get_tests_help():
+    """
+    Get all the tests in an ptlibs parsable way
+    """
     space_before = ' ' * 2
     tests = [[f'{space_before}0', 'No tests', '', 'Dont run any tests']]
     for key, test_class in list(TestRunner.get_tests_switcher().items())[1:]:
@@ -39,15 +43,21 @@ def get_tests_help():
 
 
 def get_usage():
-    return f'{script_name}.py <options>'
+    """
+    Get script usage
+    """
+    return f'{script_name} <options>'
 
 
 def get_help():
+    """
+    Get the print output
+    """
     help_msg = [
         {'description': [
             'Script that scans web servers cryptographic parameters and vulnerabilities ']},
         {'usage': [get_usage()]},
-        {'usage_example': [f'{script_name}.py -u https://example.com -t 1 2']},
+        {'usage_example': [f'{script_name} -u https://example.com -t 1 2']},
         {'options': [
             ['-u', '--url', '<url>', 'Url to scan, required option'],
             ['-p', '--port', '<port ...>',
@@ -82,10 +92,16 @@ def get_help():
 
 
 def print_help():
+    """
+    Print help output
+    """
     ptmisclib.help_print(get_help(), script_name, __version__)
 
 
 def parse_args():
+    """
+    Parse input arguments
+    """
     sudo_ops = {
         'fc': ['-fc', '--fix-conf'],
         'nd': ['-nd', '--nmap-discover'],
@@ -115,9 +131,9 @@ def parse_args():
     parser.add_argument('-ns', '--nmap-scan',
                         action='store_true', default=False)
     parser.add_argument(sudo_ops['nd'][0], sudo_ops['nd']
-                        [1], action='store_true', default=False)
+    [1], action='store_true', default=False)
     parser.add_argument(sudo_ops['fc'][0], sudo_ops['fc']
-                        [1], action='store_true', default=False)
+    [1], action='store_true', default=False)
     fix_config.add_argument(
         sudo_ops['st'][0], sudo_ops['st'][1], action='store_true', default=False)
     fix_config.add_argument(
@@ -157,6 +173,7 @@ def fix_conf_option(args):
     :param Namespace args: Parsed input arguments
     """
     if args.fix_conf:
+        log.info('Removing argument fc and running fix script')
         remove_argument('-fc', '--fix-conf')
         # Get the script path before it is ran as root
         script_path = shutil.which('fix_openssl_config.py')
@@ -165,13 +182,22 @@ def fix_conf_option(args):
         return_code = subprocess.run(
             ['sudo', script_path]).returncode
         if return_code == 1:
+            log.critical('Fix script failed')
             exit(1)
+        log.debug('Running main script again without root')
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
 
 
 def make_root(args):
+    """
+    Make the user change to root permissions to run fix script or nmap
+
+    :param Namespace args: Parsed input arguments
+    """
     if not (args.sudo_tty or args.sudo_stdin):
+        log.debug("No sudo option present, not running as root")
         return
+    log.debug("Running as root")
     var_args = vars(args)
     reasons_switch = {
         'fix_conf': 'to fix config file',
@@ -189,11 +215,15 @@ def make_root(args):
     else:
         return_code = 1
     if return_code == 1:
+        log.critical("Error occurred when trying to run as root")
         exit(1)
     return return_code
 
 
 def remove_argument(short_name, full_name):
+    """
+    Remove argument from args
+    """
     try:
         sys.argv.remove(short_name)
     except ValueError:
