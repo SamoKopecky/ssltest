@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
 
-import os
 import time
+
+correct_openssl_conf = '''
+[default_conf]
+ssl_conf = ssl_sect
+
+[ssl_sect]
+system_default = system_default_sect
+
+[system_default_sect]
+MinProtocol = TLSv1
+CipherString = DEFAULT@SECLEVEL=0
+'''
 
 
 def fix_openssl_config():
@@ -34,17 +45,13 @@ def fix_openssl_config():
         append[1] = True
 
     if append[0] or append[1]:
-        root_dir = os.path.dirname(os.path.abspath(__file__))
-        correct_config_file = open(
-            f'{root_dir}/../../resources/correct_openssl_conf.txt', 'r')
-        correct_config = correct_config_file.read()
+        correct_config = correct_openssl_conf
         with open(config_file_name, 'w') as f:
             f.seek(0, 0)
             buffer = 'openssl_conf = default_conf\n' + config_content
             buffer += correct_config
             f.write(buffer)
             f.flush()
-        correct_config_file.close()
     config_file.close()
 
 

@@ -1,10 +1,13 @@
 import json
 import logging
-import os
 import re
 import socket
+
 from time import sleep, time
 from typing import NamedTuple
+from os import sep
+
+from ..configs import get_config_location
 
 log = logging.getLogger(__name__)
 
@@ -22,8 +25,8 @@ def read_json(file_name):
     :return: Json data in python objects
     :rtype: dict
     """
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = f'{root_dir}/../../resources/{file_name}'
+    root_dir = get_config_location()
+    file_path = f'{root_dir}{sep}{file_name}'
     log.debug(f'Opening {file_path}')
     file = open(file_path, 'r')
     json_data = json.loads(file.read())

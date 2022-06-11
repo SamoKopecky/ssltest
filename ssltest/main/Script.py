@@ -4,8 +4,10 @@ import argparse
 import logging
 import os
 import subprocess
+import shutil
 import sys
 
+from importlib.resources import path
 from ptlibs import ptjsonlib, ptmisclib
 
 from .run import run
@@ -156,10 +158,12 @@ def fix_conf_option(args):
     """
     if args.fix_conf:
         remove_argument('-fc', '--fix-conf')
+        # Get the script path before it is ran as root
+        script_path = shutil.which('fix_openssl_config.py')
         # Restarts the program without the fc, st and ss arguments
         logging.info('Running fix config script')
         return_code = subprocess.run(
-            ['sudo', './ssltest/fix_openssl_config.py']).returncode
+            ['sudo', script_path]).returncode
         if return_code == 1:
             exit(1)
         os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
@@ -177,11 +181,11 @@ def make_root(args):
     reason_str = ' and '.join(reasons)
     if args.sudo_tty:
         remove_argument('-st', '--sudo-ttv')
-        return_code = subprocess.run(
-            ['sudo', '-p', f'[sudo] password for %u {reason_str}: ', '-v']).returncode
+        return_code = subprocess.run(['sudo', '-S', '-p', '', '-v']).returncode
     elif args.sudo_stdin:
         remove_argument('-ss', '--sudo-stdin')
-        return_code = subprocess.run(['sudo', '-S', '-p', '', '-v']).returncode
+        return_code = subprocess.run(
+            ['sudo', '-p', f'[sudo] password for %u {reason_str}: ', '-v']).returncode
     else:
         return_code = 1
     if return_code == 1:
