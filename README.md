@@ -25,29 +25,21 @@ Scan or test:
 
 ## Dependencies
 
-Dependencies are listed in the `requirements.txt` file, if you don't want to install with `setup.py`
-and just want to run the script install them like this:
+Nmap is required for some functions of the script, install on debian-like distros with:
 
-```
-$ pip3 install -r requirements.txt
-```
-
-Nmap is required for some functions of the script, install on ubuntu-like distros with:
-
-```
+```shell
 $ sudo apt-get install -y nmap
 ```
 
 ## Installation
 
-```
-$ git clone ssltest
-$ cd ssltest && sudo pip install .
+```shell
+$ pip install ssltest
 ```
 
 ## Installation (ptmanager)
 
-```
+```shell
 $ sudo ptmanager -ut ssltest
 ```
 
