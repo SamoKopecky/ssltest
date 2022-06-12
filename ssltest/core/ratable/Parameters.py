@@ -1,9 +1,11 @@
+import logging
 from abc import ABC
 
 from .PType import PType
 from ...main.utils import read_json
 
 security_levels_json = read_json('security_levels.json')
+log = logging.getLogger(__name__)
 
 
 class Parameters(ABC):
@@ -22,6 +24,7 @@ class Parameters(ABC):
         :param list key_types: Key type parameters to be rated
         """
         for p_type in rateable_parameters:
+            log.debug(f'Rating {p_type} parameter')
             parameter = self.key(self.parameters[p_type])
             # length parameters
             if p_type in key_types:
@@ -114,6 +117,13 @@ class Parameters(ABC):
 
     @staticmethod
     def get_params_json(cipher_suite, certificate):
+        """
+        Get all ratable parameters json
+        :param CipherSuite cipher_suite: Cipher suite
+        :param Certificate certificate:
+        :return: Json of ratable parameters
+        :rtype: dict
+        """
         worst_rating = max([cipher_suite.rating, certificate.rating])
         parameters = {key.name: value
                       for key, value in cipher_suite.parameters.items()}

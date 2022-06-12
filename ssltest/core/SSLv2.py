@@ -1,3 +1,4 @@
+import logging
 import random
 import secrets
 from struct import unpack
@@ -6,6 +7,8 @@ from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
 from ..main.utils import read_json, Address
+
+log = logging.getLogger(__name__)
 
 
 class SSLv2(SSLvX):
@@ -40,13 +43,16 @@ class SSLv2(SSLvX):
     def scan_protocol_support(self):
         # No response to SSLv2 client hello
         if len(self.response) == 0:
+            log.debug('No response to SSLv2 client hello')
             return False
         # Test if the response is Content type Alert (0x15)
         # and test if alert message is protocol version (0x46)
         elif self.response[0] == 0x15 and (self.response[6] == 0x28 or self.response[6] == 0x46):
+            log.debug('Alert response to SSLv2 client hello')
             return False
         # Test if the handshake message type is server hello
         elif self.response[2] == 0x04:
+            log.debug('SSLv2 client hello response accepted')
             return True
         return False
 

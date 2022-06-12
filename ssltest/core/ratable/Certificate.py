@@ -34,6 +34,7 @@ class Certificate(Parameters):
         """
         Parse information from a certificate and into a dictionary
         """
+        log.info('Parsing certificate')
         # Public key algorithm
         self.parameters[PType.cert_pub_key_algorithm][
             self.pub_key_alg_from_cert(self.certificate.public_key())] = 0
@@ -73,6 +74,7 @@ class Certificate(Parameters):
         :return: Alternative names
         :rtype: list
         """
+        log.info('Parsing alternative names from certificate')
         try:
             extension = self.certificate.extensions.get_extension_for_class(
                 x509.SubjectAlternativeName)
@@ -81,8 +83,11 @@ class Certificate(Parameters):
             return []
         alternative_names: list = extension.value.get_values_for_type(
             x509.DNSName)
-        if self.short_cert and len(alternative_names) > 5:
-            return alternative_names[:5] + ['...']
+        shortened_names_count = 5
+        if self.short_cert and len(alternative_names) > shortened_names_count:
+            log.debug(
+                f'Shortening alternative names output to {shortened_names_count}')
+            return alternative_names[:shortened_names_count] + ['...']
         return alternative_names
 
     @staticmethod
@@ -94,6 +99,7 @@ class Certificate(Parameters):
         :return: Parsed subject or issuer
         :rtype: list
         """
+        log.info('Parsing subject/issuer')
         name_info = []
         for attribute in name:
             name_info.append(f'{attribute.oid._name}: {attribute.value}')
@@ -142,4 +148,7 @@ class Certificate(Parameters):
         return keys[values.index(oid)].split('_')[0]
 
     def get_json(self):
+        """
+        Get parameters as json
+        """
         return {key.name: value for key, value in self.non_parameters.items()}

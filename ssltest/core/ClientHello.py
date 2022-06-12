@@ -1,9 +1,11 @@
+import logging
 import secrets
 from struct import pack
 
 from ..main.utils import read_json, protocol_version_conversion
 
 json_ciphers = read_json('cipher_suites.json')
+log = logging.getLogger(__name__)
 
 
 class ClientHello:
@@ -90,6 +92,7 @@ class ClientHello:
         :return: Client hello bytes
         :rtype: bytearray
         """
+        log.debug('Constructing client hello')
         # Body of the client hello
         extensions_length = pack('>H', len(self.extensions))
         client_hello = self.handshake_protocol + self.cipher_suites + self.compression
@@ -115,8 +118,10 @@ class ClientHello:
         """
         cipher_suites = bytearray()
         if custom_cipher_suites is not None:
+            log.debug('Adding custom cipher suites')
             cipher_suites += custom_cipher_suites
         if fill_cipher_suites:
+            log.debug('Adding usual protocol cipher suites')
             cipher_suites += self.get_cipher_suites_for_version(
                 self.str_protocol)
         return pack('>H', len(cipher_suites)) + cipher_suites
@@ -139,5 +144,5 @@ class ClientHello:
             if version in value['protocol_version']:
                 cs_bytes = key.split(',')
                 ciphers += bytearray([int(cs_bytes[0], 16),
-                                     int(cs_bytes[1], 16)])
+                                      int(cs_bytes[1], 16)])
         return ciphers
