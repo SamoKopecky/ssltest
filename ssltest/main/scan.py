@@ -1,12 +1,12 @@
 import logging
 
 from ..core.connection_utils import get_web_server_info
-from ..core.WebServerSoft import WebServerSoft
-from ..core.Certificate import Certificate
-from ..core.CipherSuite import CipherSuite
-from ..core.CipherSuites import CipherSuites
-from ..core.Parameters import Parameters
-from ..core.ProtocolSupport import ProtocolSupport
+from ..core.unratable.WebServerSoft import WebServerSoft
+from ..core.ratable.Certificate import Certificate
+from ..core.ratable.CipherSuite import CipherSuite
+from ..core.ratable.CipherSuites import CipherSuites
+from ..core.ratable.Parameters import Parameters
+from ..core.ratable.ProtocolSupport import ProtocolSupport
 from ..vulnerabilities.TestRunner import TestRunner
 from ..output.TextOutput import TextOutput
 from .utils import Address
