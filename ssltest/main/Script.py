@@ -10,6 +10,7 @@ import sys
 from ptlibs import ptjsonlib, ptmisclib
 
 from .run import run
+from ..logging import logging_option
 from ..vulnerabilities.TestRunner import TestRunner
 
 script_name = 'ssltest'
@@ -131,9 +132,9 @@ def parse_args():
     parser.add_argument('-ns', '--nmap-scan',
                         action='store_true', default=False)
     parser.add_argument(sudo_ops['nd'][0], sudo_ops['nd']
-    [1], action='store_true', default=False)
+                        [1], action='store_true', default=False)
     parser.add_argument(sudo_ops['fc'][0], sudo_ops['fc']
-    [1], action='store_true', default=False)
+                        [1], action='store_true', default=False)
     fix_config.add_argument(
         sudo_ops['st'][0], sudo_ops['st'][1], action='store_true', default=False)
     fix_config.add_argument(
@@ -195,9 +196,9 @@ def make_root(args):
     :param Namespace args: Parsed input arguments
     """
     if not (args.sudo_tty or args.sudo_stdin):
-        log.debug("No sudo option present, not running as root")
+        log.debug('No sudo option present, not running as root')
         return
-    log.debug("Running as root")
+    log.debug('Running as root')
     var_args = vars(args)
     reasons_switch = {
         'fix_conf': 'to fix config file',
@@ -215,7 +216,7 @@ def make_root(args):
     else:
         return_code = 1
     if return_code == 1:
-        log.critical("Error occurred when trying to run as root")
+        log.critical('Error occurred when trying to run as root')
         exit(1)
     return return_code
 
@@ -228,27 +229,6 @@ def remove_argument(short_name, full_name):
         sys.argv.remove(short_name)
     except ValueError:
         sys.argv.remove(full_name)
-
-
-def logging_option(args):
-    """
-    Handle the debug and information options
-
-    :param Namespace args: Parsed input arguments
-    """
-    logger = logging.getLogger(__package__)
-    logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    if args.debug:
-        ch.setLevel(logging.DEBUG)
-    elif args.logging:
-        ch.setLevel(logging.INFO)
-    else:
-        logging.disable(sys.maxsize)
-    formatter = logging.Formatter(
-        '%(asctime)s [%(levelname)s] %(name)s: %(message)s')
-    ch.setFormatter(formatter)
-    logger.addHandler(ch)
 
 
 def check_test_option(tests, usage):

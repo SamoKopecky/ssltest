@@ -1,3 +1,4 @@
+import logging
 from struct import unpack
 
 from cryptography.x509 import load_der_x509_certificate
@@ -5,6 +6,8 @@ from cryptography.x509 import load_der_x509_certificate
 from .ClientHello import ClientHello
 from .SSLvX import SSLvX
 from ..main.utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion, Address
+
+log = logging.getLogger(__name__)
 
 
 class SSLv3(SSLvX):
@@ -22,13 +25,16 @@ class SSLv3(SSLvX):
 
     def scan_protocol_support(self):
         if len(self.response) == 0:
+            log.debug('No response to SSLv3 client hello')
             return False
         # Test if the response is Content type Alert (0x15)
         # and test if the alert message is handshake failure (0x28)
         # or protocol version alert (0x46)
         elif self.response[0] == 0x15 and (self.response[6] == 0x28 or self.response[6] == 0x46):
+            log.debug('Alert response to SSLv3 client hello')
             return False
         elif self.response[0] == 0x16 and self.response[5] == 0x02:
+            log.debug('Positive response to SSLv3 client hello')
             return True
         return False
 

@@ -64,6 +64,8 @@ class CipherSuites:
                 cipher_suite_protocols = get_cipher_suite_protocols(
                     tested_cipher_suite)
                 if protocol in cipher_suite_protocols:
+                    log.debug(
+                        f'Found duplicate for {protocol} in other TLS/SSL versions')
                     to_test_cipher_suites.remove(tested_cipher_suite[0])
                     to_test_cipher_suites.remove(tested_cipher_suite[1])
                     accepted_cipher_suites.extend(tested_cipher_suite)

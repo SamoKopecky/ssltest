@@ -1,3 +1,4 @@
+import logging
 import csv
 from abc import ABC, abstractmethod
 
@@ -5,6 +6,8 @@ import requests
 from OpenSSL import crypto
 
 from ..main.utils import send_data_return_sock, Address
+
+log = logging.getLogger(__name__)
 
 
 class SSLvX(ABC):
@@ -95,6 +98,7 @@ class SSLvX(ABC):
         certs = []
         store_download_url = \
             'https://ccadb-public.secure.force.com/mozilla/IncludedRootsPEMCSV?TrustBitsInclude=Websites'
+        log.info(f'Downloading certificate store from {store_download_url}')
         store_data = requests.get(url=store_download_url).content.decode()
         store_csv = csv.reader(store_data, delimiter='"')
         store_csv.__iter__().__next__()
