@@ -1,6 +1,6 @@
 import logging
 
-from importlib.resources import path
+from pkg_resources import resource_filename
 from os import sep, mkdir
 from os.path import exists
 from pathlib import Path
@@ -20,7 +20,7 @@ def install_configs():
     install_location = get_config_location()
     if not exists(install_location):
         mkdir(install_location)
-    resource_dir = str(path('configs', configs[0]).parent)
+    resource_dir = resource_filename('ssltest', 'configs')
     for file in configs:
         config_dest = f'{install_location}{sep}{file}'
         if not exists(config_dest):

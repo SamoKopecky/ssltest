@@ -7,7 +7,7 @@ from time import sleep, time
 from typing import NamedTuple
 from os import sep
 
-from ..configs import get_config_location
+from ..config_setup import get_config_location
 
 log = logging.getLogger(__name__)
 
