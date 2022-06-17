@@ -17,6 +17,7 @@ setuptools.setup(
     url='https://www.penterep.io/',
     licence='GPLv3',
     packages=setuptools.find_packages(),
+    include_package_data=True,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python :: 3.6',
@@ -28,8 +29,5 @@ setuptools.setup(
                       'requests', 'urllib3'],
     entry_points={'console_scripts': [
         'ssltest = ssltest.__main__:main']},
-    data_files=[('/configs', ['configs/cipher_parameters.json', 'configs/cipher_suites.json',
-                              'configs/cipher_suites_sslv2.json', 'configs/english_strings.json',
-                              'configs/security_levels.json'])],
     scripts=['scripts/fix_openssl_config.py'],
 )
