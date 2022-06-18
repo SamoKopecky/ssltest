@@ -127,9 +127,16 @@ class Parameters(ABC):
         worst_rating = max([cipher_suite.rating, certificate.rating])
         parameters = {key.name: value
                       for key, value in cipher_suite.parameters.items()}
-        for key, value in certificate.parameters.items():
+        for key, value in certificate.first_cert_parameters.items():
             if key == PType.cert_pub_key_algorithm and not parameters[key.name] == {'N/A': '0'}:
                 continue
-            parameters.update({key.name: value})
+            if len(certificate.other_certs_parameters) == 0:
+                parameters.update({f'{key.name}': value})
+            else:
+                parameters.update({f'{key.name}_0': value})
+        for i, cert in enumerate(certificate.other_certs_parameters):
+            for key, value in cert.items():
+                parameters.update({f'{key.name}_{i + 1}': value})
+
         parameters.update({'rating': worst_rating})
         return parameters
