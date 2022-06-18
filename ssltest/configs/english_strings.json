@@ -31,5 +31,8 @@
   "certificate_info": "Certificate information",
   "nmap": "Nmap",
   "cipher_suites": "Cipher Suites",
-  "kex_algorithm_mod": "Key exchange algorithm modification"
+  "kex_algorithm_mod": "Key exchange algorithm modification",
+  "certificate_1": "Certificate #1",
+  "certificate_2": "Certificate #2",
+  "certificate_3": "Certificate #3"
 }

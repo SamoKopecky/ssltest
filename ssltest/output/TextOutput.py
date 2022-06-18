@@ -24,9 +24,13 @@ class TextOutput:
         self.category_title = ''
         self.address_filler = '='
         self.category_title_filter = '-'
+        self.indent_start = 0
 
     def __del__(self):
         print()
+
+    def set_indent(self, indent):
+        self.indent_start = indent
 
     def print_address(self):
         """
@@ -49,9 +53,9 @@ class TextOutput:
             return
         self.print_category_title()
         if self.category_title == 'parameters':
-            self.print_parameters(self.data, 0)
+            self.print_parameters(self.data, self.indent_start)
         else:
-            self.recursive_print(self.data, 0)
+            self.recursive_print(self.data, self.indent_start)
 
     def print_category_title(self):
         """
@@ -62,7 +66,8 @@ class TextOutput:
         self.data = self.data[title]
 
         print()
-        self.print_title(4, self.english[title], self.category_title_filter)
+        self.print_title((self.indent_start + 1) * 4,
+                         self.english[title], self.category_title_filter)
 
     def recursive_print(self, data, indent):
         """
@@ -139,6 +144,14 @@ class TextOutput:
                 if not data[key]:
                     del data[key]
                     continue
+                # Cert checking
+                keys_to_delete = []
+                for key_n, value_n in value.items():
+                    if len(value_n) == 0:
+                        keys_to_delete.append(key_n)
+                for key_to_delete in keys_to_delete:
+                    del value[key_to_delete]
+                # index 0 cause of parameters dict
                 keys_list = list(value.keys())
                 if len(keys_list) > 0 and keys_list[0] == 'N/A':
                     del data[key]

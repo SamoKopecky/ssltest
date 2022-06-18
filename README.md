@@ -50,7 +50,7 @@ $ sudo ptmanager -ut ssltest
 ```
 
 ## Configuration files
-Configuration files for the application are stored in `$HOME/.config/ssltest`. They can be edited to change the rules by 
+Configuration files for the application are stored in `$HOME/.config/ssltest`. They can be edited to change the rules by
 which the application is rating the web server parameters.
 - You need to run the application at least once in order to copy the files to the config folder.
 

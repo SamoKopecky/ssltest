@@ -73,6 +73,7 @@ def get_help():
         ['-to', '--timeout', '<dur>',
          'Set a duration for the timeout of connections in seconds'],
         ['-sc', '--short-cert', '', 'Limit alternative names to first 5'],
+        ['-cc', '--cert-chain', '', 'Get information about the whole certificate chain'],
         ['-cs', '--cipher-suites', '', 'Scan all supported cipher suites by the server'],
         ['-fc', '--fix-conf', '', 'Fix the /etc/ssl/openssl.cnf file to allow the use of older TLS protocols'
                                   ' (TLSv1 and TLSv1.1), requires root privileges (see -st and -ss options)'],
@@ -126,6 +127,8 @@ def parse_args():
     parser.add_argument('-to', '--timeout', type=int,
                         metavar='timeout', nargs='?', default=1)
     parser.add_argument('-sc', '--short-cert',
+                        action='store_true', default=False)
+    parser.add_argument('-cc', '--cert-chain',
                         action='store_true', default=False)
     parser.add_argument('-cs', '--cipher-suites',
                         action='store_true', default=False)

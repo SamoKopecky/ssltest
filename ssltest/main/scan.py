@@ -1,15 +1,15 @@
 import logging
 
+from .utils import Address
 from ..core.connection_utils import get_web_server_info
-from ..core.unratable.WebServerSoft import WebServerSoft
 from ..core.ratable.Certificate import Certificate
 from ..core.ratable.CipherSuite import CipherSuite
 from ..core.ratable.CipherSuites import CipherSuites
 from ..core.ratable.Parameters import Parameters
 from ..core.ratable.ProtocolSupport import ProtocolSupport
-from ..vulnerabilities.TestRunner import TestRunner
+from ..core.unratable.WebServerSoft import WebServerSoft
 from ..output.TextOutput import TextOutput
-from .utils import Address
+from ..vulnerabilities.TestRunner import TestRunner
 
 log = logging.getLogger(__name__)
 
@@ -57,17 +57,16 @@ def scan(args, address):
     protocol_support.rate_protocols()
     yield {'protocol_support': protocol_support.get_json()}
 
-    web_server = get_web_server_info(
-        address, protocol_support.supported, args.worst, args.timeout)
+    web_server = get_web_server_info(address, protocol_support.supported, args)
 
     cipher_suite = CipherSuite(web_server.cipher_suite, web_server.protocol)
     cipher_suite.parse_cipher_suite()
     cipher_suite.parse_protocol_version()
     cipher_suite.rate_cipher_suite()
 
-    certificate = Certificate(web_server.certificate,
-                              web_server.cert_verified, args.short_cert)
-    certificate.parse_certificate()
+    certificate = Certificate(web_server.certificates,
+                              web_server.cert_verified, args)
+    certificate.parse_certificates()
     certificate.rate_certificate()
 
     yield {'parameters': Parameters.get_params_json(cipher_suite, certificate)}

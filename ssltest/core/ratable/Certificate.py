@@ -10,64 +10,83 @@ log = logging.getLogger(__name__)
 
 
 class Certificate(Parameters):
-    def __init__(self, certificate, cert_verified, short_cert):
+    def __init__(self, certificates, cert_verified, args):
         """
         Constructor
 
-        :param x509.Certificate certificate: Certificate
+        :param list certificates: Certificate
         :param bool cert_verified: Is certificate verified
-        :param bool short_cert: Limit alternative names output
+        :param Namespace args: Limit alternative names output
         """
         super().__init__()
         self.verified = cert_verified
         # Create a dictionary for certificate parameters with PType keys
+        self.parameters = {}
+        self.non_parameters = {}
+        self.all_non_parameters = {}
+        self.certificates = certificates
+        self.short_cert = args.short_cert
+        self.cert_chain = args.cert_chain
+
+    def reset_params(self):
+        """
+        Reset the parameters with so that they don't contain anything
+        """
         # Parameters that can be rated (Signature algorithm, ...)
         self.parameters = {
             p_type: {} for p_type in PType if p_type.is_certificate and p_type.is_ratable}
         # Parameters that can't be rated (Subject, Issuer, ...)
         self.non_parameters = {
             p_type: [] for p_type in PType if p_type.is_certificate and not p_type.is_ratable}
-        self.certificate = certificate
-        self.short_cert = short_cert
 
-    def parse_certificate(self):
+    def parse_certificates(self):
+        """
+        Parse the certificate chain
+        """
+        for i, certificate in enumerate(self.certificates):
+            self.reset_params()
+            self.parse_certificate(certificate)
+            self.all_non_parameters.update(
+                {f'certificate_{i + 1}': self.non_parameters})
+
+    def parse_certificate(self, certificate):
         """
         Parse information from a certificate and into a dictionary
         """
         log.info('Parsing certificate')
         # Public key algorithm
         self.parameters[PType.cert_pub_key_algorithm][
-            self.pub_key_alg_from_cert(self.certificate.public_key())] = 0
+            self.pub_key_alg_from_cert(certificate.public_key())] = 0
         # Public key length
         self.parameters[PType.cert_pub_key_length][
-            str(self.certificate.public_key().key_size)] = 0
+            str(certificate.public_key().key_size)] = 0
         # Certificate hash function
         hash_function = str(
-            self.certificate.signature_hash_algorithm.name).upper()
+            certificate.signature_hash_algorithm.name).upper()
         self.parameters[PType.cert_sign_algorithm_hash_function][hash_function] = 0
         # Signature algorithm
         sign_algorithm = self.get_sig_alg_from_oid(
-            self.certificate.signature_algorithm_oid)
+            certificate.signature_algorithm_oid)
         self.parameters[PType.cert_sign_algorithm][sign_algorithm] = 0
         # Certificate verified
         self.parameters[PType.cert_verified][str(self.verified)] = 0
         # Other non-ratable parameters
         self.non_parameters[PType.cert_version] \
-            .append(str(self.certificate.version.value))
+            .append(str(certificate.version.value))
         self.non_parameters[PType.cert_serial_number] \
-            .append(str(self.certificate.serial_number))
+            .append(str(certificate.serial_number))
         self.non_parameters[PType.cert_not_valid_before] \
-            .append(str(self.certificate.not_valid_before.date()))
+            .append(str(certificate.not_valid_before.date()))
         self.non_parameters[PType.cert_not_valid_after]. \
-            append(str(self.certificate.not_valid_after.date()))
+            append(str(certificate.not_valid_after.date()))
         self.non_parameters[PType.cert_alternative_names] = \
-            self.parse_alternative_names()
+            self.parse_alternative_names(certificate)
         self.non_parameters[PType.cert_subject] = \
-            self.parse_name(self.certificate.subject)
+            self.parse_name(certificate.subject)
         self.non_parameters[PType.cert_issuer] = \
-            self.parse_name(self.certificate.issuer)
+            self.parse_name(certificate.issuer)
 
-    def parse_alternative_names(self):
+    def parse_alternative_names(self, certificate):
         """
         Parse the alternative names from the certificate extensions
 
@@ -76,7 +95,7 @@ class Certificate(Parameters):
         """
         log.info('Parsing alternative names from certificate')
         try:
-            extension = self.certificate.extensions.get_extension_for_class(
+            extension = certificate.extensions.get_extension_for_class(
                 x509.SubjectAlternativeName)
         except x509.extensions.ExtensionNotFound:
             log.error('No alternative names extension found in certificate')
@@ -88,6 +107,8 @@ class Certificate(Parameters):
             log.debug(
                 f'Shortening alternative names output to {shortened_names_count}')
             return alternative_names[:shortened_names_count] + ['...']
+        elif len(alternative_names) == 0:
+            log.debug('No alternative names found')
         return alternative_names
 
     @staticmethod
@@ -151,4 +172,7 @@ class Certificate(Parameters):
         """
         Get parameters as json
         """
-        return {key.name: value for key, value in self.non_parameters.items()}
+        def to_json(items): return {key.name: value for key, value in items}
+        if not self.cert_chain:
+            return to_json(self.non_parameters.items())
+        return {key: to_json(value.items()) for key, value in self.all_non_parameters.items()}
