@@ -67,7 +67,7 @@ def scan(args, address):
     certificate = Certificate(web_server.certificates,
                               web_server.cert_verified, args)
     certificate.parse_certificates()
-    certificate.rate_certificate()
+    certificate.rate_certificates()
 
     yield {'parameters': Parameters.get_params_json(cipher_suite, certificate)}
     yield {'certificate_info': certificate.get_json()}

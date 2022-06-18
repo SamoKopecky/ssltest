@@ -24,9 +24,13 @@ class Certificate(Parameters):
         self.parameters = {}
         self.non_parameters = {}
         self.all_non_parameters = {}
+        self.first_cert_parameters = {}
+        self.other_certs_parameters = []
         self.certificates = certificates
         self.short_cert = args.short_cert
         self.cert_chain = args.cert_chain
+        self.reset_params()
+        self.ratings = []
 
     def reset_params(self):
         """
@@ -44,10 +48,14 @@ class Certificate(Parameters):
         Parse the certificate chain
         """
         for i, certificate in enumerate(self.certificates):
-            self.reset_params()
             self.parse_certificate(certificate)
             self.all_non_parameters.update(
-                {f'certificate_{i + 1}': self.non_parameters})
+                {f'certificate_{i}': self.non_parameters.copy()})
+            if i == 0:
+                self.first_cert_parameters = self.parameters.copy()
+            else:
+                self.other_certs_parameters.append(self.parameters.copy())
+            self.reset_params()
 
     def parse_certificate(self, certificate):
         """
@@ -126,13 +134,27 @@ class Certificate(Parameters):
             name_info.append(f'{attribute.oid._name}: {attribute.value}')
         return name_info
 
-    def rate_certificate(self):
+    def rate_certificate(self, parameters):
         """
         Rate all valid certificate parameters
         """
-        rateable_parameters = list(self.parameters.keys())
+        rateable_parameters = list(parameters)
         key_types = [PType.cert_pub_key_length]
+        self.parameters = parameters
         self.rate_parameters(rateable_parameters, key_types)
+        self.ratings.append(self.rating)
+        return self.parameters.copy()
+
+    def rate_certificates(self):
+        """
+        TODO:
+        :return:
+        """
+        self.first_cert_parameters = self.rate_certificate(
+            self.first_cert_parameters)
+        for i, value in enumerate(self.other_certs_parameters):
+            self.other_certs_parameters[i] = self.rate_certificate(value)
+        self.rating = max(self.ratings)
 
     @staticmethod
     def pub_key_alg_from_cert(public_key):
@@ -172,7 +194,9 @@ class Certificate(Parameters):
         """
         Get parameters as json
         """
+
         def to_json(items): return {key.name: value for key, value in items}
+
         if not self.cert_chain:
-            return to_json(self.non_parameters.items())
+            return to_json(self.all_non_parameters.pop('certificate_0').items())
         return {key: to_json(value.items()) for key, value in self.all_non_parameters.items()}

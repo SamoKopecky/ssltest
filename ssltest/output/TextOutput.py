@@ -1,4 +1,5 @@
 import logging
+import re
 
 from ptlibs.ptmisclib import get_colored_text, terminal_width
 
@@ -79,8 +80,7 @@ class TextOutput:
         indent += 1
         if type(data) == dict:
             for key, value in data.items():
-                if key in self.english:
-                    key = self.english[key]
+                key = self.smart_map(key)
                 printn('\n' + '\t' * indent + key)
                 self.recursive_print(value, indent)
         elif type(data) == list:
@@ -105,12 +105,26 @@ class TextOutput:
         """
         indent += 1
         for key, value in data.items():
-            printn('\n' + '\t' * indent + f'{self.english[key]}: ')
+            key = self.smart_map(key)
+            printn('\n' + '\t' * indent + f'{key}: ')
             if type(value) != dict:
                 printn(self.get_color_for_value(value))
                 continue
             printn(
                 f'{self.get_color_for_value(next(iter(value.values())))} -- {next(iter(value.keys()))}')
+
+    def smart_map(self, key: str):
+        """
+        Map a key to its english equivalent including numbers
+        :param key:
+        :return:
+        """
+        if key in self.english.keys():
+            return self.english[key]
+        elif re.search('.*_\d', key):
+            return f'{self.english[key[:-2]]} #{int(key[-1]) + 1}'
+        else:
+            return key
 
     @staticmethod
     def print_title(prefix_len, title_string, padding_char):
