@@ -1,9 +1,9 @@
-import setuptools
+from setuptools import setup, find_packages
 
 with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
-setuptools.setup(
+setup(
     name='ssltest',
     description='Scan web servers cryptographic parameters and vulnerabilities',
     long_description=long_description,
@@ -16,7 +16,7 @@ setuptools.setup(
     },
     url='https://www.penterep.io/',
     licence='GPLv3',
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     include_package_data=True,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',

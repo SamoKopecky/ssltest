@@ -3,8 +3,7 @@ import socket
 import ssl
 from typing import NamedTuple
 
-from cryptography import x509
-from cryptography.hazmat.backends import default_backend
+from OpenSSL import SSL
 
 from .SSLv2 import SSLv2
 from .SSLv3 import SSLv3
@@ -12,7 +11,7 @@ from ..main.utils import incremental_sleep, convert_cipher_suite, Address
 
 
 class WebServer(NamedTuple):
-    certificate: x509.Certificate
+    certificates: list
     cert_verified: bool
     cipher_suite: str
     protocol: str
@@ -21,47 +20,47 @@ class WebServer(NamedTuple):
 log = logging.getLogger(__name__)
 
 
-def get_web_server_info(address, supported_protocols, worst, timeout):
+def get_web_server_info(address, supported_protocols, args):
     """
     Gather objects required to rate a web server
 
-    Uses functions in this module to create a connection and get the
+    Use functions in this module to create a connection and get the
     servers certificate, cipher suite and protocol used in the connection.
 
+    :param args:
     :param Address address: Webserver address
     :param list supported_protocols: Supported SSL/TLS protocol versions
-    :param bool worst: Whether to connect with the worst available protocol
-    :param int timeout: Timeout in seconds
     :return: Tuple of all the values
     :rtype: WebServer
     """
     log.info('Creating main session')
-    chosen_protocol = choose_protocol(supported_protocols, worst)
+    chosen_protocol = choose_protocol(supported_protocols, args.worst)
     if 'SSL' in chosen_protocol:
         log.info('Connecting with SSL')
         ssl_protocols = {
             'SSLv3': SSLv3,
             'SSLv2': SSLv2
         }
-        ssl_protocol = ssl_protocols[chosen_protocol](address, timeout)
+        ssl_protocol = ssl_protocols[chosen_protocol](address, args.timeout)
         ssl_protocol.send_client_hello()
         ssl_protocol.parse_cipher_suite()
         ssl_protocol.parse_certificate()
         ssl_protocol.verify_cert()
         cipher_suite = ssl_protocol.cipher_suite
-        certificate = ssl_protocol.certificates[0]
+        # TODO change to list later
+        certificates = ssl_protocol.certificates
         cert_verified = ssl_protocol.cert_verified
         protocol = ssl_protocol.protocol
     else:
         log.info('Connecting with TLS')
         context = create_ssl_context(chosen_protocol)
         ssl_socket, cert_verified = create_session(
-            address, True, context, timeout)
+            address, True, context, args.timeout)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
-        certificate = get_certificate(ssl_socket)
+        certificates = get_certificate(address, args.cert_chain)
         ssl_socket.close()
     webserver_info = WebServer(
-        certificate, cert_verified, cipher_suite, protocol)
+        certificates, cert_verified, cipher_suite, protocol)
     return webserver_info
 
 
@@ -133,15 +132,24 @@ def create_ssl_context(protocol_version):
     return context
 
 
-def get_certificate(ssl_socket):
+def get_certificate(address, scan_cert_chain):
     """
     Gather a certificate in the DER binary format
 
-    :param ssl.SSLSocket ssl_socket: Established socket
+    :param bool scan_cert_chain: Scan the whole cert chain
+    :param Address address: Established socket
     :return: Gathered certificate
     """
-    certificate_pem = bytes(ssl_socket.getpeercert(binary_form=True))
-    return x509.load_der_x509_certificate(certificate_pem, default_backend())
+    ctx = SSL.Context(SSL.SSLv23_METHOD)
+    ssl_socket = socket.create_connection((address.url, address.port))
+    ssl_socket = SSL.Connection(ctx, ssl_socket)
+    ssl_socket.set_tlsext_host_name(bytes(address.url, 'utf-8'))
+    ssl_socket.set_connect_state()
+    ssl_socket.do_handshake()
+    cert_chain = ssl_socket.get_peer_cert_chain()
+    if scan_cert_chain:
+        return [cert.to_cryptography() for cert in cert_chain]
+    return [cert_chain[0].to_cryptography()]
 
 
 def get_cipher_suite_and_protocol(ssl_socket):
