@@ -21,7 +21,6 @@ class Certificate(Parameters):
         super().__init__()
         self.verified = cert_verified
         # Create a dictionary for certificate parameters with PType keys
-        self.parameters = {}
         self.non_parameters = {}
         self.all_non_parameters = {}
         self.first_cert_parameters = {}
@@ -34,7 +33,7 @@ class Certificate(Parameters):
 
     def reset_params(self):
         """
-        Reset the parameters with so that they don't contain anything
+        Reset the parameters so that they don't contain anything
         """
         # Parameters that can be rated (Signature algorithm, ...)
         self.parameters = {
@@ -50,11 +49,11 @@ class Certificate(Parameters):
         for i, certificate in enumerate(self.certificates):
             self.parse_certificate(certificate)
             self.all_non_parameters.update(
-                {f'certificate_{i}': self.non_parameters.copy()})
+                {f'certificate_{i}': self.non_parameters})
             if i == 0:
-                self.first_cert_parameters = self.parameters.copy()
+                self.first_cert_parameters = self.parameters
             else:
-                self.other_certs_parameters.append(self.parameters.copy())
+                self.other_certs_parameters.append(self.parameters)
             self.reset_params()
 
     def parse_certificate(self, certificate):
@@ -98,6 +97,7 @@ class Certificate(Parameters):
         """
         Parse the alternative names from the certificate extensions
 
+        :param certificate: Certificate to parse
         :return: Alternative names
         :rtype: list
         """
@@ -119,6 +119,45 @@ class Certificate(Parameters):
             log.debug('No alternative names found')
         return alternative_names
 
+    def rate_certificate(self, parameters):
+        """
+        Rate all valid certificate parameters
+
+        :param dict parameters: Cert parameters to rate
+        :return: Rated parameters
+        :rtype: dict
+        """
+        rateable_parameters = list(parameters)
+        key_types = [PType.cert_pub_key_length]
+        self.parameters = parameters
+        self.rate_parameters(rateable_parameters, key_types)
+        self.ratings.append(self.rating)
+        return self.parameters
+
+    def rate_certificates(self):
+        """
+        Rate the whole certificate chain
+        """
+        self.first_cert_parameters = self.rate_certificate(
+            self.first_cert_parameters)
+        for i, value in enumerate(self.other_certs_parameters):
+            self.other_certs_parameters[i] = self.rate_certificate(value)
+        self.rating = max(self.ratings)
+
+    def get_json(self):
+        """
+        Get non-ratable parameters as json
+
+        :return: Json version of all non-ratable parameters
+        :rtype: dict
+        """
+
+        def to_json(items): return {key.name: value for key, value in items}
+
+        if not self.cert_chain:
+            return to_json(self.all_non_parameters.pop('certificate_0').items())
+        return {key: to_json(value.items()) for key, value in self.all_non_parameters.items()}
+
     @staticmethod
     def parse_name(name):
         """
@@ -133,28 +172,6 @@ class Certificate(Parameters):
         for attribute in name:
             name_info.append(f'{attribute.oid._name}: {attribute.value}')
         return name_info
-
-    def rate_certificate(self, parameters):
-        """
-        Rate all valid certificate parameters
-        """
-        rateable_parameters = list(parameters)
-        key_types = [PType.cert_pub_key_length]
-        self.parameters = parameters
-        self.rate_parameters(rateable_parameters, key_types)
-        self.ratings.append(self.rating)
-        return self.parameters.copy()
-
-    def rate_certificates(self):
-        """
-        TODO:
-        :return:
-        """
-        self.first_cert_parameters = self.rate_certificate(
-            self.first_cert_parameters)
-        for i, value in enumerate(self.other_certs_parameters):
-            self.other_certs_parameters[i] = self.rate_certificate(value)
-        self.rating = max(self.ratings)
 
     @staticmethod
     def pub_key_alg_from_cert(public_key):
@@ -189,14 +206,3 @@ class Certificate(Parameters):
         values = list(x509.SignatureAlgorithmOID.__dict__.values())
         keys = list(x509.SignatureAlgorithmOID.__dict__.keys())
         return keys[values.index(oid)].split('_')[0]
-
-    def get_json(self):
-        """
-        Get parameters as json
-        """
-
-        def to_json(items): return {key.name: value for key, value in items}
-
-        if not self.cert_chain:
-            return to_json(self.all_non_parameters.pop('certificate_0').items())
-        return {key: to_json(value.items()) for key, value in self.all_non_parameters.items()}
