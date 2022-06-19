@@ -47,7 +47,6 @@ def get_web_server_info(address, supported_protocols, args):
         ssl_protocol.parse_certificate()
         ssl_protocol.verify_cert()
         cipher_suite = ssl_protocol.cipher_suite
-        # TODO change to list later
         certificates = ssl_protocol.certificates
         cert_verified = ssl_protocol.cert_verified
         protocol = ssl_protocol.protocol
@@ -110,7 +109,7 @@ def worst_or_best_protocol(protocols, worst):
 
 def create_ssl_context(protocol_version):
     """
-    Create an ssl context from the native ssl library for the specific protocol version
+    Create a ssl context from the native ssl library for the specific protocol version
 
     :param str protocol_version: Protocol version to create the context with
     :return: Created SSL context
@@ -136,9 +135,10 @@ def get_certificate(address, scan_cert_chain):
     """
     Gather a certificate in the DER binary format
 
+    :param Address address: Web server address
     :param bool scan_cert_chain: Scan the whole cert chain
-    :param Address address: Established socket
-    :return: Gathered certificate
+    :return: Gathered certificate/certificates
+    :rtype: Any
     """
     ctx = SSL.Context(SSL.SSLv23_METHOD)
     ssl_socket = socket.create_connection((address.url, address.port))
