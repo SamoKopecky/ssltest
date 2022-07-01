@@ -6,7 +6,8 @@ from struct import unpack
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvX import SSLvX
-from ..main.utils import read_json, Address
+from ..main.utils import read_json
+from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
@@ -16,8 +17,8 @@ class SSLv2(SSLvX):
         """
         Constructor
 
-        :param Address address: Webserver address
-        :param int timeout: Timout for connections
+        :param SocketAddress address: Webserver address
+        :param int timeout: Timeout for connections
         """
         super().__init__(address, timeout)
         self.protocol = 'SSLv2'

@@ -3,7 +3,8 @@ import re
 
 from ptlibs.ptmisclib import get_colored_text, terminal_width
 
-from ..main.utils import read_json, Address
+from ..main.utils import read_json
+from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ class TextOutput:
         """
         Constructor
 
-        :param Address address: Webserver address
+        :param SocketAddress address: Webserver address
         """
         self.address = address
         self.english = read_json('english_strings.json')
@@ -158,13 +159,14 @@ class TextOutput:
                 if not data[key]:
                     del data[key]
                     continue
+                # TODO: Fix this later
                 # Cert checking
-                keys_to_delete = []
-                for key_n, value_n in value.items():
-                    if len(value_n) == 0:
-                        keys_to_delete.append(key_n)
-                for key_to_delete in keys_to_delete:
-                    del value[key_to_delete]
+                # keys_to_delete = []
+                # for key_n, value_n in value.items():
+                #     if len(value_n) == 0:
+                #         keys_to_delete.append(key_n)
+                # for key_to_delete in keys_to_delete:
+                #     del value[key_to_delete]
                 # index 0 cause of parameters dict
                 keys_list = list(value.keys())
                 if len(keys_list) > 0 and keys_list[0] == 'N/A':

@@ -4,9 +4,9 @@ from typing import Tuple
 from .CipherSuite import CipherSuite
 from ..ClientHello import ClientHello
 from ..SSLv2 import SSLv2
-from ...exceptions.ConnectionTimeout import ConnectionTimeout
 from ...main.utils import send_data_return_sock, parse_cipher_suite, bytes_to_cipher_suite, \
-    protocol_version_conversion, is_server_hello, get_cipher_suite_protocols, Address
+    protocol_version_conversion, get_cipher_suite_protocols
+from ...network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class CipherSuites:
         """
         Constructor
 
-        :param Address address: Webserver address
+        :param SocketAddress address: Webserver address
         :param list supported_protocols: Webserver supported SSL/TLS protocols
         :param int timeout: Timeout
         """
@@ -72,12 +72,12 @@ class CipherSuites:
             client_hello = ClientHello(protocol_version_conversion(protocol),
                                        to_test_cipher_suites, False)
             while True:
-                client_hello_bytes = client_hello.construct_client_hello()
+                client_hello_bytes = client_hello.pack_client_hello()
                 response, try_again = self.try_receive_data(
                     client_hello_bytes, protocol)
                 if try_again:
                     continue
-                if not is_server_hello(response):
+                if not ClientHello.is_server_hello(response):
                     break
                 # Register accepted cipher suite
                 cipher_suite_index = to_test_cipher_suites.find(
@@ -112,12 +112,12 @@ class CipherSuites:
         :rtype: Tuple[bytes, bool]
         """
         if self.short_timeout >= 1:
-            raise ConnectionTimeout
+            raise Exception('timeout')
         try:
             response, sock = send_data_return_sock(self.address, client_hello_bytes, self.short_timeout,
                                                    f'cipher_suite_scanning_for_{protocol}')
             sock.close()
-        except ConnectionTimeout:
+        except Exception('timeout'):
             log.warning('Connection timed out, increasing timeout by 0.1s')
             self.short_timeout += 0.1
             return bytes(), True

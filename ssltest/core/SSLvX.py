@@ -5,7 +5,8 @@ from abc import ABC, abstractmethod
 import requests
 from OpenSSL import crypto
 
-from ..main.utils import send_data_return_sock, Address
+from ..main.utils import send_data_return_sock
+from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
@@ -15,8 +16,8 @@ class SSLvX(ABC):
         """
         Constructor
 
-        :param Address address: Webserver address
-        :param int timeout: Timout for connections
+        :param SocketAddress address: Webserver address
+        :param int timeout: Timeout for connections
         """
         self.address = address
         self.protocol = ''

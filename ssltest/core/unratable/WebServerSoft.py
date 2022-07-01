@@ -3,7 +3,7 @@ import logging
 import nmap3
 import requests
 
-from ...main.utils import Address
+from ...network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ class WebServerSoft:
         """
         Constructor
 
-        :param Address address: Web server address
+        :param SocketAddress address: Web server address
         :param bool scan_nmap: Scan with nmap
         """
         self.address = address

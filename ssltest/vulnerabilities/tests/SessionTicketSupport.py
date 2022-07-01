@@ -2,7 +2,7 @@
 
 from ..VulnerabilityTest import VulnerabilityTest
 from ...core.ClientHello import ClientHello
-from ...main.utils import send_data_return_sock, is_server_hello
+from ...network.MySocket import MySocket
 
 
 class SessionTicketSupport(VulnerabilityTest):
@@ -10,8 +10,8 @@ class SessionTicketSupport(VulnerabilityTest):
     short_name = 'Session Ticket'
     description = 'Test for session ticket support'
 
-    def __init__(self, supported_protocols, address, timeout, protocol):
-        super().__init__(supported_protocols, address, timeout, protocol)
+    def __init__(self, supported_protocols, address, protocol):
+        super().__init__(supported_protocols, address, protocol)
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
         self.session_ticket_extension = bytes([
             # Session ticket
@@ -28,11 +28,13 @@ class SessionTicketSupport(VulnerabilityTest):
         """
         client_hello = ClientHello(version)
         client_hello.extensions += self.session_ticket_extension
-        client_hello = client_hello.construct_client_hello()
-        response, sock = send_data_return_sock(
-            self.address, client_hello, self.timeout, self.name)
-        sock.close()
-        if not is_server_hello(response):
+        client_hello = client_hello.pack_client_hello()
+
+        with MySocket(self.address, self.usage) as sock:
+            sock.send(client_hello)
+            response = sock.receive()
+
+        if not ClientHello.is_server_hello(response):
             return False
         # If there is no session ticket found it means the server doesn't
         # support session ticket extension
@@ -43,5 +45,4 @@ class SessionTicketSupport(VulnerabilityTest):
         # -1 means no match
         elif session_ticket == -1:
             return False
-        else:
-            return True
+        return True

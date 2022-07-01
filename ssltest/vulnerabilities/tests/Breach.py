@@ -9,8 +9,8 @@ class Breach(VulnerabilityTest):
     name = short_name = 'BREACH'
     description = 'Test for https encoding methods'
 
-    def __init__(self, supported_protocols, address, timeout, protocol):
-        super().__init__(supported_protocols, address, timeout, protocol)
+    def __init__(self, supported_protocols, address, protocol):
+        super().__init__(supported_protocols, address, protocol)
         self.valid_protocols = ['TLSv1.3', 'TLSv1.2',
                                 'TLSv1.1', 'TLSv1.0', 'SSLv3', 'SSLv2']
         self.encoding_key_string = 'Content-Encoding'

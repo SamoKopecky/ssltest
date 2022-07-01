@@ -2,19 +2,13 @@ import json
 import logging
 import re
 import socket
-
-from time import sleep, time
-from typing import NamedTuple
 from os import sep
+from time import sleep, time
 
 from ..config_setup import get_config_location
+from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
-
-
-class Address(NamedTuple):
-    url: str
-    port: int
 
 
 def read_json(file_name):
@@ -74,7 +68,7 @@ def send_data_return_sock(address, client_hello, timeout, debug_source):
     """
     Send client client_hello to the server and catch the response
 
-    :param Address address: Webserver address
+    :param SocketAddress address: Webserver address
     :param bytes client_hello: client_hello data in bytes
     :param float timeout: Timeout in seconds
     :param str debug_source: Description of the debug source
@@ -203,7 +197,7 @@ def cs_bytes_to_str(bytes_object):
 
 def filter_cipher_suite_bytes(cipher_suites, filter_regex):
     """
-    Filters cipher suite bytes with the given filter function
+    Filters cipher suite bytes with the given filter regex
 
     :param bytearray or bytes cipher_suites: Cipher suites
     :param lambda filter_regex: Regex to find the required cipher suites
@@ -254,20 +248,3 @@ def protocol_version_conversion(version):
         return protocol_version[version]
     elif protocol_type is int:
         return next(key for key, value in protocol_version.items() if value == version)
-
-
-def is_server_hello(message):
-    """
-    Checks if the message is a server hello
-
-    :param bytes message: Received message
-    :return: Whether the message is a legit server hello msg
-    :rtype: bool
-    """
-    # Server hello content type in record protocol
-    try:
-        if message[5] == 0x02 and message[0] == 0x16:
-            return True
-    except IndexError:
-        return False
-    return False

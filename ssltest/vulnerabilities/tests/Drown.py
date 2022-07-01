@@ -1,20 +1,19 @@
 """Vulnerability test for DROWN"""
 
-from ..VulnerabilityTest import VulnerabilityTest
-from ...core.ClientHello import ClientHello
+from ..CipherSuiteTest import CipherSuiteTest
 from ...core.SSLv2 import SSLv2
-from ...main.utils import filter_cipher_suite_bytes, send_data_return_sock, is_server_hello
 
 
-class Drown(VulnerabilityTest):
+class Drown(CipherSuiteTest):
     name = short_name = 'DROWN'
     description = 'Test for rsa key exchange suites with ssl2 support'
 
-    def __init__(self, supported_protocols, address, timeout, protocol):
-        super().__init__(supported_protocols, address, timeout, protocol)
+    def __init__(self, supported_protocols, address, protocol):
+        super().__init__(supported_protocols, address, protocol)
         self.valid_protocols = ['SSLv3', 'TLSv1.0', 'TLSv1.1', 'TLSv1.2']
         self.scan_once = False
         self.sslv2_vulnerable = True
+        self.filter_regex = 'TLS_RSA'
 
     def test(self, version):
         """
@@ -27,18 +26,9 @@ class Drown(VulnerabilityTest):
         if 'SSLv2' not in self.supported_protocols or self.supported_protocols == ['SSLv2'] \
                 or not self.sslv2_vulnerable:
             return False
-        cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
+
         # All cipher suites that use RSA for kex
-        rsa_cipher_suites = filter_cipher_suite_bytes(
-            cipher_suite_bytes, 'TLS_RSA')
-        client_hello = ClientHello(version, rsa_cipher_suites, False)
-        client_hello = client_hello.construct_client_hello()
-        response, sock = send_data_return_sock(
-            self.address, client_hello, self.timeout, self.name)
-        sock.close()
-        if not is_server_hello(response):
-            return False
-        return True
+        return super().test(version)
 
     def run_once(self):
         """
@@ -46,7 +36,7 @@ class Drown(VulnerabilityTest):
         """
         if 'SSLv2' not in self.supported_protocols:
             return
-        sslv2 = SSLv2(self.address, self.timeout)
+        sslv2 = SSLv2(self.address, 1)
         sslv2.send_client_hello()
         sslv2.parse_cipher_suite()
         export_cipher_suites = list(

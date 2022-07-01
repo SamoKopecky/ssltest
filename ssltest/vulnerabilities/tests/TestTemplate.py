@@ -1,4 +1,4 @@
-"""{Delete this to to be able to run this test}Vulnerability test for {Test name}"""
+"""<Delete this to to be able to run this test>Vulnerability test for <test_name>"""
 
 from ..VulnerabilityTest import VulnerabilityTest
 
@@ -8,8 +8,8 @@ class TestTemplate(VulnerabilityTest):
     short_name = 'Short test name in -h output'
     description = 'Test description in -h output'
 
-    def __init__(self, supported_protocols, address, timeout, protocol):
-        super().__init__(supported_protocols, address, timeout, protocol)
+    def __init__(self, supported_protocols, address, protocol):
+        super().__init__(supported_protocols, address, protocol)
         self.valid_protocols = ['TLSv1.2']  # Add protocols to scan on
         self.scan_once = False  # Run tess for all available protocols
         self.custom_variable = ''

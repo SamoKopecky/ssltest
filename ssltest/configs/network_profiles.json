@@ -1,0 +1,17 @@
+{
+  "one_try": {
+    "retries_count": 0,
+    "retry_interval": 0,
+    "network_timeout": 500
+  },
+  "fast": {
+    "retries_count": 2,
+    "retry_interval": 100,
+    "network_timeout": 500
+  },
+  "slow": {
+    "retries_count": 3,
+    "retry_interval": 500,
+    "network_timeout": 1000
+  }
+}

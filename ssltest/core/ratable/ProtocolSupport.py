@@ -6,7 +6,7 @@ from .Parameters import Parameters
 from ..SSLv2 import SSLv2
 from ..SSLv3 import SSLv3
 from ..connection_utils import create_session, create_ssl_context
-from ...main.utils import Address
+from ...network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class ProtocolSupport:
         """
         Constructor
 
-        :param Address address: Webserver address
+        :param SocketAddress address: Webserver address
         :param int timeout: Timeout
         """
         self.protocols = {PType.protocols: {}, PType.no_protocol: {}}

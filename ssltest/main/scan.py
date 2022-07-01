@@ -1,6 +1,6 @@
 import logging
 
-from .utils import Address
+from ..network.SocketAddress import SocketAddress
 from ..core.connection_utils import get_web_server_info
 from ..core.ratable.Certificate import Certificate
 from ..core.ratable.CipherSuite import CipherSuite
@@ -23,7 +23,7 @@ def handle_scan_output(args, port, only_json):
     :param only_json:
     :return:
     """
-    address = Address(args.url, port)
+    address = SocketAddress(args.url, port)
     address_str = f'{address.url}:{address.port}'
     json_data = {address_str: {}}
     handlers = []
@@ -45,7 +45,7 @@ def scan(args, address):
     Call scanning/testing functions for a specific url and port
 
     :param Namespace args: Parsed input arguments
-    :param Address address: Address of the web server
+    :param SocketAddress address: Address of the web server
     :return: Single dictionary containing scanned data
     :rtype: dict
     """
@@ -76,8 +76,8 @@ def scan(args, address):
     web_server_soft.scan_server_software()
     yield {'web_server_software': web_server_soft.software}
 
-    test_runner = TestRunner(address, args.timeout,
-                             web_server.protocol, protocol_support.supported)
+    test_runner = TestRunner(
+        address, web_server.protocol, protocol_support.supported)
     yield {'vulnerabilities': test_runner.run_tests(test_option(args))}
 
     cipher_suites = CipherSuites(
