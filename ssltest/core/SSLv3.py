@@ -5,7 +5,8 @@ from cryptography.x509 import load_der_x509_certificate
 
 from .ClientHello import ClientHello
 from .SSLvX import SSLvX
-from ..main.utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion, Address
+from ..main.utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion
+from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
@@ -15,13 +16,13 @@ class SSLv3(SSLvX):
         """
         Constructor
 
-        :param Address address: Webserver address
-        :param int timeout: Timout for connections
+        :param SocketAddress address: Webserver address
+        :param int timeout: Timeout for connections
         """
         super().__init__(address, timeout)
         self.protocol = 'SSLv3'
         self.client_hello = ClientHello(protocol_version_conversion(self.protocol)) \
-            .construct_client_hello()
+            .pack_client_hello()
 
     def scan_protocol_support(self):
         if len(self.response) == 0:

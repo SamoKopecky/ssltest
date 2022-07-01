@@ -11,8 +11,8 @@ class HSTSSupport(VulnerabilityTest):
     short_name = 'HSTS'
     description = 'Test for HTTP Strict Transport Security support'
 
-    def __init__(self, supported_protocols, address, timeout, protocol):
-        super().__init__(supported_protocols, address, timeout, protocol)
+    def __init__(self, supported_protocols, address, protocol):
+        super().__init__(supported_protocols, address, protocol)
         self.valid_protocols = ['TLSv1.3', 'TLSv1.2',
                                 'TLSv1.1', 'TLSv1.0', 'SSLv3', 'SSLv2']
         self.hsts_header_key = 'Strict-Transport-Security'

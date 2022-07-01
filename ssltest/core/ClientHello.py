@@ -85,7 +85,7 @@ class ClientHello:
                 0x00, 0x00,  # Key share length
             ])
 
-    def construct_client_hello(self):
+    def pack_client_hello(self):
         """
         Concat all the client hello parts
 
@@ -146,3 +146,20 @@ class ClientHello:
                 ciphers += bytearray([int(cs_bytes[0], 16),
                                       int(cs_bytes[1], 16)])
         return ciphers
+
+    @staticmethod
+    def is_server_hello(message):
+        """
+        Checks if the message is a server hello
+
+        :param bytes message: Received message
+        :return: Whether the message is a legit server hello msg
+        :rtype: bool
+        """
+        # Server hello content type in record protocol
+        try:
+            if message[5] == 0x02 and message[0] == 0x16:
+                return True
+        except IndexError:
+            return False
+        return False

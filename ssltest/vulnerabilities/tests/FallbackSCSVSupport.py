@@ -2,7 +2,7 @@
 
 from ..VulnerabilityTest import VulnerabilityTest, protocol_version_conversion
 from ...core.ClientHello import ClientHello
-from ...main.utils import send_data_return_sock, is_server_hello
+from ...network.MySocket import MySocket
 
 
 class FallbackSCSVSupport(VulnerabilityTest):
@@ -10,8 +10,8 @@ class FallbackSCSVSupport(VulnerabilityTest):
     short_name = 'Fallback SCSV'
     description = 'Test if fallback Signaling Cipher Suite Value is available'
 
-    def __init__(self, supported_protocols, address, timeout, protocol):
-        super().__init__(supported_protocols, address, timeout, protocol)
+    def __init__(self, supported_protocols, address, protocol):
+        super().__init__(supported_protocols, address, protocol)
         self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
         self.fallback_scsv = bytes([0x56, 0x00])
 
@@ -30,13 +30,15 @@ class FallbackSCSVSupport(VulnerabilityTest):
         usable_protocols = sorted(usable_protocols)
         second_worst_protocol = protocol_version_conversion(
             usable_protocols[-2])
-        client_hello = ClientHello(second_worst_protocol, self.fallback_scsv)
-        client_hello = client_hello.construct_client_hello()
-        response, sock = send_data_return_sock(
-            self.address, client_hello, self.timeout, self.name)
-        sock.close()
+
+        client_hello = ClientHello(
+            second_worst_protocol, self.fallback_scsv).pack_client_hello()
+        with MySocket(self.address, self.usage) as sock:
+            sock.send(client_hello)
+            response = sock.receive()
+
         # If server doesn't respond with an alert, it doesn't support SCSV fallback
-        if is_server_hello(response):
+        if ClientHello.is_server_hello(response):
             return True, "Server didn't respond with an alert"
         elif not response:
             return True

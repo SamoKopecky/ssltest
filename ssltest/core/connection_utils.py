@@ -7,7 +7,8 @@ from OpenSSL import SSL
 
 from .SSLv2 import SSLv2
 from .SSLv3 import SSLv3
-from ..main.utils import incremental_sleep, convert_cipher_suite, Address
+from ..main.utils import incremental_sleep, convert_cipher_suite
+from ..network.SocketAddress import SocketAddress
 
 
 class WebServer(NamedTuple):
@@ -28,7 +29,7 @@ def get_web_server_info(address, supported_protocols, args):
     servers certificate, cipher suite and protocol used in the connection.
 
     :param args:
-    :param Address address: Webserver address
+    :param SocketAddress address: Webserver address
     :param list supported_protocols: Supported SSL/TLS protocol versions
     :return: Tuple of all the values
     :rtype: WebServer
@@ -135,7 +136,7 @@ def get_certificate(address, scan_cert_chain):
     """
     Gather a certificate in the DER binary format
 
-    :param Address address: Web server address
+    :param SocketAddress address: Web server address
     :param bool scan_cert_chain: Scan the whole cert chain
     :return: Gathered certificate/certificates
     :rtype: Any
@@ -170,7 +171,7 @@ def create_session(address, verify_cert, context, timeout):
     """
     Create a secure connection to any server on any port with a defined context
 
-    :param Address address: Webserver address
+    :param SocketAddress address: Webserver address
     :param bool verify_cert: Whether to verify the certificate or not
     :param ssl.SSLContext context: ssl context
     :param int timeout: Timeout in seconds
@@ -200,7 +201,7 @@ def create_session(address, verify_cert, context, timeout):
             cert_verified = False
             context.check_hostname = False
             context.verify_mode = ssl.VerifyMode.CERT_NONE
-        except socket.timeout as e:
+        except (socket.timeout, ConnectionRefusedError) as e:
             log.warning('Connection timeout, retrying')
             sleep = incremental_sleep(sleep, e, 3)
         except socket.gaierror:

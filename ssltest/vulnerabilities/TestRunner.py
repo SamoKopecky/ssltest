@@ -3,7 +3,7 @@ import importlib.util
 import inspect
 import logging
 
-from ..main.utils import Address
+from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
@@ -11,17 +11,15 @@ log = logging.getLogger(__name__)
 class TestRunner:
     test_module = importlib.import_module('.tests', __package__)
 
-    def __init__(self, address, timeout, protocol, supported_protocols):
+    def __init__(self, address, protocol, supported_protocols):
         """
         Constructor
 
-        :param Address address: Webserver address
-        :param int timeout: Timeout
+        :param SocketAddress address: Webserver address
         :param str protocol: SSL/TLS protocol
         :param list supported_protocols: Webservers supported SSL/TLS protocols
         """
         self.address = address
-        self.timeout = timeout
         self.protocol = protocol
         self.supported_protocols = supported_protocols
 
@@ -44,7 +42,7 @@ class TestRunner:
         with cf.ThreadPoolExecutor(max_workers=classes_len) as executor:
             for test_class in tests:
                 scan_class = test_class(
-                    self.supported_protocols, self.address, self.timeout, self.protocol)
+                    self.supported_protocols, self.address, self.protocol)
                 execution = executor.submit(scan_class.scan)
                 futures.update({execution: test_class.name})
             for execution in cf.as_completed(futures):
