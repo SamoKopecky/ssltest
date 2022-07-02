@@ -70,8 +70,6 @@ def get_help():
         ]}]
     help_msg[3]['options'].extend(get_tests_help())
     help_msg[3]['options'].extend([
-        ['-to', '--timeout', '<dur>',
-         'Set a duration for the timeout of connections in seconds'],
         ['-sc', '--short-cert', '', 'Limit alternative names to first 5'],
         ['-cc', '--cert-chain', '', 'Get information about the whole certificate chain'],
         ['-cs', '--cipher-suites', '', 'Scan all supported cipher suites by the server'],
@@ -124,8 +122,6 @@ def parse_args():
                         metavar='output_file', required=False, nargs='?', default=False)
     parser.add_argument('-t', '--test', type=int,
                         metavar='test_num', nargs='+')
-    parser.add_argument('-to', '--timeout', type=int,
-                        metavar='timeout', nargs='?', default=1)
     parser.add_argument('-sc', '--short-cert',
                         action='store_true', default=False)
     parser.add_argument('-cc', '--cert-chain',
