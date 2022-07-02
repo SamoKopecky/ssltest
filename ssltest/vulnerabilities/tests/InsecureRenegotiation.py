@@ -1,8 +1,8 @@
 """Vulnerability test for Insecure Renegotiation"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...core.ClientHello import ClientHello
-from ...network.SafeSocket import SafeSocket
+from ...network.ClientHello import ClientHello
+from ...sockets.SafeSocket import SafeSocket
 
 
 class InsecureRenegotiation(VulnerabilityTest):

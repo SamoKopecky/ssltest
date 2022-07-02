@@ -6,8 +6,8 @@ from struct import unpack
 from cryptography.x509 import load_der_x509_certificate
 
 from .SSLvN import SSLvN
-from ..main.utils import read_json
-from ..network.SocketAddress import SocketAddress
+from ..core.utils import read_json
+from ..sockets.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 

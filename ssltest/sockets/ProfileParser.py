@@ -1,6 +1,6 @@
 import logging
 
-from ..main.utils import read_json
+from ..core.utils import read_json
 
 network_profile_usage = read_json('network_profile_usage.json')
 network_profiles = read_json('network_profiles.json')

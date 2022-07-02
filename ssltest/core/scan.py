@@ -1,14 +1,14 @@
 import logging
 
-from ..core.Endpoint import Endpoint
-from ..core.ratable.Certificate import Certificate
-from ..core.ratable.CipherSuite import CipherSuite
-from ..core.ratable.CipherSuites import CipherSuites
-from ..core.ratable.Parameters import Parameters
-from ..core.ratable.ProtocolSupport import ProtocolSupport
-from ..core.unratable.WebServerSoft import WebServerSoft
-from ..network.SocketAddress import SocketAddress
+from ..network.Endpoint import Endpoint
 from ..output.TextOutput import TextOutput
+from ..parameters.ratable.Certificate import Certificate
+from ..parameters.ratable.CipherSuite import CipherSuite
+from ..parameters.ratable.CipherSuites import CipherSuites
+from ..parameters.ratable.Parameters import Parameters
+from ..parameters.ratable.ProtocolSupport import ProtocolSupport
+from ..parameters.unratable.WebServerSoft import WebServerSoft
+from ..sockets.SocketAddress import SocketAddress
 from ..vulnerabilities.TestRunner import TestRunner
 
 log = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 """Vulnerability test for DROWN"""
 
 from ..CipherSuiteTest import CipherSuiteTest
-from ...core.SSLv2 import SSLv2
+from ...network.SSLv2 import SSLv2
 
 
 class Drown(CipherSuiteTest):

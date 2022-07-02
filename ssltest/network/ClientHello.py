@@ -2,7 +2,7 @@ import logging
 import secrets
 from struct import pack
 
-from ..main.utils import read_json, protocol_version_conversion
+from ..core.utils import read_json, protocol_version_conversion
 
 json_ciphers = read_json('cipher_suites.json')
 log = logging.getLogger(__name__)

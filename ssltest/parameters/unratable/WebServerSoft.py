@@ -3,7 +3,7 @@ import logging
 import nmap3
 import requests
 
-from ...network.SocketAddress import SocketAddress
+from ...sockets.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
