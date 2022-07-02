@@ -4,14 +4,14 @@ from struct import unpack
 from cryptography.x509 import load_der_x509_certificate
 
 from .ClientHello import ClientHello
-from .SSLvX import SSLvX
+from .SSLvN import SSLvN
 from ..main.utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion
 from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
 
-class SSLv3(SSLvX):
+class SSLv3(SSLvN):
     def __init__(self, address):
         """
         Constructor

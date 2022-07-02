@@ -19,15 +19,13 @@ class MySocket:
         """
         self.sock_addr = sock_addr
         # Read from json
-        self.sock: socket
+        self.sock = None
         self.retries_count, self.retry_interval, self.network_timeout = \
             ProfileParser.parse(usage)
         self.connection_end = False
         self.connection_shutdown = False
 
     def __enter__(self):
-        self.sock = socket(AF_INET, SOCK_STREAM)
-        self.sock.settimeout(self.network_timeout)
         self.connect()
         return self
 
@@ -52,19 +50,28 @@ class MySocket:
         self.connection_shutdown = True
         self.sock.shutdown(SHUT_WR)
 
+    def new_socket(self):
+        """
+        Create a new socket
+        """
+        self.sock = socket(AF_INET, SOCK_STREAM)
+        self.sock.settimeout(self.network_timeout)
+
     def connect(self):
         """
         Connect to address while retrying based on a json config
         """
-        exceptions = (timeout, ConnectionResetError)
         current_retry_interval = self.retry_interval
         for i in range(self.retries_count + 1):
+            self.connection_end = False
             try:
+                self.new_socket()
                 self.sock.connect(self.sock_addr)
+                log.debug('Connected')
                 return
-            except exceptions as exception:
+            except Exception as exception:
                 log.warning(
-                    f'{exception.strerror}, retrying in {current_retry_interval} ms...')
+                    f'{exception}, retrying in {current_retry_interval} s...')
                 sleep(current_retry_interval)
             finally:
                 current_retry_interval = self.retry_interval * 2

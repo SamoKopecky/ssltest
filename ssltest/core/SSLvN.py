@@ -11,7 +11,7 @@ from ..network.SocketAddress import SocketAddress
 log = logging.getLogger(__name__)
 
 
-class SSLvX(ABC):
+class SSLvN(ABC):
     def __init__(self, address):
         """
         Constructor
