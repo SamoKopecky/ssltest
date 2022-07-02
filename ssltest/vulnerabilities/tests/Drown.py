@@ -36,8 +36,8 @@ class Drown(CipherSuiteTest):
         """
         if 'SSLv2' not in self.supported_protocols:
             return
-        sslv2 = SSLv2(self.address, 1)
-        sslv2.send_client_hello()
+        sslv2 = SSLv2(self.address)
+        sslv2.data = sslv2.connect()
         sslv2.parse_cipher_suite()
         export_cipher_suites = list(
             filter(lambda cs: 'EXPORT' in cs, sslv2.server_cipher_suites))

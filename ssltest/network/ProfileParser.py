@@ -17,7 +17,7 @@ class ProfileParser:
             profile = network_profiles[profile_name]
         except KeyError:
             log.error('This key doesn\'t exist, returning default values')
-            return 0, 0, 100
+            profile = network_profiles['medium']
         return (
             profile['retries_count'],
             profile['retry_interval'],

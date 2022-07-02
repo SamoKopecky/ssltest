@@ -12,44 +12,43 @@ log = logging.getLogger(__name__)
 
 
 class SSLv3(SSLvX):
-    def __init__(self, address, timeout):
+    def __init__(self, address):
         """
         Constructor
 
         :param SocketAddress address: Webserver address
-        :param int timeout: Timeout for connections
         """
-        super().__init__(address, timeout)
+        super().__init__(address)
         self.protocol = 'SSLv3'
         self.client_hello = ClientHello(protocol_version_conversion(self.protocol)) \
             .pack_client_hello()
 
-    def scan_protocol_support(self):
-        if len(self.response) == 0:
+    def is_supported(self):
+        if len(self.data) == 0:
             log.debug('No response to SSLv3 client hello')
             return False
         # Test if the response is Content type Alert (0x15)
         # and test if the alert message is handshake failure (0x28)
         # or protocol version alert (0x46)
-        elif self.response[0] == 0x15 and (self.response[6] == 0x28 or self.response[6] == 0x46):
+        elif self.data[0] == 0x15 and (self.data[6] == 0x28 or self.data[6] == 0x46):
             log.debug('Alert response to SSLv3 client hello')
             return False
-        elif self.response[0] == 0x16 and self.response[5] == 0x02:
+        elif self.data[0] == 0x16 and self.data[5] == 0x02:
             log.debug('Positive response to SSLv3 client hello')
             return True
         return False
 
     def parse_cipher_suite(self):
-        if len(self.response) == 0:
+        if len(self.data) == 0:
             return
-        cipher_suite_bytes = parse_cipher_suite(self.response)
+        cipher_suite_bytes = parse_cipher_suite(self.data)
         self.cipher_suite = bytes_to_cipher_suite(cipher_suite_bytes, 'IANA')
 
     def parse_certificate(self):
-        if len(self.response) == 0:
+        if len(self.data) == 0:
             return
         # Length is always at the same place in server_hello (idx 3, 4)
-        server_hello_len = unpack('>H', self.response[3:5])[0]
+        server_hello_len = unpack('>H', self.data[3:5])[0]
         # +4 -- Length index in server_hello
         record_protocol_certificate_begin_idx = server_hello_len + 4 + 1
         # +5 -- Certificate index in record layer
@@ -57,7 +56,7 @@ class SSLv3(SSLvX):
         # +7 -- Certificate length index in handshake protocol: certificate
         certs_len_idx = handshake_certificate_idx + 4
         certs_len = unpack(
-            '>I', b'\x00' + self.response[certs_len_idx: certs_len_idx + 3])[0]
+            '>I', b'\x00' + self.data[certs_len_idx: certs_len_idx + 3])[0]
 
         offset = 0
         length_bytes = 3
@@ -66,11 +65,11 @@ class SSLv3(SSLvX):
         while certs_len != 0:
             cert_len_idx += offset
             cert_len = unpack(
-                '>I', b'\x00' + self.response[cert_len_idx: cert_len_idx + 3])[0]
+                '>I', b'\x00' + self.data[cert_len_idx: cert_len_idx + 3])[0]
             cert_idx = cert_len_idx + length_bytes
             offset = cert_len + length_bytes
             # Read bytes
             certs_len -= (cert_len + length_bytes)
-            certificate_in_bytes = self.response[cert_idx:cert_len + cert_idx]
+            certificate_in_bytes = self.data[cert_idx:cert_len + cert_idx]
             self.certificates.append(
                 load_der_x509_certificate(certificate_in_bytes))

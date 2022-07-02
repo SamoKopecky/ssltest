@@ -13,14 +13,13 @@ log = logging.getLogger(__name__)
 
 
 class SSLv2(SSLvX):
-    def __init__(self, address, timeout):
+    def __init__(self, address):
         """
         Constructor
 
         :param SocketAddress address: Webserver address
-        :param int timeout: Timeout for connections
         """
-        super().__init__(address, timeout)
+        super().__init__(address)
         self.protocol = 'SSLv2'
         self.server_cipher_suites = []
         self.client_hello = bytes([
@@ -41,41 +40,41 @@ class SSLv2(SSLvX):
         ])
         self.client_hello += secrets.token_bytes(16)
 
-    def scan_protocol_support(self):
+    def is_supported(self):
         # No response to SSLv2 client hello
-        if len(self.response) == 0:
+        if len(self.data) == 0:
             log.debug('No response to SSLv2 client hello')
             return False
         # Test if the response is Content type Alert (0x15)
         # and test if alert message is protocol version (0x46)
-        elif self.response[0] == 0x15 and (self.response[6] == 0x28 or self.response[6] == 0x46):
+        elif self.data[0] == 0x15 and (self.data[6] == 0x28 or self.data[6] == 0x46):
             log.debug('Alert response to SSLv2 client hello')
             return False
         # Test if the handshake message type is server hello
-        elif self.response[2] == 0x04:
+        elif self.data[2] == 0x04:
             log.debug('SSLv2 client hello response accepted')
             return True
         return False
 
     def parse_cipher_suite(self):
         cipher_suites = read_json('cipher_suites_sslv2.json')
-        certificate_len = unpack('>H', self.response[7:9])[0]
-        cipher_spec_len = unpack('>H', self.response[9:11])[0]
+        certificate_len = unpack('>H', self.data[7:9])[0]
+        cipher_spec_len = unpack('>H', self.data[9:11])[0]
         cipher_spec_begin_idx = 11 + 2 + certificate_len
         for idx in range(cipher_spec_begin_idx, cipher_spec_begin_idx + cipher_spec_len, 3):
             self.server_cipher_suites.append(
                 cipher_suites[
-                    f'{SSLv2.int_to_hex_str(self.response[idx])},'
-                    f'{SSLv2.int_to_hex_str(self.response[idx + 1])},'
-                    f'{SSLv2.int_to_hex_str(self.response[idx + 2])}'
+                    f'{SSLv2.int_to_hex_str(self.data[idx])},'
+                    f'{SSLv2.int_to_hex_str(self.data[idx + 1])},'
+                    f'{SSLv2.int_to_hex_str(self.data[idx + 2])}'
                 ])
         random_number = int(random.randint(
             0, len(self.server_cipher_suites) - 1))
         self.cipher_suite = self.server_cipher_suites[random_number]
 
     def parse_certificate(self):
-        certificate_length = unpack('>H', self.response[7:9])[0]
-        certificate_in_bytes = self.response[13:certificate_length + 13]
+        certificate_length = unpack('>H', self.data[7:9])[0]
+        certificate_in_bytes = self.data[13:certificate_length + 13]
         self.certificates.append(
             load_der_x509_certificate(certificate_in_bytes))
 

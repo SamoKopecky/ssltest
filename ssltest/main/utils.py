@@ -1,12 +1,10 @@
 import json
 import logging
 import re
-import socket
 from os import sep
-from time import sleep, time
+from time import sleep
 
 from ..config_setup import get_config_location
-from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
@@ -29,70 +27,6 @@ def read_json(file_name):
 
 
 cipher_suites_json = read_json('cipher_suites.json')
-
-
-def receive_data(sock, timeout, debug_source):
-    """
-    Receive network data in chunks
-
-    :param sock: Socket to receive from
-    :param float timeout: Timeout in seconds
-    :param str debug_source: Description of the debug source
-    :return: Array of bytes of received data
-    :rtype: bytes
-    """
-    all_data = []
-    begin = time()
-    while True:
-        try:
-            data = sock.recv(2048)
-            if data:
-                log.debug(f'({debug_source}) receiving data')
-                all_data.extend(data)
-                begin = time()
-            else:
-                sleep(0.1)
-        except socket.timeout:
-            log.debug('Timeout out while receiving data')
-            break
-        if all_data and time() - begin > timeout:
-            log.debug(f'({debug_source}) finished with received data')
-            break
-        elif time() - begin > timeout:
-            log.debug(f'({debug_source}) finished with no received data')
-            break
-    return bytes(all_data)
-
-
-def send_data_return_sock(address, client_hello, timeout, debug_source):
-    """
-    Send client client_hello to the server and catch the response
-
-    :param SocketAddress address: Webserver address
-    :param bytes client_hello: client_hello data in bytes
-    :param float timeout: Timeout in seconds
-    :param str debug_source: Description of the debug source
-    :return: Created socket and received response
-    :rtype: bytes or socket
-    """
-    sleep_dur = 0
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(timeout)
-    while True:
-        try:
-            sock.connect(address)
-            sock.send(client_hello)
-            response = receive_data(sock, timeout, debug_source)
-            break
-        except socket.timeout as e:
-            sock.close()
-            log.warning(
-                'Timeout out while creating socket and sending data, retrying')
-            sleep_dur = incremental_sleep(sleep_dur, e, 2)
-        except (socket.error, ConnectionResetError) as e:
-            log.warning('Socket error occurred, retrying')
-            sleep_dur = incremental_sleep(sleep_dur, e, 3)
-    return response, sock
 
 
 def incremental_sleep(sleep_dur, exception, max_timeout_dur):

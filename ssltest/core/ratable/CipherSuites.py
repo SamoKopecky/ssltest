@@ -105,8 +105,8 @@ class CipherSuites:
         the server sends his supported cipher suites in the ServerHello
         message.
         """
-        sslv2 = SSLv2(self.address, 1)
-        sslv2.send_client_hello()
+        sslv2 = SSLv2(self.address)
+        sslv2.data = sslv2.connect()
         sslv2.parse_cipher_suite()
         self.unrated.update({'SSLv2': sslv2.server_cipher_suites})
 

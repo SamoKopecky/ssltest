@@ -52,7 +52,7 @@ def scan(args, address):
 
     log.info(f'Scanning for {address.url}:{address.port}')
 
-    protocol_support = ProtocolSupport(address, args.timeout)
+    protocol_support = ProtocolSupport(address)
     protocol_support.scan_protocols()
     protocol_support.rate_protocols()
     yield {'protocol_support': protocol_support.get_json()}
