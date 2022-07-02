@@ -1,6 +1,6 @@
 import logging
 
-from ..core.connection_utils import get_web_server_info
+from ..core.Endpoint import Endpoint
 from ..core.ratable.Certificate import Certificate
 from ..core.ratable.CipherSuite import CipherSuite
 from ..core.ratable.CipherSuites import CipherSuites
@@ -57,15 +57,16 @@ def scan(args, address):
     protocol_support.rate_protocols()
     yield {'protocol_support': protocol_support.get_json()}
 
-    web_server = get_web_server_info(address, protocol_support.supported, args)
+    endpoint = Endpoint(address, protocol_support.supported, args)
+    endpoint.scan_endpoint()
 
-    cipher_suite = CipherSuite(web_server.cipher_suite, web_server.protocol)
+    cipher_suite = CipherSuite(endpoint.cipher_suite, endpoint.protocol)
     cipher_suite.parse_cipher_suite()
     cipher_suite.parse_protocol_version()
     cipher_suite.rate_cipher_suite()
 
-    certificate = Certificate(web_server.certificates,
-                              web_server.cert_verified, args)
+    certificate = Certificate(endpoint.certificates,
+                              endpoint.cert_verified, args)
     certificate.parse_certificates()
     certificate.rate_certificates()
 
@@ -77,11 +78,11 @@ def scan(args, address):
     yield {'web_server_software': web_server_soft.software}
 
     test_runner = TestRunner(
-        address, web_server.protocol, protocol_support.supported)
+        address, endpoint.protocol, protocol_support.supported)
     yield {'vulnerabilities': test_runner.run_tests(test_option(args))}
 
     cipher_suites = CipherSuites(address, protocol_support.supported)
-    option_result = cipher_suites_option(args, web_server.protocol)
+    option_result = cipher_suites_option(args, endpoint.protocol)
     if option_result[0]:
         cipher_suites.scan_cipher_suites(option_result[1])
         cipher_suites.rate_cipher_suites()

@@ -70,13 +70,15 @@ class SSLv2(SSLvN):
                 ])
         random_number = int(random.randint(
             0, len(self.server_cipher_suites) - 1))
-        self.cipher_suite = self.server_cipher_suites[random_number]
+        return self.server_cipher_suites[random_number]
 
     def parse_certificate(self):
+        certificates = []
         certificate_length = unpack('>H', self.data[7:9])[0]
         certificate_in_bytes = self.data[13:certificate_length + 13]
-        self.certificates.append(
+        certificates.append(
             load_der_x509_certificate(certificate_in_bytes))
+        return certificates
 
     @staticmethod
     def int_to_hex_str(number):

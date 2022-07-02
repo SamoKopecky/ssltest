@@ -20,9 +20,6 @@ class SSLvN(ABC):
         """
         self.address = address
         self.protocol = ''
-        self.cipher_suite = None
-        self.certificates = []
-        self.cert_verified = None
         self.data = b''
         self.client_hello = bytes([])
 
@@ -56,9 +53,9 @@ class SSLvN(ABC):
         store_context = crypto.X509StoreContext(store, endpoint_certificate)
         try:
             store_context.verify_certificate()
-            self.cert_verified = True
+            return True
         except crypto.X509StoreContextError:
-            self.cert_verified = False
+            return False
 
     @abstractmethod
     def is_supported(self):
