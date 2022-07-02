@@ -1,6 +1,5 @@
 import logging
 
-from ..network.SocketAddress import SocketAddress
 from ..core.connection_utils import get_web_server_info
 from ..core.ratable.Certificate import Certificate
 from ..core.ratable.CipherSuite import CipherSuite
@@ -8,6 +7,7 @@ from ..core.ratable.CipherSuites import CipherSuites
 from ..core.ratable.Parameters import Parameters
 from ..core.ratable.ProtocolSupport import ProtocolSupport
 from ..core.unratable.WebServerSoft import WebServerSoft
+from ..network.SocketAddress import SocketAddress
 from ..output.TextOutput import TextOutput
 from ..vulnerabilities.TestRunner import TestRunner
 
@@ -80,8 +80,7 @@ def scan(args, address):
         address, web_server.protocol, protocol_support.supported)
     yield {'vulnerabilities': test_runner.run_tests(test_option(args))}
 
-    cipher_suites = CipherSuites(
-        address, protocol_support.supported, args.timeout)
+    cipher_suites = CipherSuites(address, protocol_support.supported)
     option_result = cipher_suites_option(args, web_server.protocol)
     if option_result[0]:
         cipher_suites.scan_cipher_suites(option_result[1])
