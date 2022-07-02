@@ -1,7 +1,9 @@
 import logging
+import platform
 
 from ..network.Endpoint import Endpoint
 from ..output.TextOutput import TextOutput
+from ..output.WindowsTextOutput import WindowsTextOutput
 from ..parameters.ratable.Certificate import Certificate
 from ..parameters.ratable.CipherSuite import CipherSuite
 from ..parameters.ratable.CipherSuites import CipherSuites
@@ -29,7 +31,10 @@ def handle_scan_output(args, port, only_json):
     handlers = []
     text_output = None
     if not only_json:
-        text_output = TextOutput(address, args)
+        if platform.system() == 'Windows':
+            text_output = WindowsTextOutput(address, args)
+        else:
+            text_output = TextOutput(address, args)
         text_output.print_address()
         handlers.append(text_output.print_category)
     handlers.append(json_data[address_str].update)
