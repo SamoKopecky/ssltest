@@ -6,8 +6,8 @@ from OpenSSL import SSL
 
 from .SSLv2 import SSLv2
 from .SSLv3 import SSLv3
-from ..main.utils import convert_cipher_suite
-from ..network.SecureSafeSocket import SecureSafeSocket
+from ..core.utils import convert_cipher_suite
+from ..sockets.SecureSafeSocket import SecureSafeSocket
 
 log = logging.getLogger(__name__)
 

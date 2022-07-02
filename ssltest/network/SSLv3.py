@@ -5,8 +5,8 @@ from cryptography.x509 import load_der_x509_certificate
 
 from .ClientHello import ClientHello
 from .SSLvN import SSLvN
-from ..main.utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion
-from ..network.SocketAddress import SocketAddress
+from ..core.utils import bytes_to_cipher_suite, parse_cipher_suite, protocol_version_conversion
+from ..sockets.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import logging
 
 from .PType import PType
 from .Parameters import Parameters
-from ...main.utils import read_json
+from ...core.utils import read_json
 
 json_data = read_json('cipher_parameters.json')
 log = logging.getLogger(__name__)

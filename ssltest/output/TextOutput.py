@@ -3,8 +3,8 @@ import re
 
 from ptlibs.ptmisclib import get_colored_text, terminal_width
 
-from ..main.utils import read_json
-from ..network.SocketAddress import SocketAddress
+from ..core.utils import read_json
+from ..sockets.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 

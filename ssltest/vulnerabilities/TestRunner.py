@@ -3,7 +3,7 @@ import importlib.util
 import inspect
 import logging
 
-from ..network.SocketAddress import SocketAddress
+from ..sockets.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 

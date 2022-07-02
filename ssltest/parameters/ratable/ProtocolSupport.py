@@ -2,10 +2,10 @@ import logging
 
 from .PType import PType
 from .Parameters import Parameters
-from ..SSLv2 import SSLv2
-from ..SSLv3 import SSLv3
-from ...network.SecureSafeSocket import SecureSafeSocket
-from ...network.SocketAddress import SocketAddress
+from ...network.SSLv2 import SSLv2
+from ...network.SSLv3 import SSLv3
+from ...sockets.SecureSafeSocket import SecureSafeSocket
+from ...sockets.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 

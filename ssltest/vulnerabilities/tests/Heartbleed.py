@@ -1,8 +1,8 @@
 """Vulnerability test for Heartbleed"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...core.ClientHello import ClientHello
-from ...network.SafeSocket import SafeSocket
+from ...network.ClientHello import ClientHello
+from ...sockets.SafeSocket import SafeSocket
 
 
 class Heartbleed(VulnerabilityTest):

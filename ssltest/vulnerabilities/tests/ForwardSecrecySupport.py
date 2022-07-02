@@ -1,9 +1,9 @@
 """Vulnerability test for Forward Secrecy Support"""
 
 from ..VulnerabilityTest import VulnerabilityTest
-from ...core.ClientHello import ClientHello
-from ...main.utils import filter_cipher_suite_bytes
-from ...network.SafeSocket import SafeSocket
+from ...network.ClientHello import ClientHello
+from ...core.utils import filter_cipher_suite_bytes
+from ...sockets.SafeSocket import SafeSocket
 
 
 class ForwardSecrecySupport(VulnerabilityTest):

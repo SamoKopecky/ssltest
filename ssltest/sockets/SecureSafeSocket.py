@@ -9,6 +9,7 @@ log = logging.getLogger(__name__)
 
 
 class SecureSafeSocket(SafeSocket):
+
     def __init__(self, sock_addr, protocol, verify_cert, usage):
         self.protocol = protocol
         self.verify_cert = verify_cert

@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 import requests
 from OpenSSL import crypto
 
-from ..network.SafeSocket import SafeSocket
-from ..network.SocketAddress import SocketAddress
+from ..sockets.SafeSocket import SafeSocket
+from ..sockets.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 

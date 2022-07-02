@@ -1,12 +1,12 @@
 import logging
 
 from .CipherSuite import CipherSuite
-from ..ClientHello import ClientHello
-from ..SSLv2 import SSLv2
-from ...main.utils import parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
+from ...core.utils import parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
     get_cipher_suite_protocols
-from ...network.SafeSocket import SafeSocket
-from ...network.SocketAddress import SocketAddress
+from ...network.ClientHello import ClientHello
+from ...network.SSLv2 import SSLv2
+from ...sockets.SafeSocket import SafeSocket
+from ...sockets.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
