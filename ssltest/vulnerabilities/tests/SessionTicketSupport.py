@@ -2,7 +2,7 @@
 
 from ..VulnerabilityTest import VulnerabilityTest
 from ...core.ClientHello import ClientHello
-from ...network.MySocket import MySocket
+from ...network.SafeSocket import SafeSocket
 
 
 class SessionTicketSupport(VulnerabilityTest):
@@ -30,7 +30,7 @@ class SessionTicketSupport(VulnerabilityTest):
         client_hello.extensions += self.session_ticket_extension
         client_hello = client_hello.pack_client_hello()
 
-        with MySocket(self.address, self.usage) as sock:
+        with SafeSocket(self.address, self.usage) as sock:
             sock.send(client_hello)
             response = sock.receive()
 

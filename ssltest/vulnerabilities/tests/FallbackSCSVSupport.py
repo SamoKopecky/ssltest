@@ -2,7 +2,7 @@
 
 from ..VulnerabilityTest import VulnerabilityTest, protocol_version_conversion
 from ...core.ClientHello import ClientHello
-from ...network.MySocket import MySocket
+from ...network.SafeSocket import SafeSocket
 
 
 class FallbackSCSVSupport(VulnerabilityTest):
@@ -33,7 +33,7 @@ class FallbackSCSVSupport(VulnerabilityTest):
 
         client_hello = ClientHello(
             second_worst_protocol, self.fallback_scsv).pack_client_hello()
-        with MySocket(self.address, self.usage) as sock:
+        with SafeSocket(self.address, self.usage) as sock:
             sock.send(client_hello)
             response = sock.receive()
 

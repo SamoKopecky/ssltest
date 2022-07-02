@@ -3,7 +3,7 @@ from abc import ABC
 from .VulnerabilityTest import VulnerabilityTest
 from ..core.ClientHello import ClientHello
 from ..main.utils import filter_cipher_suite_bytes
-from ..network.MySocket import MySocket
+from ..network.SafeSocket import SafeSocket
 
 
 class CipherSuiteTest(VulnerabilityTest, ABC):
@@ -25,7 +25,7 @@ class CipherSuiteTest(VulnerabilityTest, ABC):
         client_hello = ClientHello(
             version, filtered_suites, False).pack_client_hello()
 
-        with MySocket(self.address, self.usage) as sock:
+        with SafeSocket(self.address, self.usage) as sock:
             sock.send(client_hello)
             response = sock.receive()
 

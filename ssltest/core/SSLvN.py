@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 import requests
 from OpenSSL import crypto
 
-from ..network.MySocket import MySocket
+from ..network.SafeSocket import SafeSocket
 from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ class SSLvN(ABC):
         """
         Send the initial client hello, return the response
         """
-        with MySocket(self.address, 'sslv2_scan') as sock:
+        with SafeSocket(self.address, 'sslvn_scan') as sock:
             sock.send(self.client_hello)
             return sock.receive()
 

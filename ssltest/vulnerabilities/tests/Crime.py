@@ -2,7 +2,7 @@
 
 from ..VulnerabilityTest import VulnerabilityTest
 from ...core.ClientHello import ClientHello
-from ...network.MySocket import MySocket
+from ...network.SafeSocket import SafeSocket
 
 
 class Crime(VulnerabilityTest):
@@ -21,7 +21,7 @@ class Crime(VulnerabilityTest):
         :return: Whether the server is vulnerable
         :rtype: bool
         """
-        with MySocket(self.address, self.usage) as sock:
+        with SafeSocket(self.address, self.usage) as sock:
             client_hello = ClientHello(version)
             client_hello.compression = bytearray([
                 0x01,  # Compression method length

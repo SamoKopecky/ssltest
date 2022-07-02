@@ -5,7 +5,7 @@ from ..ClientHello import ClientHello
 from ..SSLv2 import SSLv2
 from ...main.utils import parse_cipher_suite, bytes_to_cipher_suite, protocol_version_conversion, \
     get_cipher_suite_protocols
-from ...network.MySocket import MySocket
+from ...network.SafeSocket import SafeSocket
 from ...network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class CipherSuites:
                                        to_test_cipher_suites, False)
             while True:
                 client_hello_bytes = client_hello.pack_client_hello()
-                with MySocket(self.address, 'cipher_suites') as sock:
+                with SafeSocket(self.address, 'cipher_suites') as sock:
                     sock.send(client_hello_bytes)
                     sock.shutdown()
                     response = sock.receive()

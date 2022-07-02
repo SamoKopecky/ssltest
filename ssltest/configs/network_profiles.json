@@ -2,16 +2,16 @@
   "fast": {
     "retries_count": 1,
     "retry_interval": 100,
-    "network_timeout": 100
+    "timeout": 100
   },
   "medium": {
     "retries_count": 2,
     "retry_interval": 100,
-    "network_timeout": 500
+    "timeout": 500
   },
   "slow": {
     "retries_count": 3,
-    "retry_interval": 500,
-    "network_timeout": 1000
+    "retry_interval": 300,
+    "timeout": 1000
   }
 }
