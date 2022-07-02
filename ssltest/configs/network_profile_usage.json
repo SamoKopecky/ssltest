@@ -1,4 +1,5 @@
 {
   "cipher_suites": "fast",
-  "vulnerability_scan": "medium"
+  "vulnerability_scan": "medium",
+  "sslv2_scan": "medium"
 }

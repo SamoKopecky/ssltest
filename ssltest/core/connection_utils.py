@@ -42,8 +42,8 @@ def get_web_server_info(address, supported_protocols, args):
             'SSLv3': SSLv3,
             'SSLv2': SSLv2
         }
-        ssl_protocol = ssl_protocols[chosen_protocol](address, args.timeout)
-        ssl_protocol.send_client_hello()
+        ssl_protocol = ssl_protocols[chosen_protocol](address)
+        ssl_protocol.connect()
         ssl_protocol.parse_cipher_suite()
         ssl_protocol.parse_certificate()
         ssl_protocol.verify_cert()
@@ -54,8 +54,7 @@ def get_web_server_info(address, supported_protocols, args):
     else:
         log.info('Connecting with TLS')
         context = create_ssl_context(chosen_protocol)
-        ssl_socket, cert_verified = create_session(
-            address, True, context, args.timeout)
+        ssl_socket, cert_verified = create_session(address, True, context)
         cipher_suite, protocol = get_cipher_suite_and_protocol(ssl_socket)
         certificates = get_certificate(address, args.cert_chain)
         ssl_socket.close()
@@ -167,16 +166,17 @@ def get_cipher_suite_and_protocol(ssl_socket):
     return cipher_suite, ssl_socket.version()
 
 
-def create_session(address, verify_cert, context, timeout):
+def create_session(address, verify_cert, context):
     """
     Create a secure connection to any server on any port with a defined context
 
     :param SocketAddress address: Webserver address
     :param bool verify_cert: Whether to verify the certificate or not
     :param ssl.SSLContext context: ssl context
-    :param int timeout: Timeout in seconds
     :return: Created secure socket, that needs to be closed
     """
+    # TODO: change
+    timeout = 1
     correct_errors = ['[SSL: NO_PROTOCOLS_AVAILABLE]', '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]',
                       '[SSL: TLSV1_ALERT_PROTOCOL_VERSION]', 'EOF occurred in violation of protocol']
     cert_verified = True

@@ -1,39 +1,38 @@
-import logging
 import csv
+import logging
 from abc import ABC, abstractmethod
 
 import requests
 from OpenSSL import crypto
 
-from ..main.utils import send_data_return_sock
+from ..network.MySocket import MySocket
 from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
 
 class SSLvX(ABC):
-    def __init__(self, address, timeout):
+    def __init__(self, address):
         """
         Constructor
 
         :param SocketAddress address: Webserver address
-        :param int timeout: Timeout for connections
         """
         self.address = address
         self.protocol = ''
         self.cipher_suite = None
         self.certificates = []
         self.cert_verified = None
-        self.timeout = timeout
-        self.response = b''
+        self.data = b''
         self.client_hello = bytes([])
 
-    def send_client_hello(self):
+    def connect(self):
         """
-        Send the initial client hello
+        Send the initial client hello, return the response
         """
-        self.response, _ = send_data_return_sock(self.address, self.client_hello, self.timeout,
-                                                 self.__class__.__name__)
+        with MySocket(self.address, 'sslv2_scan') as sock:
+            sock.send(self.client_hello)
+            return sock.receive()
 
     def verify_cert(self):
         """
@@ -62,7 +61,7 @@ class SSLvX(ABC):
             self.cert_verified = False
 
     @abstractmethod
-    def scan_protocol_support(self):
+    def is_supported(self):
         """
         Check if SSLvX version is supported by the web server
 

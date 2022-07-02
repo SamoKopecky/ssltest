@@ -12,19 +12,17 @@ log = logging.getLogger(__name__)
 
 
 class ProtocolSupport:
-    def __init__(self, address, timeout):
+    def __init__(self, address):
         """
         Constructor
 
         :param SocketAddress address: Webserver address
-        :param int timeout: Timeout
         """
         self.protocols = {PType.protocols: {}, PType.no_protocol: {}}
         self.supported = []
         self.unsupported = []
         self.address = address
         self.rating = 0
-        self.timeout = timeout
 
     def scan_protocols(self):
         """
@@ -50,14 +48,11 @@ class ProtocolSupport:
             SSLv3
         ]
         for ssl_version in ssl_versions:
-            ssl_version = ssl_version(self.address, self.timeout)
+            ssl_version = ssl_version(self.address)
             log.info(f'Scanning for {ssl_version.protocol}')
-            try:
-                ssl_version.send_client_hello()
-            except socket.error:
-                pass
-            result = ssl_version.scan_protocol_support()
-            if result:
+            ssl_version.data = ssl_version.connect()
+            supported = ssl_version.is_supported()
+            if supported:
                 self.supported.append(ssl_version.protocol)
             else:
                 self.unsupported.append(ssl_version.protocol)
@@ -76,8 +71,7 @@ class ProtocolSupport:
             log.info(f'Scanning for {protocol}')
             context = create_ssl_context(protocol)
             try:
-                ssl_socket, _ = create_session(
-                    self.address, False, context, self.timeout)
+                ssl_socket, _ = create_session(self.address, False, context)
                 ssl_socket.close()
                 self.supported.append(protocol)
             except socket.error:
