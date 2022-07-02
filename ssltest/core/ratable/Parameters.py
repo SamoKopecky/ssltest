@@ -120,7 +120,7 @@ class Parameters(ABC):
         """
         Get all ratable parameters json
         :param CipherSuite cipher_suite: Cipher suite
-        :param Certificate certificate:
+        :param Certificate certificate: Certificate
         :return: Json of ratable parameters
         :rtype: dict
         """

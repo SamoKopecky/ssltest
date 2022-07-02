@@ -42,9 +42,10 @@ class SSLv3(SSLvN):
         if len(self.data) == 0:
             return
         cipher_suite_bytes = parse_cipher_suite(self.data)
-        self.cipher_suite = bytes_to_cipher_suite(cipher_suite_bytes, 'IANA')
+        return bytes_to_cipher_suite(cipher_suite_bytes, 'IANA')
 
     def parse_certificate(self):
+        certificates = []
         if len(self.data) == 0:
             return
         # Length is always at the same place in server_hello (idx 3, 4)
@@ -71,5 +72,6 @@ class SSLv3(SSLvN):
             # Read bytes
             certs_len -= (cert_len + length_bytes)
             certificate_in_bytes = self.data[cert_idx:cert_len + cert_idx]
-            self.certificates.append(
+            certificates.append(
                 load_der_x509_certificate(certificate_in_bytes))
+        return certificates
