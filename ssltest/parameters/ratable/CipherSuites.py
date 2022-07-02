@@ -70,7 +70,7 @@ class CipherSuites:
                                        to_test_cipher_suites, False)
             while True:
                 client_hello_bytes = client_hello.pack_client_hello()
-                with SafeSocket(self.address, 'cipher_suites') as sock:
+                with SafeSocket(self.address, 'cipher_suites_scan') as sock:
                     sock.send(client_hello_bytes)
                     sock.shutdown()
                     response = sock.receive()
