@@ -21,5 +21,5 @@ class ProfileParser:
         return (
             profile['retries_count'],
             profile['retry_interval'] / 1000,
-            profile['network_timeout'] / 1000
+            profile['timeout'] / 1000
         )

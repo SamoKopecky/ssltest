@@ -1,11 +1,10 @@
 import logging
-import socket
 
 from .PType import PType
 from .Parameters import Parameters
 from ..SSLv2 import SSLv2
 from ..SSLv3 import SSLv3
-from ..connection_utils import create_session, create_ssl_context
+from ...network.SecureSafeSocket import SecureSafeSocket
 from ...network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
@@ -69,13 +68,12 @@ class ProtocolSupport:
         ]
         for protocol in tls_protocols:
             log.info(f'Scanning for {protocol}')
-            context = create_ssl_context(protocol)
-            try:
-                ssl_socket, _ = create_session(self.address, False, context)
-                ssl_socket.close()
-                self.supported.append(protocol)
-            except socket.error:
+            with SecureSafeSocket(self.address, protocol, False, 'tlsv1.n_scan') as sock:
+                supported = sock.connect()
+            if not supported:
                 self.unsupported.append(protocol)
+                continue
+            self.supported.append(protocol)
 
     def rate_protocols(self):
         """

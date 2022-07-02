@@ -2,7 +2,6 @@ import json
 import logging
 import re
 from os import sep
-from time import sleep
 
 from ..config_setup import get_config_location
 
@@ -27,25 +26,6 @@ def read_json(file_name):
 
 
 cipher_suites_json = read_json('cipher_suites.json')
-
-
-def incremental_sleep(sleep_dur, exception, max_timeout_dur):
-    """
-    Sleeps for a period of time
-
-    :param int sleep_dur: Sleep duration
-    :param exception: Exception to be raised
-    :param max_timeout_dur: Maximum amount of time to sleep
-    :return: Next sleep duration
-    :rtype: int
-    """
-    if sleep_dur >= max_timeout_dur:
-        log.debug('timed out')
-        raise exception
-    sleep_dur += 1
-    log.debug(f'increasing sleep duration to {sleep_dur}')
-    sleep(sleep_dur)
-    return sleep_dur
 
 
 # cipher_suites.json file was created using
