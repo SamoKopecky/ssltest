@@ -122,7 +122,7 @@ class TextOutput:
         """
         if key in self.english.keys():
             return self.english[key]
-        elif re.search('.*_\d', key):
+        elif re.search('.*_\d$', key):
             return f'{self.english[key[:-2]]} #{int(key[-1]) + 1}'
         else:
             return key

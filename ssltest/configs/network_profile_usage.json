@@ -1,4 +1,4 @@
 {
-  "cipher_suites": "one_try",
-  "vulnerability_scan": "fast"
+  "cipher_suites": "fast",
+  "vulnerability_scan": "medium"
 }

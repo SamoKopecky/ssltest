@@ -22,6 +22,8 @@ class MySocket:
         self.sock: socket
         self.retries_count, self.retry_interval, self.network_timeout = \
             ProfileParser.parse(usage)
+        self.connection_end = False
+        self.connection_shutdown = False
 
     def __enter__(self):
         self.sock = socket(AF_INET, SOCK_STREAM)
@@ -30,14 +32,25 @@ class MySocket:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.connection_end:
+            return
         self.close()
 
     def close(self):
         """
         Properly close a socket
         """
-        self.sock.shutdown(SHUT_WR)
+        self.connection_end = True
+        if not self.connection_shutdown:
+            self.sock.shutdown(SHUT_WR)
         self.sock.close()
+
+    def shutdown(self):
+        """
+        Prevent further sending to the socket
+        """
+        self.connection_shutdown = True
+        self.sock.shutdown(SHUT_WR)
 
     def connect(self):
         """
@@ -45,7 +58,7 @@ class MySocket:
         """
         exceptions = (timeout, ConnectionResetError)
         current_retry_interval = self.retry_interval
-        for i in range(self.retries_count):
+        for i in range(self.retries_count + 1):
             try:
                 self.sock.connect(self.sock_addr)
                 return
@@ -79,6 +92,7 @@ class MySocket:
                 break
             if chunk == b'':
                 log.debug('Connection broken/ended')
+                self.connection_end = True
                 break
             chunks.append(chunk)
         return b''.join(chunks)
