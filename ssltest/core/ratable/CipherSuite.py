@@ -21,7 +21,7 @@ class CipherSuite(Parameters):
         self.parameters = {enum: {} for enum in PType if enum.is_cipher_suite}
         self.protocol = protocol
         self.cipher_suite = cipher_suite
-        log.info(f'Parsing {self.cipher_suite} for {self.protocol} protocol')
+        log.info(f'Parsing {self.cipher_suite}')
 
     def parse_cipher_suite(self):
         """

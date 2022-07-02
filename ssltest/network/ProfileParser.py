@@ -20,6 +20,6 @@ class ProfileParser:
             profile = network_profiles['medium']
         return (
             profile['retries_count'],
-            profile['retry_interval'],
+            profile['retry_interval'] / 1000,
             profile['network_timeout'] / 1000
         )

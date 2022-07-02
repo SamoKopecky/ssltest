@@ -5,14 +5,14 @@ from struct import unpack
 
 from cryptography.x509 import load_der_x509_certificate
 
-from .SSLvX import SSLvX
+from .SSLvN import SSLvN
 from ..main.utils import read_json
 from ..network.SocketAddress import SocketAddress
 
 log = logging.getLogger(__name__)
 
 
-class SSLv2(SSLvX):
+class SSLv2(SSLvN):
     def __init__(self, address):
         """
         Constructor
