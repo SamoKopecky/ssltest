@@ -93,32 +93,6 @@ class Certificate(Parameters):
         self.non_parameters[PType.cert_issuer] = \
             self.parse_name(certificate.issuer)
 
-    def parse_alternative_names(self, certificate):
-        """
-        Parse the alternative names from the certificate extensions
-
-        :param certificate: Certificate to parse
-        :return: Alternative names
-        :rtype: list
-        """
-        log.info('Parsing alternative names from certificate')
-        try:
-            extension = certificate.extensions.get_extension_for_class(
-                x509.SubjectAlternativeName)
-        except x509.extensions.ExtensionNotFound:
-            log.error('No alternative names extension found in certificate')
-            return []
-        alternative_names: list = extension.value.get_values_for_type(
-            x509.DNSName)
-        shortened_names_count = 5
-        if self.short_cert and len(alternative_names) > shortened_names_count:
-            log.debug(
-                f'Shortening alternative names output to {shortened_names_count}')
-            return alternative_names[:shortened_names_count] + ['...']
-        elif len(alternative_names) == 0:
-            log.debug('No alternative names found')
-        return alternative_names
-
     def rate_certificate(self, parameters):
         """
         Rate all valid certificate parameters
@@ -157,6 +131,28 @@ class Certificate(Parameters):
         if not self.cert_chain:
             return to_json(self.all_non_parameters.pop('certificate_0').items())
         return {key: to_json(value.items()) for key, value in self.all_non_parameters.items()}
+
+    @staticmethod
+    def parse_alternative_names(certificate):
+        """
+        Parse the alternative names from the certificate extensions
+
+        :param certificate: Certificate to parse
+        :return: Alternative names
+        :rtype: list
+        """
+        log.info('Parsing alternative names from certificate')
+        try:
+            extension = certificate.extensions.get_extension_for_class(
+                x509.SubjectAlternativeName)
+        except x509.extensions.ExtensionNotFound:
+            log.error('No alternative names extension found in certificate')
+            return []
+        alternative_names: list = extension.value.get_values_for_type(
+            x509.DNSName)
+        if len(alternative_names) == 0:
+            log.debug('No alternative names found')
+        return alternative_names
 
     @staticmethod
     def parse_name(name):

@@ -29,7 +29,7 @@ def handle_scan_output(args, port, only_json):
     handlers = []
     text_output = None
     if not only_json:
-        text_output = TextOutput(address)
+        text_output = TextOutput(address, args)
         text_output.print_address()
         handlers.append(text_output.print_category)
     handlers.append(json_data[address_str].update)

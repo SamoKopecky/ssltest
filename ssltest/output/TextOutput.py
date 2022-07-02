@@ -14,7 +14,7 @@ def printn(string):
 
 
 class TextOutput:
-    def __init__(self, address):
+    def __init__(self, address, args):
         """
         Constructor
 
@@ -27,6 +27,7 @@ class TextOutput:
         self.address_filler = '='
         self.category_title_filter = '-'
         self.indent_start = 0
+        self.short_cert = args.short_cert
 
     def __del__(self):
         print()
@@ -56,8 +57,8 @@ class TextOutput:
         self.print_category_title()
         if self.category_title == 'parameters':
             self.print_parameters(self.data, self.indent_start)
-        else:
-            self.recursive_print(self.data, self.indent_start)
+            return
+        self.recursive_print(self.data, self.indent_start)
 
     def print_category_title(self):
         """
@@ -124,8 +125,7 @@ class TextOutput:
             return self.english[key]
         elif re.search('.*_\d$', key):
             return f'{self.english[key[:-2]]} #{int(key[-1]) + 1}'
-        else:
-            return key
+        return key
 
     @staticmethod
     def print_title(prefix_len, title_string, padding_char):
@@ -147,34 +147,35 @@ class TextOutput:
         except OSError:
             print(title)
 
-    @staticmethod
-    def filter_data(data):
+    def filter_data(self, data):
         """
         Removes any empty/invalid values/lists from the data
 
         :param dict data: Data to be filtered
         """
         for key, value in list(data.items()):
-            if type(value) is dict:
-                if not data[key]:
-                    del data[key]
-                    continue
-                # TODO: Fix this later
-                # Cert checking
-                # keys_to_delete = []
-                # for key_n, value_n in value.items():
-                #     if len(value_n) == 0:
-                #         keys_to_delete.append(key_n)
-                # for key_to_delete in keys_to_delete:
-                #     del value[key_to_delete]
-                # index 0 cause of parameters dict
-                keys_list = list(value.keys())
-                if len(keys_list) > 0 and keys_list[0] == 'N/A':
-                    del data[key]
-                    continue
-                TextOutput.filter_data(value)
-            else:
-                return
+            val_type = type(value)
+            if self.short_cert and val_type is list and key is 'cert_alternative_names':
+                data[key] = TextOutput.shorted_alternative_names(value)
+                continue
+            if val_type is not dict:
+                continue
+            if not data[key]:
+                del data[key]
+                continue
+            # index 0 cause of parameters dict
+            keys_list = list(value.keys())
+            if len(keys_list) > 0 and keys_list[0] == 'N/A':
+                del data[key]
+                continue
+            self.filter_data(value)
+
+    @staticmethod
+    def shorted_alternative_names(data):
+        max_names = 5
+        if len(data) < max_names:
+            return data
+        return data[:max_names] + ['...']
 
     @staticmethod
     def get_color_for_value(text):
