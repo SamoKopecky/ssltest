@@ -4,11 +4,12 @@ from struct import pack
 
 from ..core.utils import read_json, protocol_version_conversion
 
-json_ciphers = read_json('cipher_suites.json')
 log = logging.getLogger(__name__)
 
 
 class ClientHello:
+    json_ciphers = read_json('cipher_suites.json')
+
     def __init__(self, protocol, cipher_suites=None, fill_cipher_suites=True):
         """
         Constructor
@@ -126,8 +127,8 @@ class ClientHello:
                 self.str_protocol)
         return pack('>H', len(cipher_suites)) + cipher_suites
 
-    @staticmethod
-    def get_cipher_suites_for_version(version):
+    @classmethod
+    def get_cipher_suites_for_version(cls, version):
         """
         Extract cipher suites from ssl lib or json file
 
@@ -140,7 +141,7 @@ class ClientHello:
         if version == 'TLSv1.1':
             version = 'TLSv1.0'
         ciphers = bytearray([])
-        for key, value in json_ciphers.items():
+        for key, value in cls.json_ciphers.items():
             if version in value['protocol_version']:
                 cs_bytes = key.split(',')
                 ciphers += bytearray([int(cs_bytes[0], 16),

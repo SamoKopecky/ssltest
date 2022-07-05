@@ -1,6 +1,3 @@
-__version__ = '0.1.1'
-
-import argparse
 import logging
 import os
 import shutil
@@ -10,7 +7,7 @@ import sys
 from ptlibs import ptjsonlib, ptmisclib
 
 from .run import run
-from ..logging import logging_option
+from ..Args import Args, __version__
 from ..vulnerabilities.TestRunner import TestRunner
 
 script_name = 'ssltest'
@@ -65,6 +62,8 @@ def get_help():
              'Port or ports (separate with spaces) to scan on (default: 443)'],
             ['-j', '--json', '<file>',
              'Change output to json format, if a file name is specified output is written to the given file'],
+            ['-c', '--config', '<dir>',
+             'Custom config directory (absolute path)'],
             ['-t', '--test', '<num ...>',
              'Run specified vulnerability tests (numbers) separated with spaces, if unspecified all tests are ran'],
         ]}]
@@ -98,56 +97,15 @@ def print_help():
     ptmisclib.help_print(get_help(), script_name, __version__)
 
 
-def parse_args():
+def custom_args_parse(args, parser):
     """
     Parse input arguments
     """
-    sudo_ops = {
-        'fc': ['-fc', '--fix-conf'],
-        'nd': ['-nd', '--nmap-discover'],
-        'ss': ['-ss', '--sudo-stdin'],
-        'st': ['-st', '--sudo-tty'],
-    }
-    for key in sudo_ops.keys():
-        sudo_ops[key].append('/'.join(sudo_ops[key]))
-
-    parser = argparse.ArgumentParser(add_help=False)
-    required = parser.add_argument_group('required arguments')
-    fix_config = parser.add_mutually_exclusive_group()
-    required.add_argument('-u', '--url', required=True, metavar='url')
-    parser.add_argument('-h', '--help', action='store_true', default=False)
-    parser.add_argument(
-        '-p', '--port', default=[443], type=int, nargs='+', metavar='port')
-    parser.add_argument('-j', '--json', action='store',
-                        metavar='output_file', required=False, nargs='?', default=False)
-    parser.add_argument('-t', '--test', type=int,
-                        metavar='test_num', nargs='+')
-    parser.add_argument('-sc', '--short-cert',
-                        action='store_true', default=False)
-    parser.add_argument('-cc', '--cert-chain',
-                        action='store_true', default=False)
-    parser.add_argument('-cs', '--cipher-suites',
-                        action='store_true', default=False)
-    parser.add_argument('-ns', '--nmap-scan',
-                        action='store_true', default=False)
-    parser.add_argument(sudo_ops['nd'][0], sudo_ops['nd']
-                        [1], action='store_true', default=False)
-    parser.add_argument(sudo_ops['fc'][0], sudo_ops['fc']
-                        [1], action='store_true', default=False)
-    fix_config.add_argument(
-        sudo_ops['st'][0], sudo_ops['st'][1], action='store_true', default=False)
-    fix_config.add_argument(
-        sudo_ops['ss'][0], sudo_ops['ss'][1], action='store_true', default=False)
-    parser.add_argument('-w', '--worst', action='store_true', default=False)
-    parser.add_argument('-l', '--logging', action='store_true', default=False)
-    parser.add_argument('-d', '--debug', action='store_true', default=False)
-    parser.add_argument('-v', '--version', action='version',
-                        version=f'%(prog)s {__version__}')
+    sudo_ops = Args.get_sudo_ops()
 
     if len(sys.argv) == 1 or '-h' in sys.argv or '--help' in sys.argv:
         print_help()
         sys.exit(0)
-    args = parser.parse_args()
 
     error_string = 'option {error_option} needs ' + \
                    f'{sudo_ops["st"][2]} or {sudo_ops["ss"][2]} to be present'
@@ -248,9 +206,8 @@ def check_test_option(tests, usage):
         sys.exit(1)
 
 
-def run_script():
-    args = parse_args()
-    logging_option(args)
+def run_script(args, parser):
+    args = custom_args_parse(args, parser)
     make_root(args)
     fix_conf_option(args)
     script = Script(args)

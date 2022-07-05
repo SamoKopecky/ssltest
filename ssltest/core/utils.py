@@ -3,7 +3,7 @@ import logging
 import re
 from os import sep
 
-from ..config_setup import get_config_location
+from ..ConfigSetup import ConfigSetup
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ def read_json(file_name):
     :return: Json data in python objects
     :rtype: dict
     """
-    root_dir = get_config_location()
+    root_dir = ConfigSetup.get_config_location()
     file_path = f'{root_dir}{sep}{file_name}'
     log.debug(f'Opening {file_path}')
     file = open(file_path, 'r')
