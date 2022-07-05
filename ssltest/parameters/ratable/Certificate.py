@@ -26,7 +26,6 @@ class Certificate(Parameters):
         self.first_cert_parameters = {}
         self.other_certs_parameters = []
         self.certificates = certificates
-        self.short_cert = args.short_cert
         self.cert_chain = args.cert_chain
         self.reset_params()
         self.ratings = []

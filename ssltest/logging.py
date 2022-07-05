@@ -13,7 +13,7 @@ def logging_option(args):
     ch = logging.StreamHandler()
     if args.debug:
         ch.setLevel(logging.DEBUG)
-    elif args.logging:
+    elif args.info:
         ch.setLevel(logging.INFO)
     else:
         logging.disable(sys.maxsize)

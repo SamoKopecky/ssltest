@@ -27,7 +27,7 @@ class TextOutput:
         self.address_filler = "="
         self.category_title_filter = "-"
         self.indent_start = 0
-        self.short_cert = args.short_cert
+        self.short_names = args.short_names
 
     def __del__(self):
         print()
@@ -158,7 +158,11 @@ class TextOutput:
         """
         for key, value in list(data.items()):
             val_type = type(value)
-            if self.short_cert and val_type is list and key is "cert_alternative_names":
+            if (
+                self.short_names
+                and val_type is list
+                and key is "cert_alternative_names"
+            ):
                 data[key] = TextOutput.shorted_alternative_names(value)
                 continue
             if val_type is not dict:
