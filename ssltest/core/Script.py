@@ -90,7 +90,7 @@ def get_help():
     help_msg[3]["options"].extend(get_tests_help())
     help_msg[3]["options"].extend(
         [
-            ["-sc", "--short-cert", "", "Limit alternative names to first 5"],
+            ["-sn", "--short-names", "", "Limit alternative names to first 5"],
             [
                 "-cc",
                 "--cert-chain",
@@ -137,8 +137,8 @@ def get_help():
                 "Create a main connection on the worst available protocol version, otherwise servers "
                 "preferred protocol version is chosen",
             ],
-            ["-l", "--logging", "", "Enable logging"],
-            ["-d", "--debug", "", "Log debug information"],
+            ["-i", "--info", "", "Enable logging at info level"],
+            ["-d", "--debug", "", "Enable logging at debug level"],
             ["-v", "--version", "", "Show script version and exit"],
             ["-h", "--help", "", "Show this help message and exit"],
         ]
@@ -220,9 +220,11 @@ def make_root(args):
     reasons = [v for k, v in reasons_switch.items() if var_args[k]]
     reason_str = " and ".join(reasons)
     if args.sudo_tty:
+        log.debug("Using console for password input")
         remove_argument("-st", "--sudo-ttv")
         return_code = subprocess.run(["sudo", "-S", "-p", "", "-v"]).returncode
     elif args.sudo_stdin:
+        log.debug("Using stdin for password input")
         remove_argument("-ss", "--sudo-stdin")
         return_code = subprocess.run(
             ["sudo", "-p", f"[sudo] password for %u {reason_str}: ", "-v"]

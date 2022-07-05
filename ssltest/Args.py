@@ -28,7 +28,7 @@ class Args:
         )
         parser.add_argument("-c", "--config", action="store", metavar="config_dir")
         parser.add_argument("-t", "--test", type=int, metavar="test_num", nargs="+")
-        parser.add_argument("-sc", "--short-cert", action="store_true", default=False)
+        parser.add_argument("-sn", "--short-names", action="store_true", default=False)
         parser.add_argument("-cc", "--cert-chain", action="store_true", default=False)
         parser.add_argument(
             "-cs", "--cipher-suites", action="store_true", default=False
@@ -47,7 +47,7 @@ class Args:
             sudo_ops["ss"][0], sudo_ops["ss"][1], action="store_true", default=False
         )
         parser.add_argument("-w", "--worst", action="store_true", default=False)
-        parser.add_argument("-l", "--logging", action="store_true", default=False)
+        parser.add_argument("-i", "--info", action="store_true", default=False)
         parser.add_argument("-d", "--debug", action="store_true", default=False)
         parser.add_argument(
             "-v", "--version", action="version", version=f"%(prog)s {__version__}"
