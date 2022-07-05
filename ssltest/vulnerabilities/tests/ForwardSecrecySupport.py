@@ -7,13 +7,13 @@ from ...sockets.SafeSocket import SafeSocket
 
 
 class ForwardSecrecySupport(VulnerabilityTest):
-    name = 'No Forward Secrecy Support'
-    short_name = 'Foward Secrecy'
-    description = 'Test for forward secrecy cipher suites'
+    name = "No Forward Secrecy Support"
+    short_name = "Foward Secrecy"
+    description = "Test for forward secrecy cipher suites"
 
     def __init__(self, supported_protocols, address, protocol):
         super().__init__(supported_protocols, address, protocol)
-        self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
+        self.valid_protocols = ["TLSv1.2", "TLSv1.1", "TLSv1.0", "SSLv3"]
         self.scan_once = False
 
     def test(self, version):
@@ -26,9 +26,11 @@ class ForwardSecrecySupport(VulnerabilityTest):
         """
         cipher_suite_bytes = ClientHello.get_cipher_suites_for_version(version)
         sixty_four_bit_ciphers = filter_cipher_suite_bytes(
-            cipher_suite_bytes, 'ECDHE|DHE')
-        client_hello = ClientHello(version, sixty_four_bit_ciphers, False) \
-            .pack_client_hello()
+            cipher_suite_bytes, "ECDHE|DHE"
+        )
+        client_hello = ClientHello(
+            version, sixty_four_bit_ciphers, False
+        ).pack_client_hello()
         with SafeSocket(self.address, self.usage) as sock:
             sock.send(client_hello)
             response = sock.receive()

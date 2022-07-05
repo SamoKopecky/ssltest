@@ -16,7 +16,7 @@ def run(args):
 
     :param Namespace args: Parsed input arguments
     """
-    if '/' in args.url:
+    if "/" in args.url:
         args.url = fix_url(args.url)
     nmap_discover_option(args)
     json_data = scan_all_ports(args)
@@ -32,14 +32,14 @@ def fix_url(url):
     :return: Fixed hostname address
     :rtype: str
     """
-    log.warning('Url in incorrect format, correcting url')
-    if url[:4] == 'http':
+    log.warning("Url in incorrect format, correcting url")
+    if url[:4] == "http":
         # Removes http(s):// and anything after TLD (*.com)
-        url = re.search('[/]{2}([^/]+)', url).group(1)
+        url = re.search("[/]{2}([^/]+)", url).group(1)
     else:
         # Removes anything after TLD (*.com)
-        url = re.search('^([^/]+)', url).group(0)
-    log.info(f'Corrected url: {url}')
+        url = re.search("^([^/]+)", url).group(0)
+    log.info(f"Corrected url: {url}")
     return url
 
 
@@ -56,15 +56,14 @@ def nmap_discover_option(args):
         except Exception as ex:
             tb = traceback.format_exc()
             log.debug(tb)
-            print(f'Unexpected exception occurred: {ex}', file=sys.stderr)
-        scanned_ports = list(
-            filter(lambda p: p not in args.port, scanned_ports))
+            print(f"Unexpected exception occurred: {ex}", file=sys.stderr)
+        scanned_ports = list(filter(lambda p: p not in args.port, scanned_ports))
         # Hacky way to check if default value was used with -p option
         if 443 in args.port and any(scanned_ports):
             args.port = scanned_ports
         else:
             args.port.extend(scanned_ports)
-        log.info(f'Ports to scan: {args.port}')
+        log.info(f"Ports to scan: {args.port}")
 
 
 def scan_all_ports(args):
@@ -86,7 +85,7 @@ def scan_all_ports(args):
         except Exception as ex:
             tb = traceback.format_exc()
             log.debug(tb)
-            print(f'\n\nUnexpected exception occurred: {ex}', file=sys.stderr)
+            print(f"\n\nUnexpected exception occurred: {ex}", file=sys.stderr)
     return output_data
 
 
@@ -101,7 +100,7 @@ def json_option(args, json_data):
     if args.json is None:
         print(json_output_data)
     elif bool(args.json):
-        file = open(args.json, 'w')
+        file = open(args.json, "w")
         file.write(json_output_data)
         file.close()
-        log.info(f'Output writen to {args.json}')
+        log.info(f"Output writen to {args.json}")

@@ -6,17 +6,19 @@ from ...sockets.SafeSocket import SafeSocket
 
 
 class InsecureRenegotiation(VulnerabilityTest):
-    name = 'Insecure Renegotiation'
-    short_name = 'Renegotiation'
-    description = 'Test for insecure renegotiation (secure renegotiation extension)'
+    name = "Insecure Renegotiation"
+    short_name = "Renegotiation"
+    description = "Test for insecure renegotiation (secure renegotiation extension)"
 
     def __init__(self, supported_protocols, address, protocol):
         super().__init__(supported_protocols, address, protocol)
-        self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
+        self.valid_protocols = ["TLSv1.2", "TLSv1.1", "TLSv1.0", "SSLv3"]
+        # fmt: off
         self.renegotiation_extension = bytes([
             # Secure renegotiation extension
             0xff, 0x01, 0x00, 0x01, 0x00
         ])
+        # fmt: on
 
     def test(self, version):
         """

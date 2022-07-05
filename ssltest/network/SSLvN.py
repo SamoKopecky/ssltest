@@ -19,15 +19,15 @@ class SSLvN(ABC):
         :param SocketAddress address: Webserver address
         """
         self.address = address
-        self.protocol = ''
-        self.data = b''
+        self.protocol = ""
+        self.data = b""
         self.client_hello = bytes([])
 
     def connect(self):
         """
         Send the initial client hello, return the response
         """
-        with SafeSocket(self.address, 'sslvn_scan') as sock:
+        with SafeSocket(self.address, "sslvn_scan") as sock:
             sock.send(self.client_hello)
             return sock.receive()
 
@@ -38,8 +38,9 @@ class SSLvN(ABC):
         OpenSSL lib is used to verify the certificate or the certificate chain
         """
         store = crypto.X509Store()
-        ssl_certificates = [crypto.X509.from_cryptography(cert)
-                            for cert in self.certificates]
+        ssl_certificates = [
+            crypto.X509.from_cryptography(cert) for cert in self.certificates
+        ]
         # Just one certificate present in the response
         endpoint_certificate = ssl_certificates[0]
         # A certificate chain is present in the response
@@ -93,17 +94,17 @@ class SSLvN(ABC):
         :rtype: list
         """
         certs = []
-        store_download_url = \
-            'https://ccadb-public.secure.force.com/mozilla/IncludedRootsPEMCSV?TrustBitsInclude=Websites'
-        log.info(f'Downloading certificate store from {store_download_url}')
+        store_download_url = "https://ccadb-public.secure.force.com/mozilla/IncludedRootsPEMCSV?TrustBitsInclude=Websites"
+        log.info(f"Downloading certificate store from {store_download_url}")
         store_data = requests.get(url=store_download_url).content.decode()
         store_csv = csv.reader(store_data, delimiter='"')
         store_csv.__iter__().__next__()
         for row in store_csv:
             if len(row) == 0:
                 continue
-            certificate_data = row[0].replace('\'', '')
+            certificate_data = row[0].replace("'", "")
             ssl_certificate = crypto.load_certificate(
-                crypto.FILETYPE_PEM, certificate_data.encode())
+                crypto.FILETYPE_PEM, certificate_data.encode()
+            )
             certs.append(ssl_certificate)
         return certs

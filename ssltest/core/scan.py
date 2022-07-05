@@ -24,7 +24,7 @@ def handle_scan_output(args, port, only_json):
     :return:
     """
     address = SocketAddress(args.url, port)
-    address_str = f'{address.url}:{address.port}'
+    address_str = f"{address.url}:{address.port}"
     json_data = {address_str: {}}
     handlers = []
     text_output = None
@@ -50,12 +50,12 @@ def scan(args, address):
     :rtype: dict
     """
 
-    log.info(f'Scanning for {address.url}:{address.port}')
+    log.info(f"Scanning for {address.url}:{address.port}")
 
     protocol_support = ProtocolSupport(address)
     protocol_support.scan_protocols()
     protocol_support.rate_protocols()
-    yield {'protocol_support': protocol_support.get_json()}
+    yield {"protocol_support": protocol_support.get_json()}
 
     endpoint = Endpoint(address, protocol_support.supported, args)
     endpoint.scan_endpoint()
@@ -65,30 +65,28 @@ def scan(args, address):
     cipher_suite.parse_protocol_version()
     cipher_suite.rate_cipher_suite()
 
-    certificate = Certificate(endpoint.certificates,
-                              endpoint.cert_verified, args)
+    certificate = Certificate(endpoint.certificates, endpoint.cert_verified, args)
     certificate.parse_certificates()
     certificate.rate_certificates()
 
-    yield {'parameters': Parameters.get_params_json(cipher_suite, certificate)}
-    yield {'certificate_info': certificate.get_json()}
+    yield {"parameters": Parameters.get_params_json(cipher_suite, certificate)}
+    yield {"certificate_info": certificate.get_json()}
 
     web_server_soft = WebServerSoft(address, args.nmap_scan)
     web_server_soft.scan_server_software()
-    yield {'web_server_software': web_server_soft.software}
+    yield {"web_server_software": web_server_soft.software}
 
-    test_runner = TestRunner(
-        address, endpoint.protocol, protocol_support.supported)
-    yield {'vulnerabilities': test_runner.run_tests(test_option(args))}
+    test_runner = TestRunner(address, endpoint.protocol, protocol_support.supported)
+    yield {"vulnerabilities": test_runner.run_tests(test_option(args))}
 
     cipher_suites = CipherSuites(address, protocol_support.supported)
     option_result = cipher_suites_option(args, endpoint.protocol)
     if option_result[0]:
         cipher_suites.scan_cipher_suites(option_result[1])
         cipher_suites.rate_cipher_suites()
-    yield {'cipher_suites': cipher_suites.supported}
+    yield {"cipher_suites": cipher_suites.supported}
 
-    log.info(f'Scanning done for {address.url}:{address.port}')
+    log.info(f"Scanning done for {address.url}:{address.port}")
 
 
 def test_option(args):
@@ -121,7 +119,7 @@ def cipher_suites_option(args, protocol):
     :rtype: list
     """
     return_val = [False, False]
-    if protocol == 'SSLv2' and not args.cipher_suites:
+    if protocol == "SSLv2" and not args.cipher_suites:
         return_val[1] = True
     elif args.cipher_suites:
         return_val[0] = True

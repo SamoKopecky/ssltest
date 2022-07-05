@@ -37,10 +37,16 @@ class Certificate(Parameters):
         """
         # Parameters that can be rated (Signature algorithm, ...)
         self.parameters = {
-            p_type: {} for p_type in PType if p_type.is_certificate and p_type.is_ratable}
+            p_type: {}
+            for p_type in PType
+            if p_type.is_certificate and p_type.is_ratable
+        }
         # Parameters that can't be rated (Subject, Issuer, ...)
         self.non_parameters = {
-            p_type: [] for p_type in PType if p_type.is_certificate and not p_type.is_ratable}
+            p_type: []
+            for p_type in PType
+            if p_type.is_certificate and not p_type.is_ratable
+        }
 
     def parse_certificates(self):
         """
@@ -48,8 +54,7 @@ class Certificate(Parameters):
         """
         for i, certificate in enumerate(self.certificates):
             self.parse_certificate(certificate)
-            self.all_non_parameters.update(
-                {f'certificate_{i}': self.non_parameters})
+            self.all_non_parameters.update({f"certificate_{i}": self.non_parameters})
             if i == 0:
                 self.first_cert_parameters = self.parameters
             else:
@@ -60,38 +65,39 @@ class Certificate(Parameters):
         """
         Parse information from a certificate and into a dictionary
         """
-        log.info('Parsing certificate')
+        log.info("Parsing certificate")
         # Public key algorithm
         self.parameters[PType.cert_pub_key_algorithm][
-            self.pub_key_alg_from_cert(certificate.public_key())] = 0
+            self.pub_key_alg_from_cert(certificate.public_key())
+        ] = 0
         # Public key length
         self.parameters[PType.cert_pub_key_length][
-            str(certificate.public_key().key_size)] = 0
+            str(certificate.public_key().key_size)
+        ] = 0
         # Certificate hash function
-        hash_function = str(
-            certificate.signature_hash_algorithm.name).upper()
+        hash_function = str(certificate.signature_hash_algorithm.name).upper()
         self.parameters[PType.cert_sign_algorithm_hash_function][hash_function] = 0
         # Signature algorithm
-        sign_algorithm = self.get_sig_alg_from_oid(
-            certificate.signature_algorithm_oid)
+        sign_algorithm = self.get_sig_alg_from_oid(certificate.signature_algorithm_oid)
         self.parameters[PType.cert_sign_algorithm][sign_algorithm] = 0
         # Certificate verified
         self.parameters[PType.cert_verified][str(self.verified)] = 0
         # Other non-ratable parameters
-        self.non_parameters[PType.cert_version] \
-            .append(str(certificate.version.value))
-        self.non_parameters[PType.cert_serial_number] \
-            .append(str(certificate.serial_number))
-        self.non_parameters[PType.cert_not_valid_before] \
-            .append(str(certificate.not_valid_before.date()))
-        self.non_parameters[PType.cert_not_valid_after]. \
-            append(str(certificate.not_valid_after.date()))
-        self.non_parameters[PType.cert_alternative_names] = \
-            self.parse_alternative_names(certificate)
-        self.non_parameters[PType.cert_subject] = \
-            self.parse_name(certificate.subject)
-        self.non_parameters[PType.cert_issuer] = \
-            self.parse_name(certificate.issuer)
+        self.non_parameters[PType.cert_version].append(str(certificate.version.value))
+        self.non_parameters[PType.cert_serial_number].append(
+            str(certificate.serial_number)
+        )
+        self.non_parameters[PType.cert_not_valid_before].append(
+            str(certificate.not_valid_before.date())
+        )
+        self.non_parameters[PType.cert_not_valid_after].append(
+            str(certificate.not_valid_after.date())
+        )
+        self.non_parameters[
+            PType.cert_alternative_names
+        ] = self.parse_alternative_names(certificate)
+        self.non_parameters[PType.cert_subject] = self.parse_name(certificate.subject)
+        self.non_parameters[PType.cert_issuer] = self.parse_name(certificate.issuer)
 
     def rate_certificate(self, parameters):
         """
@@ -112,8 +118,7 @@ class Certificate(Parameters):
         """
         Rate the whole certificate chain
         """
-        self.first_cert_parameters = self.rate_certificate(
-            self.first_cert_parameters)
+        self.first_cert_parameters = self.rate_certificate(self.first_cert_parameters)
         for i, value in enumerate(self.other_certs_parameters):
             self.other_certs_parameters[i] = self.rate_certificate(value)
         self.rating = max(self.ratings)
@@ -126,11 +131,15 @@ class Certificate(Parameters):
         :rtype: dict
         """
 
-        def to_json(items): return {key.name: value for key, value in items}
+        def to_json(items):
+            return {key.name: value for key, value in items}
 
         if not self.cert_chain:
-            return to_json(self.all_non_parameters.pop('certificate_0').items())
-        return {key: to_json(value.items()) for key, value in self.all_non_parameters.items()}
+            return to_json(self.all_non_parameters.pop("certificate_0").items())
+        return {
+            key: to_json(value.items())
+            for key, value in self.all_non_parameters.items()
+        }
 
     @staticmethod
     def parse_alternative_names(certificate):
@@ -141,17 +150,17 @@ class Certificate(Parameters):
         :return: Alternative names
         :rtype: list
         """
-        log.info('Parsing alternative names from certificate')
+        log.info("Parsing alternative names from certificate")
         try:
             extension = certificate.extensions.get_extension_for_class(
-                x509.SubjectAlternativeName)
+                x509.SubjectAlternativeName
+            )
         except x509.extensions.ExtensionNotFound:
-            log.error('No alternative names extension found in certificate')
+            log.error("No alternative names extension found in certificate")
             return []
-        alternative_names: list = extension.value.get_values_for_type(
-            x509.DNSName)
+        alternative_names: list = extension.value.get_values_for_type(x509.DNSName)
         if len(alternative_names) == 0:
-            log.debug('No alternative names found')
+            log.debug("No alternative names found")
         return alternative_names
 
     @staticmethod
@@ -163,10 +172,10 @@ class Certificate(Parameters):
         :return: Parsed subject or issuer
         :rtype: list
         """
-        log.info('Parsing subject/issuer')
+        log.info("Parsing subject/issuer")
         name_info = []
         for attribute in name:
-            name_info.append(f'{attribute.oid._name}: {attribute.value}')
+            name_info.append(f"{attribute.oid._name}: {attribute.value}")
         return name_info
 
     @staticmethod
@@ -179,16 +188,18 @@ class Certificate(Parameters):
         :rtype: str
         """
         if isinstance(public_key, ec.EllipticCurvePublicKey):
-            return 'EC'
+            return "EC"
         elif isinstance(public_key, rsa.RSAPublicKey):
-            return 'RSA'
+            return "RSA"
         elif isinstance(public_key, dsa.DSAPublicKey):
-            return 'DSA'
-        elif isinstance(public_key, ed25519.Ed25519PublicKey) or isinstance(public_key, ed448.Ed448PublicKey):
-            return 'ECDSA'
+            return "DSA"
+        elif isinstance(public_key, ed25519.Ed25519PublicKey) or isinstance(
+            public_key, ed448.Ed448PublicKey
+        ):
+            return "ECDSA"
         else:
-            log.error('Unknown type for certificate public key ')
-            return 'N/A'
+            log.error("Unknown type for certificate public key ")
+            return "N/A"
 
     @staticmethod
     def get_sig_alg_from_oid(oid):
@@ -201,4 +212,4 @@ class Certificate(Parameters):
         """
         values = list(x509.SignatureAlgorithmOID.__dict__.values())
         keys = list(x509.SignatureAlgorithmOID.__dict__.keys())
-        return keys[values.index(oid)].split('_')[0]
+        return keys[values.index(oid)].split("_")[0]

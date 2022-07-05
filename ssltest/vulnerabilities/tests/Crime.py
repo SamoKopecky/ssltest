@@ -6,12 +6,12 @@ from ...sockets.SafeSocket import SafeSocket
 
 
 class Crime(VulnerabilityTest):
-    name = short_name = 'CRIME'
-    description = 'Test for ssl/tls encoding methods'
+    name = short_name = "CRIME"
+    description = "Test for ssl/tls encoding methods"
 
     def __init__(self, supported_protocols, address, protocol):
         super().__init__(supported_protocols, address, protocol)
-        self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
+        self.valid_protocols = ["TLSv1.2", "TLSv1.1", "TLSv1.0", "SSLv3"]
 
     def test(self, version):
         """
@@ -23,10 +23,12 @@ class Crime(VulnerabilityTest):
         """
         with SafeSocket(self.address, self.usage) as sock:
             client_hello = ClientHello(version)
-            client_hello.compression = bytearray([
-                0x01,  # Compression method length
-                0x01  # Compression method (deflate)
-            ])
+            client_hello.compression = bytearray(
+                [
+                    0x01,  # Compression method length
+                    0x01,  # Compression method (deflate)
+                ]
+            )
             sock.send(client_hello.pack_client_hello())
             response = sock.receive()
         if not ClientHello.is_server_hello(response):

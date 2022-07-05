@@ -6,13 +6,13 @@ from ...sockets.SafeSocket import SafeSocket
 
 
 class Heartbleed(VulnerabilityTest):
-    name = short_name = 'Heartbleed'
-    description = 'Test for Heartbleed vulnerability'
+    name = short_name = "Heartbleed"
+    description = "Test for Heartbleed vulnerability"
 
     def __init__(self, supported_protocols, address, protocol):
         super().__init__(supported_protocols, address, protocol)
-        self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
-        self.heartbeat_extension = bytearray([0x00, 0x0f, 0x00, 0x01, 0x01])
+        self.valid_protocols = ["TLSv1.2", "TLSv1.1", "TLSv1.0", "SSLv3"]
+        self.heartbeat_extension = bytearray([0x00, 0x0F, 0x00, 0x01, 0x01])
 
     def test(self, version):
         """
@@ -22,7 +22,7 @@ class Heartbleed(VulnerabilityTest):
         :return: Whether the server is vulnerable
         :rtype: bool
         """
-
+        # fmt: off
         heartbeat_request = bytes([
             # Record protocol
             0x18,  # Content type (Handshake)
@@ -32,7 +32,7 @@ class Heartbleed(VulnerabilityTest):
             0x01,  # Type (Request)
             0x40, 0x00,  # Payload length
         ])
-
+        # fmt: on
         client_hello = ClientHello(version)
         client_hello.extensions += self.heartbeat_extension
         client_hello = client_hello.pack_client_hello()
