@@ -17,7 +17,6 @@ def logging_option(args):
         ch.setLevel(logging.INFO)
     else:
         logging.disable(sys.maxsize)
-    formatter = logging.Formatter(
-        '%(asctime)s [%(levelname)s] %(name)s: %(message)s')
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
     ch.setFormatter(formatter)
     logger.addHandler(ch)

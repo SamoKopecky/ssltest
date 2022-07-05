@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 
 def printn(string):
-    print(string, end='', flush=True)
+    print(string, end="", flush=True)
 
 
 class TextOutput:
@@ -21,11 +21,11 @@ class TextOutput:
         :param SocketAddress address: Webserver address
         """
         self.address = address
-        self.english = read_json('english_strings.json')
+        self.english = read_json("english_strings.json")
         self.data = None
-        self.category_title = ''
-        self.address_filler = '='
-        self.category_title_filter = '-'
+        self.category_title = ""
+        self.address_filler = "="
+        self.category_title_filter = "-"
         self.indent_start = 0
         self.short_cert = args.short_cert
 
@@ -40,7 +40,8 @@ class TextOutput:
         Print the address of a scan
         """
         self.print_title(
-            2, f'Scan for {self.address.url}:{self.address.port}', self.address_filler)
+            2, f"Scan for {self.address.url}:{self.address.port}", self.address_filler
+        )
 
     def print_category(self, data):
         """
@@ -48,14 +49,14 @@ class TextOutput:
 
         :param dict data: Category data
         """
-        log.info('Printing output')
+        log.info("Printing output")
         self.data = data
         self.filter_data(self.data)
         if not self.data:
-            log.warning('No values found not printing output')
+            log.warning("No values found not printing output")
             return
         self.print_category_title()
-        if self.category_title == 'parameters':
+        if self.category_title == "parameters":
             self.print_parameters(self.data, self.indent_start)
             return
         self.recursive_print(self.data, self.indent_start)
@@ -69,8 +70,9 @@ class TextOutput:
         self.data = self.data[title]
 
         print()
-        self.print_title((self.indent_start + 1) * 4,
-                         self.english[title], self.category_title_filter)
+        self.print_title(
+            (self.indent_start + 1) * 4, self.english[title], self.category_title_filter
+        )
 
     def recursive_print(self, data, indent):
         """
@@ -83,19 +85,19 @@ class TextOutput:
         if type(data) == dict:
             for key, value in data.items():
                 key = self.smart_map(key)
-                printn('\n' + '\t' * indent + key)
+                printn("\n" + "\t" * indent + key)
                 self.recursive_print(value, indent)
         elif type(data) == list:
             if len(data) == 1:
-                printn(f': {data[0]}')
+                printn(f": {data[0]}")
                 return
             for value in data:
-                printn('\n' + '\t' * indent + value)
+                printn("\n" + "\t" * indent + value)
         elif type(data) == tuple:
-            row = ' '.join(map(self.get_color_for_value, data))
-            printn(': ' + row)
+            row = " ".join(map(self.get_color_for_value, data))
+            printn(": " + row)
         else:
-            printn(f': {self.get_color_for_value(data)}')
+            printn(f": {self.get_color_for_value(data)}")
 
     def print_parameters(self, data, indent):
         """
@@ -108,12 +110,13 @@ class TextOutput:
         indent += 1
         for key, value in data.items():
             key = self.smart_map(key)
-            printn('\n' + '\t' * indent + f'{key}: ')
+            printn("\n" + "\t" * indent + f"{key}: ")
             if type(value) != dict:
                 printn(self.get_color_for_value(value))
                 continue
             printn(
-                f'{self.get_color_for_value(next(iter(value.values())))} -- {next(iter(value.keys()))}')
+                f"{self.get_color_for_value(next(iter(value.values())))} -- {next(iter(value.keys()))}"
+            )
 
     def smart_map(self, key: str):
         """
@@ -123,8 +126,8 @@ class TextOutput:
         """
         if key in self.english.keys():
             return self.english[key]
-        elif re.search('.*_\d$', key):
-            return f'{self.english[key[:-2]]} #{int(key[-1]) + 1}'
+        elif re.search(".*_\d$", key):
+            return f"{self.english[key[:-2]]} #{int(key[-1]) + 1}"
         return key
 
     @staticmethod
@@ -140,10 +143,10 @@ class TextOutput:
         :param str title_string: Title to be printed
         :param str padding_char: Padding character
         """
-        title = f'{padding_char * prefix_len} {title_string} '
+        title = f"{padding_char * prefix_len} {title_string} "
         try:
             width = terminal_width() - len(title)
-            printn(get_colored_text(title + padding_char * width, 'TITLE'))
+            printn(get_colored_text(title + padding_char * width, "TITLE"))
         except OSError:
             print(title)
 
@@ -155,7 +158,7 @@ class TextOutput:
         """
         for key, value in list(data.items()):
             val_type = type(value)
-            if self.short_cert and val_type is list and key is 'cert_alternative_names':
+            if self.short_cert and val_type is list and key is "cert_alternative_names":
                 data[key] = TextOutput.shorted_alternative_names(value)
                 continue
             if val_type is not dict:
@@ -165,7 +168,7 @@ class TextOutput:
                 continue
             # index 0 cause of parameters dict
             keys_list = list(value.keys())
-            if len(keys_list) > 0 and keys_list[0] == 'N/A':
+            if len(keys_list) > 0 and keys_list[0] == "N/A":
                 del data[key]
                 continue
             self.filter_data(value)
@@ -175,7 +178,7 @@ class TextOutput:
         max_names = 5
         if len(data) < max_names:
             return data
-        return data[:max_names] + ['...']
+        return data[:max_names] + ["..."]
 
     @staticmethod
     def get_color_for_value(text):
@@ -186,16 +189,8 @@ class TextOutput:
         :return: Colored string
         :rtype: str
         """
-        bool_switcher = {
-            True: 'ERROR',
-            False: 'OK'
-        }
-        int_switcher = {
-            1: 'OK',
-            2: 'TITLE',
-            3: 'ERROR',
-            4: 'ERROR'
-        }
+        bool_switcher = {True: "ERROR", False: "OK"}
+        int_switcher = {1: "OK", 2: "TITLE", 3: "ERROR", 4: "ERROR"}
         if type(text) == bool:
             return get_colored_text(text, bool_switcher[text])
         elif text.isdigit():

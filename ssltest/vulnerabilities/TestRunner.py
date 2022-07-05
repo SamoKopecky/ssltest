@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 
 class TestRunner:
-    test_module = importlib.import_module('.tests', __package__)
+    test_module = importlib.import_module(".tests", __package__)
 
     def __init__(self, address, protocol, supported_protocols):
         """
@@ -38,11 +38,12 @@ class TestRunner:
         # Dictionary that all the threads live in where the key
         # is the thread (future) and value is the function name
         futures = {}
-        log.info(f'Creating {classes_len} threads for vulnerability tests')
+        log.info(f"Creating {classes_len} threads for vulnerability tests")
         with cf.ThreadPoolExecutor(max_workers=classes_len) as executor:
             for test_class in tests:
                 scan_class = test_class(
-                    self.supported_protocols, self.address, self.protocol)
+                    self.supported_protocols, self.address, self.protocol
+                )
                 execution = executor.submit(scan_class.scan)
                 futures.update({execution: test_class.name})
             for execution in cf.as_completed(futures):
@@ -60,15 +61,12 @@ class TestRunner:
         :return: All available tests
         :rtype: dict
         """
-        tests = {
-            0: None
-        }
+        tests = {0: None}
         idx = 1
         for name, obj in inspect.getmembers(TestRunner.test_module, inspect.ismodule):
-            if not inspect.getdoc(obj).startswith('Vulnerability test for'):
+            if not inspect.getdoc(obj).startswith("Vulnerability test for"):
                 continue
-            test_class = next(
-                m[1] for m in inspect.getmembers(obj) if m[0] == name)
+            test_class = next(m[1] for m in inspect.getmembers(obj) if m[0] == name)
             tests.update({idx: test_class})
             idx += 1
         return tests

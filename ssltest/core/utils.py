@@ -17,19 +17,20 @@ def read_json(file_name):
     :rtype: dict
     """
     root_dir = ConfigSetup.get_config_location()
-    file_path = f'{root_dir}{sep}{file_name}'
-    log.debug(f'Opening {file_path}')
-    file = open(file_path, 'r')
+    file_path = f"{root_dir}{sep}{file_name}"
+    log.debug(f"Opening {file_path}")
+    file = open(file_path, "r")
     json_data = json.loads(file.read())
     file.close()
     return json_data
 
 
-cipher_suites_json = read_json('cipher_suites.json')
+cipher_suites_json = read_json("cipher_suites.json")
 
 
 # cipher_suites.json file was created using
 # https://github.com/april/tls-table
+
 
 def convert_cipher_suite(cipher_suite, from_cipher_suite, to_cipher_suite):
     """
@@ -44,7 +45,7 @@ def convert_cipher_suite(cipher_suite, from_cipher_suite, to_cipher_suite):
     for cipher in cipher_suites_json.values():
         if cipher[from_cipher_suite] == cipher_suite:
             return cipher[to_cipher_suite]
-    raise Exception(f'No pair found for {cipher_suite}')
+    raise Exception(f"No pair found for {cipher_suite}")
 
 
 def bytes_to_cipher_suite(bytes_object, string_format):
@@ -57,12 +58,12 @@ def bytes_to_cipher_suite(bytes_object, string_format):
     :rtype: str
     """
     if len(bytes_object) != 2:
-        raise Exception(f'Can only convert from 2 bytes')
+        raise Exception(f"Can only convert from 2 bytes")
     bytes_string = cs_bytes_to_str(bytes_object)
     for key, value in cipher_suites_json.items():
         if key == bytes_string:
             return value[string_format]
-    raise Exception(f'No cipher suite found for {bytes_string}')
+    raise Exception(f"No cipher suite found for {bytes_string}")
 
 
 def cipher_suite_to_bytes(cipher_suite, string_format):
@@ -76,9 +77,9 @@ def cipher_suite_to_bytes(cipher_suite, string_format):
     """
     for key, value in cipher_suites_json.items():
         if value[string_format] == cipher_suite:
-            bytes_list = key.split(',')
+            bytes_list = key.split(",")
             return bytes([int(bytes_list[0], 16), int(bytes_list[1], 16)])
-    raise Exception(f'No bytes found for {cipher_suite}')
+    raise Exception(f"No bytes found for {cipher_suite}")
 
 
 def get_cipher_suite_protocols(cipher_suite):
@@ -90,10 +91,10 @@ def get_cipher_suite_protocols(cipher_suite):
     :rtype: list
     """
     if type(cipher_suite) == str:
-        cipher_suite_to_bytes(cipher_suite, 'IANA')
+        cipher_suite_to_bytes(cipher_suite, "IANA")
     for key, value in cipher_suites_json.items():
         if key == cs_bytes_to_str(cipher_suite):
-            return value['protocol_version'].split(',')
+            return value["protocol_version"].split(",")
 
 
 def cs_bytes_to_str(bytes_object):
@@ -106,7 +107,7 @@ def cs_bytes_to_str(bytes_object):
     :return: Converted string representation
     :rtype: str
     """
-    return f'0x{bytes_object[0]:02X},0x{bytes_object[1]:02X}'
+    return f"0x{bytes_object[0]:02X},0x{bytes_object[1]:02X}"
 
 
 def filter_cipher_suite_bytes(cipher_suites, filter_regex):
@@ -120,8 +121,8 @@ def filter_cipher_suite_bytes(cipher_suites, filter_regex):
     """
     filtered_suites = bytearray([])
     for i in range(0, len(cipher_suites), 2):
-        cipher_suite_bytes = cipher_suites[i: i + 2]
-        cipher_suite = bytes_to_cipher_suite(cipher_suite_bytes, 'IANA')
+        cipher_suite_bytes = cipher_suites[i : i + 2]
+        cipher_suite = bytes_to_cipher_suite(cipher_suite_bytes, "IANA")
         regex_find = re.findall(filter_regex, cipher_suite)
         if len(regex_find) != 0:
             filtered_suites += cipher_suite_bytes
@@ -138,7 +139,7 @@ def parse_cipher_suite(data):
     """
     sess_id_len_idx = 43  # Always fixed index
     cipher_suite_idx = data[sess_id_len_idx] + sess_id_len_idx + 1
-    cipher_suites_bytes = data[cipher_suite_idx: cipher_suite_idx + 2]
+    cipher_suites_bytes = data[cipher_suite_idx : cipher_suite_idx + 2]
     return bytearray(cipher_suites_bytes)
 
 
@@ -151,11 +152,11 @@ def protocol_version_conversion(version):
     :rtype: str or int
     """
     protocol_version = {
-        'TLSv1.3': 0x04,
-        'TLSv1.2': 0x03,
-        'TLSv1.1': 0x02,
-        'TLSv1.0': 0x01,
-        'SSLv3': 0x00
+        "TLSv1.3": 0x04,
+        "TLSv1.2": 0x03,
+        "TLSv1.1": 0x02,
+        "TLSv1.0": 0x01,
+        "SSLv3": 0x00,
     }
     protocol_type = type(version)
     if protocol_type is str:

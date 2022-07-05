@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 
 class ClientHello:
-    json_ciphers = read_json('cipher_suites.json')
+    json_ciphers = read_json("cipher_suites.json")
 
     def __init__(self, protocol, cipher_suites=None, fill_cipher_suites=True):
         """
@@ -20,6 +20,7 @@ class ClientHello:
         """
         self.protocol = protocol
         self.str_protocol = protocol_version_conversion(protocol)
+        # fmt: off
         self.record_protocol = bytearray([
             0x16,  # Content type (Handshake)
             0x03, self.protocol,  # Version
@@ -38,10 +39,6 @@ class ClientHello:
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00,  # Session id length
         ])
-        # Fill random bytes
-        self.handshake_protocol[2:34] = secrets.token_bytes(32)
-        self.cipher_suites = self.pack_cipher_suite_bytes(
-            cipher_suites, fill_cipher_suites)
         self.compression = bytearray([
             0x01,  # Compression method length
             0x00  # Compression method
@@ -67,13 +64,20 @@ class ClientHello:
             0x03, 0x01, 0x02, 0x01, 0x03, 0x02, 0x02, 0x02,
             0x04, 0x02, 0x05, 0x02, 0x06, 0x02
         ])
-        if self.str_protocol == 'TLSv1.3':
+        # fmt: on
+        # Fill random bytes
+        self.handshake_protocol[2:34] = secrets.token_bytes(32)
+        self.cipher_suites = self.pack_cipher_suite_bytes(
+            cipher_suites, fill_cipher_suites
+        )
+        if self.str_protocol == "TLSv1.3":
             # It is specified in RFC8446 that TLSv1.3 uses TLSv1.2 protocol version
             # number in the client hello, TLSv1.3 is specified by the supported versions
             # extension
-            tls_v12_number = protocol_version_conversion('TLSv1.2')
+            tls_v12_number = protocol_version_conversion("TLSv1.2")
             self.record_protocol[2] = tls_v12_number
             self.handshake_protocol[1] = tls_v12_number
+            # fmt: off
             self.extensions += bytearray([
                 # Supported versions extension
                 0x00, 0x2b,  # Supported versions extension
@@ -85,6 +89,7 @@ class ClientHello:
                 0x00, 0x02,  # Length
                 0x00, 0x00,  # Key share length
             ])
+            # fmt: on
 
     def pack_client_hello(self):
         """
@@ -93,18 +98,18 @@ class ClientHello:
         :return: Client hello bytes
         :rtype: bytearray
         """
-        log.debug('Constructing client hello')
+        log.debug("Constructing client hello")
         # Body of the client hello
-        extensions_length = pack('>H', len(self.extensions))
+        extensions_length = pack(">H", len(self.extensions))
         client_hello = self.handshake_protocol + self.cipher_suites + self.compression
         client_hello += extensions_length + self.extensions
 
         # Handshake protocol header
-        length = pack('>I', len(client_hello))[1:]
+        length = pack(">I", len(client_hello))[1:]
         client_hello = self.handshake_protocol_header + length + client_hello
 
         # Record protocol
-        length = pack('>H', len(client_hello))
+        length = pack(">H", len(client_hello))
         client_hello = self.record_protocol + length + client_hello
         return client_hello
 
@@ -119,13 +124,12 @@ class ClientHello:
         """
         cipher_suites = bytearray()
         if custom_cipher_suites is not None:
-            log.debug('Adding custom cipher suites')
+            log.debug("Adding custom cipher suites")
             cipher_suites += custom_cipher_suites
         if fill_cipher_suites:
-            log.debug('Adding usual protocol cipher suites')
-            cipher_suites += self.get_cipher_suites_for_version(
-                self.str_protocol)
-        return pack('>H', len(cipher_suites)) + cipher_suites
+            log.debug("Adding usual protocol cipher suites")
+            cipher_suites += self.get_cipher_suites_for_version(self.str_protocol)
+        return pack(">H", len(cipher_suites)) + cipher_suites
 
     @classmethod
     def get_cipher_suites_for_version(cls, version):
@@ -138,14 +142,13 @@ class ClientHello:
         """
         if type(version) == int:
             version = protocol_version_conversion(version)
-        if version == 'TLSv1.1':
-            version = 'TLSv1.0'
+        if version == "TLSv1.1":
+            version = "TLSv1.0"
         ciphers = bytearray([])
         for key, value in cls.json_ciphers.items():
-            if version in value['protocol_version']:
-                cs_bytes = key.split(',')
-                ciphers += bytearray([int(cs_bytes[0], 16),
-                                      int(cs_bytes[1], 16)])
+            if version in value["protocol_version"]:
+                cs_bytes = key.split(",")
+                ciphers += bytearray([int(cs_bytes[0], 16), int(cs_bytes[1], 16)])
         return ciphers
 
     @staticmethod

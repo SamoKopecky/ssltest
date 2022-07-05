@@ -12,6 +12,8 @@
 A Python script that scans web servers cryptographic parameters and vulnerabilities. All available Vulnerability tests
 can be found in the `help` output of the script.
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 ## Main features
 
 Scan or test:

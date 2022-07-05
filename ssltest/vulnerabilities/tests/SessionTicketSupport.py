@@ -6,17 +6,19 @@ from ...sockets.SafeSocket import SafeSocket
 
 
 class SessionTicketSupport(VulnerabilityTest):
-    name = 'Session Ticket Support'
-    short_name = 'Session Ticket'
-    description = 'Test for session ticket support'
+    name = "Session Ticket Support"
+    short_name = "Session Ticket"
+    description = "Test for session ticket support"
 
     def __init__(self, supported_protocols, address, protocol):
         super().__init__(supported_protocols, address, protocol)
-        self.valid_protocols = ['TLSv1.2', 'TLSv1.1', 'TLSv1.0', 'SSLv3']
+        self.valid_protocols = ["TLSv1.2", "TLSv1.1", "TLSv1.0", "SSLv3"]
+        # fmt: off
         self.session_ticket_extension = bytes([
             # Session ticket
             0x00, 0x23, 0x00, 0x00
         ])
+        # fmt: on
 
     def test(self, version):
         """

@@ -38,7 +38,7 @@ class PType(Enum):
         pairs = {
             self.sym_enc_algorithm_key_length: self.sym_enc_algorithm,
             self.cert_pub_key_length: self.cert_pub_key_algorithm,
-            self.sym_ecn_algorithm_block_mode_number: self.sym_enc_algorithm_block_mode
+            self.sym_ecn_algorithm_block_mode_number: self.sym_enc_algorithm_block_mode,
         }
         return pairs[self]
 
@@ -60,7 +60,7 @@ class PType(Enum):
             self.sym_ecn_algorithm_block_mode_number,
             self.hash_function,
             self.hmac_function,
-            self.cert_pub_key_algorithm
+            self.cert_pub_key_algorithm,
         ]
         return self in cipher_suite_parameters
 
@@ -84,7 +84,7 @@ class PType(Enum):
             self.cert_subject,
             self.cert_issuer,
             self.cert_alternative_names,
-            self.cert_verified
+            self.cert_verified,
         ]
         return self in certificate_parameters
 
@@ -110,6 +110,6 @@ class PType(Enum):
             self.cert_pub_key_length,
             self.cert_sign_algorithm,
             self.cert_sign_algorithm_hash_function,
-            self.cert_verified
+            self.cert_verified,
         ]
         return self in rateable_parameters

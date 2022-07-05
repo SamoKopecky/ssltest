@@ -6,5 +6,5 @@ def main():
     run_script(Args.args, Args.parser)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
