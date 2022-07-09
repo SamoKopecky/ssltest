@@ -12,7 +12,7 @@ class Args:
         parser = argparse.ArgumentParser(add_help=False)
         required = parser.add_argument_group("required arguments")
         fix_config = parser.add_mutually_exclusive_group()
-        required.add_argument("-u", "--url", required=True, metavar="url")
+        required.add_argument("-u", "--url", metavar="url")
         parser.add_argument("-h", "--help", action="store_true", default=False)
         parser.add_argument(
             "-p", "--port", default=[443], type=int, nargs="+", metavar="port"
