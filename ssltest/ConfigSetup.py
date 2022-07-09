@@ -1,5 +1,5 @@
 import logging
-from os import sep, mkdir
+from os import sep, mkdir, listdir
 from os.path import exists
 from pathlib import Path
 from shutil import copy
@@ -34,10 +34,14 @@ class ConfigSetup:
                 copy(config_file, config_destination)
 
     @classmethod
-    def get_config_location(cls):
+    def get_config_location(cls, file_name):
         """
         Get the config location
+
+        :param str file_name: File name
         """
-        if cls.custom_dir is None:
-            return cls.install_dir
-        return cls.custom_dir
+        if cls.custom_dir is not None:
+            opt_dir = listdir(cls.custom_dir)
+            if file_name in opt_dir:
+                return cls.custom_dir
+        return cls.install_dir

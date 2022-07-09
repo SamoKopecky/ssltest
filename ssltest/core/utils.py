@@ -16,7 +16,7 @@ def read_json(file_name):
     :return: Json data in python objects
     :rtype: dict
     """
-    root_dir = ConfigSetup.get_config_location()
+    root_dir = ConfigSetup.get_config_location(file_name)
     file_path = f"{root_dir}{sep}{file_name}"
     log.debug(f"Opening {file_path}")
     file = open(file_path, "r")

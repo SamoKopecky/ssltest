@@ -76,7 +76,12 @@ def get_help():
                     "<file>",
                     "Change output to json format, if a file name is specified output is written to the given file",
                 ],
-                ["-c", "--config", "<dir>", "Custom config directory (absolute path)"],
+                [
+                    "-c",
+                    "--config",
+                    "<dir>",
+                    "Custom config directory (absolute path), not all config files need to be present",
+                ],
                 [
                     "-t",
                     "--test",
@@ -162,6 +167,9 @@ def custom_args_parse(args, parser):
     if len(sys.argv) == 1 or "-h" in sys.argv or "--help" in sys.argv:
         print_help()
         sys.exit(0)
+
+    if args.url is None:
+        parser.error("the following arguments are required: -u/--url")
 
     error_string = (
         "option {error_option} needs "
