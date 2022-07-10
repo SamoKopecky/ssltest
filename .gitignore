@@ -131,5 +131,11 @@ dmypy.json
 # Pycharm
 .idea/
 
+# ssltest
 ssltest/output.json
 logs/
+
+# Sphinx
+_static/
+_build/
+_templates/

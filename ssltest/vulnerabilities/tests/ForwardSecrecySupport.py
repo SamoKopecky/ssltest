@@ -8,7 +8,7 @@ from ...sockets.SafeSocket import SafeSocket
 
 class ForwardSecrecySupport(VulnerabilityTest):
     name = "No Forward Secrecy Support"
-    short_name = "Foward Secrecy"
+    short_name = "Forward Secrecy"
     description = "Test for forward secrecy cipher suites"
 
     def __init__(self, supported_protocols, address, protocol):

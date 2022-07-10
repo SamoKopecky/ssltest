@@ -9,10 +9,13 @@
 
 # ssltest
 
-A Python script that scans web servers cryptographic parameters and vulnerabilities. All available Vulnerability tests
-can be found in the `help` output of the script.
+Scan web servers cryptographic parameters and chosen vulnerabilities.
 
+TODO: add more badges
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+## Documentation
+Documentation is available at TODO
 
 ## Main features
 
@@ -25,64 +28,39 @@ Scan or test:
 - Chosen vulnerability tests
 - Supported cipher suites for all SSL/TLS protocols
 
-## Dependencies
-
-Nmap is required for some functions of the script, install on debian-like distros with:
-
-```shell
-$ sudo apt-get install -y nmap
-```
-
 ## Installation
 
+To install from [pypi](https://pypi.org/project/ssltest/) run:
 ```shell
-$ pip install ssltest
+pip install ssltest
 ```
 
-For the most up-to-date version clone the repository and install with:
-
+To install straight from source run:
 ```shell
-$ pip install .
+git clone git@github.com:SamoKopecky/ssltest.git && \
+cd ssltest && \
+pip install .
 ```
 
-## Installation (ptmanager)
+Nmap is required for some functions of the script (`--ns/--nmap-scan` and `--nd/--nmap-discover`), install on debian-like distros with:
 
 ```shell
-$ sudo ptmanager -ut ssltest
+apt-get install -y nmap
 ```
-
-## Configuration files
-Configuration files for the application are stored in `$HOME/.config/ssltest`. They can be edited to change the rules by
-which the application is rating the web server parameters.
-- You need to run the application at least once in order to copy the files to the config folder.
-
-## -fc argument
-
-The `-fc` argument may rewrite the file located at `/etc/ssl/openssl.cnf` that is why a backup file is created with this
-format `{old_file}.backup_{unix_time}` in the same folder as the config file
 
 ## Contributing
-- Check the [CONTRIBUTING.MD](CONTRIBUTING.md) file
-- Development board can be see [here](https://trello.com/b/7XxY6gFy/ssltest)
+Check the [CONTRIBUTING.MD](CONTRIBUTING.md) file
 
 ## Usage examples
+TODO: sync with documentation
 
 ```
 $ ssltest -u https://example.com -t 1 2 -cs
 ```
 
-## Version History
-
-* Full changelog [here](/CHANGELOG.md)
-* [0.1.1](https://github.com/SamoKopecky/ssltest/releases/tag/v0.1.1)
-* [0.1.0](https://github.com/SamoKopecky/ssltest/releases/tag/v0.1.0)
-* [0.0.3](https://github.com/SamoKopecky/ssltest/releases/tag/v0.0.3)
-* [0.0.2](https://github.com/SamoKopecky/ssltest/releases/tag/v0.0.2)
-* [0.0.1](https://github.com/SamoKopecky/ssltest/releases/tag/v0.0.1)
-
 ## Licence
 
-Copyright (c) 2020 HACKER Consulting s.r.o.
+Copyright (c) 2022 HACKER Consulting s.r.o.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
 License as published by the Free Software Foundation, either version 3 of the License, or
