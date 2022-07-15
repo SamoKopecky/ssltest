@@ -7,15 +7,25 @@
                                  |_|
 ```
 
+<p align="center">
+    <a href="https://pypi.org/project/ssltest/" alt="pypi">
+        <img src="https://img.shields.io/pypi/v/ssltest" /></a>
+    <a href="https://github.com/SamoKopecky/ssltest/blob/master/LICENSE" alt="License">
+        <img src="https://img.shields.io/github/license/samokopecky/ssltest?color=9cf" /></a>
+    <a href='https://ssltest.readthedocs.io/en/latest/?badge=latest'>
+        <img src='https://readthedocs.org/projects/ssltest/badge/?version=latest' alt='Documentation Status' />
+    <a href="https://github.com/psf/black" alt="Code style: black">
+        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" /></a>
+</a>
+</p>
+
 # ssltest
 
 Scan web servers cryptographic parameters and chosen vulnerabilities.
 
-TODO: add more badges
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-
 ## Documentation
-Documentation is available at TODO
+
+Documentation is available [here](https://ssltest.readthedocs.io/en/latest/). Thanks [readthedocs](https://readthedocs.org/) for the free hosting!
 
 ## Main features
 
@@ -52,10 +62,29 @@ apt-get install -y nmap
 Check the [CONTRIBUTING.MD](CONTRIBUTING.md) file
 
 ## Usage examples
-TODO: sync with documentation
 
+Basic scan with no vulnerability tests:
+
+```shell
+ssltest -u nmap.org -t 0
 ```
-$ ssltest -u https://example.com -t 1 2 -cs
+
+Scan all vulnerability tests and available cipher suites:
+
+```shell
+ssltest -u nmap.org -cs
+```
+
+Scan for `Heartbleed` vulnerability, scan the whole certificate chain and shorted alternative names in the output:
+
+```shell
+ssltest -u nmap.org -t 9 -cc -sn
+```
+
+Scan using custom config files in debug mode:
+
+```shell
+ssltest -u nmap.org -c ~/.config/custom_ssltest -d
 ```
 
 ## Licence

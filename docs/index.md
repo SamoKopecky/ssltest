@@ -1,7 +1,5 @@
 % ssltest documentation master file, created by
 % sphinx-quickstart on Sat Jul 9 09:56:52 2022.
-% You can adapt this file completely to your liking, but it should at least
-% contain the root `toctree` directive.
 
 # ssltest
 
@@ -39,24 +37,37 @@ apt-get install -y nmap
 
 ## Usage examples
 
-TODO: add more usages
+Basic scan with no vulnerability tests:
 
+```shell
+ssltest -u nmap.org -t 0
 ```
-$ ssltest -u vut.cz -t 1 2 -cs
+
+Scan all vulnerability tests and available cipher suites:
+
+```shell
+ssltest -u nmap.org -cs
 ```
 
-## Configuration files
+Scan for `Heartbleed` vulnerability, scan the whole certificate chain and shorted alternative names in the output:
 
-Configuration files for the application are stored in `$HOME/.config/ssltest`. They can be edited to change the rules by which the application is rating the web server parameters.
+```shell
+ssltest -u nmap.org -t 9 -cc -sn
+```
 
-- You need to run the application at least once in order to copy the files to the config folder.
+Scan using custom config files in debug mode:
+
+```shell
+ssltest -u nmap.org -c ~/.config/custom_ssltest -d
+```
 
 ```{toctree}
 :maxdepth: 1
 :hidden:
 
-contributing
 features
 vulnerabilities
+configuration
+contributing
 version-history
 ```

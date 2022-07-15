@@ -32,12 +32,6 @@ Here are a few things you can do that will increase the likelihood of your pull 
 
 Work in Progress pull request are also welcome to get feedback early on, or if there is something blocked you. Please open such pull requests as *Draft*.
 
-## Updating `CHANGELOG.md`
-TODO
-
-## Release process
-TODO
-
 ## Development setup
 
 For a development setup follow these steps:
@@ -72,7 +66,7 @@ apt-get install -y nmap
 deactivate
 ```
 
-## Contribute a new Vulnerability test
+## Contribute a new vulnerability test
 
 In order to create a **vulnerability test** some conditions have to be met:
 
@@ -95,3 +89,10 @@ Template vulnerability test class can be found in `ssltest/scan_vulnerabilities/
 - The `ClientHello` class can be used to create the initial client hello message, where every client hello field can be customized such as cipher suites or TLS extensions.
 - The `SafeSocket` is the recommended way to send data, check other tests for example on how to use it.
 - The `CipherSuiteTest` class can be used to create a simplified vulnerability test where it is filtering cipher suites based on a regex string and checks if the server supports these filtered cipher suites. Set this regex string with the `self.filter_regex` variable. Check the `Freak` class for an example.
+
+
+## Updating `CHANGELOG.md`
+TODO
+
+## Release process
+TODO
