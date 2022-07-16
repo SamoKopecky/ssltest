@@ -20,8 +20,8 @@ class Parameters(ABC):
         """
         Rate given parameters of PType class
 
-        :param list rateable_parameters: Parameters to be rated
-        :param list key_types: Key type parameters to be rated
+        :param list[PType] rateable_parameters: Parameters to be rated
+        :param list[PType] key_types: Key type parameters to be rated
         """
         for p_type in rateable_parameters:
             log.debug(f"Rating {p_type} parameter")
@@ -52,7 +52,7 @@ class Parameters(ABC):
     @staticmethod
     def key(dictionary):
         """
-        Get the first key of an dictionary
+        Get the first key of a dictionary
 
         :param dict dictionary: Dictionary to get the key from
         :return: First key
@@ -117,8 +117,8 @@ class Parameters(ABC):
     def get_params_json(cipher_suite, certificate):
         """
         Get all ratable parameters json
-        :param CipherSuite cipher_suite: Cipher suite
-        :param Certificate certificate: Certificate
+        :param ssltest.parameters.ratable.CipherSuite.CipherSuite cipher_suite: Cipher suite
+        :param ssltest.parameters.ratable.Certificate.Certificate certificate: Certificate
         :return: Json of ratable parameters
         :rtype: dict
         """

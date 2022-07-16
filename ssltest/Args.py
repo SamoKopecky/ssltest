@@ -8,6 +8,12 @@ class Args:
 
     @staticmethod
     def parse_args():
+        """
+        Parse input options
+
+        :return: Parsed arguments and the argument parser
+        :rtype: tuple[argparse.Namespace, argparse.ArgumentParser]
+        """
         sudo_ops = Args.get_sudo_ops()
         parser = argparse.ArgumentParser(add_help=False)
         required = parser.add_argument_group("required arguments")
@@ -56,6 +62,12 @@ class Args:
 
     @staticmethod
     def get_sudo_ops():
+        """
+        Get all possible sudo options formats
+
+        :return: Sudo options dictionary
+        :rtype: dict
+        """
         sudo_ops = {
             "fc": ["-fc", "--fix-conf"],
             "nd": ["-nd", "--nmap-discover"],

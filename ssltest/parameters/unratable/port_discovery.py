@@ -14,7 +14,7 @@ def discover_ports(url):
 
     :param str url: Url to be scanned
     :return: Usable ports
-    :rtype: list
+    :rtype: list[int]
     """
     log.info("Discovering ports with nmap")
     nmap = nmap3.NmapScanTechniques()

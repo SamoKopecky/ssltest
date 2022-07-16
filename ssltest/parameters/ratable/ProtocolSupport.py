@@ -92,8 +92,10 @@ class ProtocolSupport:
 
     def get_json(self):
         """
-        TODO:
-        :return:
+        Get supported protocols as json
+
+        :return: Json version supported protocols
+        :rtype: dict
         """
         protocols = {}
         keys = {key.name: value for key, value in self.protocols.items()}

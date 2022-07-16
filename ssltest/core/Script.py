@@ -31,7 +31,10 @@ class Script:
 
 def get_tests_help():
     """
-    Get all the tests in an ptlibs parsable way
+    Get all the tests in a ptlibs parsable way
+
+    :return: List of tests
+    :rtype: list[list[str, str, str, str]]
     """
     space_before = " " * 2
     tests = [[f"{space_before}0", "No tests", "", "Dont run any tests"]]
@@ -161,6 +164,11 @@ def print_help():
 def custom_args_parse(args, parser):
     """
     Parse input arguments
+
+    :param argparse.Namespace args: Parsed script arguments
+    :param argparse.ArgumentParser parser: Parser from argparse
+    :return: Parsed script arguments
+    :rtype: argparse.Namespace
     """
     sudo_ops = Args.get_sudo_ops()
 
@@ -194,9 +202,9 @@ def custom_args_parse(args, parser):
 
 def fix_conf_option(args):
     """
-    Fixes the OpenSSL configuration file
+    Call a script to fix openssl config file
 
-    :param Namespace args: Parsed input arguments
+    :param argparse.Namespace args: Parsed script arguments
     """
     if args.fix_conf:
         log.info("Removing argument fc and running fix script")
@@ -217,7 +225,7 @@ def make_root(args):
     """
     Make the user change to root permissions to run fix script or nmap
 
-    :param Namespace args: Parsed input arguments
+    :param argparse.Namespace args: Parsed script arguments
     """
     if not (args.sudo_tty or args.sudo_stdin):
         log.debug("No sudo option present, not running as root")
@@ -247,7 +255,10 @@ def make_root(args):
 
 def remove_argument(short_name, full_name):
     """
-    Remove argument from args
+    Remove option from options
+
+    :param str short_name: Short option
+    :param str full_name: Long option
     """
     try:
         sys.argv.remove(short_name)
@@ -256,6 +267,12 @@ def remove_argument(short_name, full_name):
 
 
 def check_test_option(tests, usage):
+    """
+    Filter test option to check if test numbers are valid
+
+    :param list[str] tests: Test numbers
+    :param str usage: Script usage
+    """
     if not tests:
         return
     tests_switcher = TestRunner.get_tests_switcher()
@@ -277,6 +294,12 @@ def check_test_option(tests, usage):
 
 
 def run_script(args, parser):
+    """
+    Run the script and start scanning
+
+    :param argparse.Namespace args: Parsed script arguments
+    :param argparse.ArgumentParser parser: Parser from argparse
+    """
     args = custom_args_parse(args, parser)
     make_root(args)
     fix_conf_option(args)

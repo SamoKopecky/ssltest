@@ -10,6 +10,14 @@ log = logging.getLogger(__name__)
 
 class SecureSafeSocket(SafeSocket):
     def __init__(self, sock_addr, protocol, verify_cert, usage):
+        """
+        Constructor
+
+        :param SocketAddress sock_addr: Socket address
+        :param str protocol: TLS protocol version
+        :param bool verify_cert: Whether to verify cert
+        :param str usage: Network usage
+        """
         self.protocol = protocol
         self.verify_cert = verify_cert
         self.cert_verified = False
@@ -21,6 +29,9 @@ class SecureSafeSocket(SafeSocket):
         return self
 
     def create_socket(self):
+        """
+        Wrap a socket into a secure context
+        """
         sock = socket(AF_INET, SOCK_STREAM)
         sock.settimeout(self.timeout)
         self.sock = self.context.wrap_socket(sock, server_hostname=self.sock_addr.url)
@@ -68,6 +79,9 @@ class SecureSafeSocket(SafeSocket):
         raise Exception("Not implemented")
 
     def setup_context(self):
+        """
+        Setup a secure context
+        """
         self.create_ssl_context()
         self.cert_verified = True
         if not self.verify_cert:

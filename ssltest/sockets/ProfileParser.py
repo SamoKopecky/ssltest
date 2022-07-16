@@ -11,6 +11,13 @@ class ProfileParser:
 
     @classmethod
     def parse(cls, usage):
+        """
+        Get a network profile from a usage
+
+        :param str usage: Network usage
+        :return: Network profile
+        :rtype: tuple[int, float, float]
+        """
         try:
             profile_name = cls.network_profile_usage[usage]
             profile = cls.network_profiles[profile_name]

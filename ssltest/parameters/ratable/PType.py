@@ -48,7 +48,7 @@ class PType(Enum):
         Define which parameters are parsable from cipher suites
 
         :return: true if a parameter is parsable
-        :rtype: PType
+        :rtype: bool
         """
         cipher_suite_parameters = [
             self.kex_algorithm,
@@ -70,7 +70,7 @@ class PType(Enum):
         Define which parameters are parsable from a certificate
 
         :return: true if a parameter is parsable
-        :rtype: PType
+        :rtype: bool
         """
         certificate_parameters = [
             self.cert_pub_key_algorithm,
@@ -94,7 +94,7 @@ class PType(Enum):
         Define which parameter can be rated
 
         :return: true if a parameter can be rated
-        :rtype: PType
+        :rtype: bool
         """
         rateable_parameters = [
             self.kex_algorithm,

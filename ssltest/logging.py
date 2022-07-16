@@ -6,7 +6,7 @@ def logging_option(args):
     """
     Handle the debug and information options
 
-    :param Namespace args: Parsed input arguments
+    :param argparse.Namespace args: Parsed input arguments
     """
     logger = logging.getLogger(__package__)
     logger.setLevel(logging.DEBUG)

@@ -68,6 +68,9 @@ class Endpoint:
     def get_certificate(self):
         """
         Gather a certificate in the DER binary format
+
+        :return: List of endpoints certificates
+        :rtype: list[cryptography.x509.Certificate]
         """
         ctx = SSL.Context(SSL.SSLv23_METHOD)
         ssl_socket = socket.create_connection(self.sock_addr)
@@ -84,6 +87,7 @@ class Endpoint:
     def worst_or_best_protocol(supported_protocols, worst):
         """
         Find either the best or worst protocol to connect with
+
         :param list supported_protocols: Supported protocols by the server
         :param bool worst: Whether to find the worst available protocol or best
         :return: The string of the chosen protocol
@@ -109,10 +113,11 @@ class Endpoint:
     @staticmethod
     def get_cipher_suite_and_protocol(sock):
         """
-        Gather the cipher suite and the protocol from the ssl_socket
+        Gather the cipher suite and the protocol from a ssl socket
 
         :param ssl.SSLSocket sock: Established socket
         :return: Negotiated cipher suite and SSL/TLS protocol
+        :rtype: tuple[str, str]
         """
         cipher_suite = sock.cipher()[0]
         if "-" in cipher_suite:

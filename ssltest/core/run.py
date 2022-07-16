@@ -12,9 +12,9 @@ log = logging.getLogger(__name__)
 
 def run(args):
     """
-    Call other functions to run the script
+    Call other functions to run the script, such as option handling
 
-    :param Namespace args: Parsed input arguments
+    :param argparse.Namespace args: Parsed script arguments
     """
     if "/" in args.url:
         args.url = fix_url(args.url)
@@ -47,7 +47,7 @@ def nmap_discover_option(args):
     """
     Handle discover ports option
 
-    :param Namespace args: Parsed input arguments
+    :param argparse.Namespace args: Parsed script arguments
     """
     scanned_ports = []
     if args.nmap_discover:
@@ -68,9 +68,9 @@ def nmap_discover_option(args):
 
 def scan_all_ports(args):
     """
-    Call scan function for each port
+    Scan each port
 
-    :param Namespace args: Parsed input arguments
+    :param argparse.Namespace args: Parsed script arguments
     :return: Scanned data
     :rtype: dict
     """
@@ -93,7 +93,7 @@ def json_option(args, json_data):
     """
     Handle json option
 
-    :param Namespace args: Parsed input arguments
+    :param argparse.Namespace args: Parsed script arguments
     :param dict json_data: Collected data from scanning/testing
     """
     json_output_data = json.dumps(json_data, indent=2)

@@ -11,10 +11,10 @@ log = logging.getLogger(__name__)
 class SafeSocket:
     def __init__(self, sock_addr, usage):
         """
-        Init
+        Constructor
 
-        :param SocketAddress sock_addr:
-        :param str usage:
+        :param SocketAddress sock_addr: Socket address
+        :param str usage: Network usage
         """
         self.sock_addr = sock_addr
         self.sock = None
@@ -81,6 +81,7 @@ class SafeSocket:
     def send(self, data):
         """
         Send data
+
         :param bytes data:
         """
         self.sock.send(data)

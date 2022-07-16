@@ -17,20 +17,21 @@ class TestRunner:
 
         :param SocketAddress address: Webserver address
         :param str protocol: SSL/TLS protocol
-        :param list supported_protocols: Webservers supported SSL/TLS protocols
+        :param list[str] supported_protocols: Webservers supported SSL/TLS protocols
         """
         self.address = address
         self.protocol = protocol
         self.supported_protocols = supported_protocols
 
-    def run_tests(self, tests):
+    def run_tests(self, test_classes):
         """
         Run chosen vulnerability tests in parallel
 
+        :param list test_classes: List of test numbers
         :return: Tests results
         :rtype: dict
         """
-        classes_len = len(tests)
+        classes_len = len(test_classes)
         if classes_len == 0:
             return {}
         # Output dictionary
@@ -40,7 +41,7 @@ class TestRunner:
         futures = {}
         log.info(f"Creating {classes_len} threads for vulnerability tests")
         with cf.ThreadPoolExecutor(max_workers=classes_len) as executor:
-            for test_class in tests:
+            for test_class in test_classes:
                 scan_class = test_class(
                     self.supported_protocols, self.address, self.protocol
                 )
@@ -58,6 +59,7 @@ class TestRunner:
         Provides all the available tests switcher
 
         Tests are extracted from the tests package where each class is a test
+
         :return: All available tests
         :rtype: dict
         """
