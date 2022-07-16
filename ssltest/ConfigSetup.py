@@ -39,6 +39,8 @@ class ConfigSetup:
         Get the config location
 
         :param str file_name: File name
+        :return: Config installation directory
+        :rtype: str
         """
         if cls.custom_dir is not None:
             opt_dir = listdir(cls.custom_dir)

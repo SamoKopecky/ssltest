@@ -52,7 +52,7 @@ def bytes_to_cipher_suite(bytes_object, string_format):
     """
     Convert from cipher suite bytes to a cipher suite
 
-    :param bytes bytes_object: Two bytes in an bytes object
+    :param bytes bytes_object: Two bytes of a bytes object
     :param str string_format: Which cipher format to convert to
     :return: Cipher suite
     :rtype: str
@@ -68,11 +68,11 @@ def bytes_to_cipher_suite(bytes_object, string_format):
 
 def cipher_suite_to_bytes(cipher_suite, string_format):
     """
-    Convert from string cipher suite to bytes
+    Convert from string cipher suite to cipher suite bytes
 
     :param str cipher_suite: String representation of a cipher suite
     :param str string_format: Which cipher format to convert from
-    :return: Two bytes in an bytes object
+    :return: Two bytes in a bytes object
     :rtype: bytes
     """
     for key, value in cipher_suites_json.items():
@@ -103,7 +103,7 @@ def cs_bytes_to_str(bytes_object):
 
     e.g. bytes([192, 13]) => "0xC0,0x13"
 
-    :param bytearray or bytes bytes_object: Pair of bytes representing a cipher suite
+    :param bytearray or bytes bytes_object: A Pair of bytes representing a cipher suite
     :return: Converted string representation
     :rtype: str
     """
@@ -115,8 +115,8 @@ def filter_cipher_suite_bytes(cipher_suites, filter_regex):
     Filters cipher suite bytes with the given filter regex
 
     :param bytearray or bytes cipher_suites: Cipher suites
-    :param lambda filter_regex: Regex to find the required cipher suites
-    :return: Filter cipher suites
+    :param str filter_regex: Regex to find the required cipher suites
+    :return: Filtered cipher suites
     :rtype: bytearray
     """
     filtered_suites = bytearray([])

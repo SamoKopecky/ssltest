@@ -26,6 +26,9 @@ class SSLvN(ABC):
     def connect(self):
         """
         Send the initial client hello, return the response
+
+        :return: Response to the client hello
+        :rtype: bytes
         """
         with SafeSocket(self.address, "sslvn_scan") as sock:
             sock.send(self.client_hello)
@@ -35,7 +38,10 @@ class SSLvN(ABC):
         """
         Verifies the web servers certificate or web servers certificate chain
 
-        OpenSSL lib is used to verify the certificate or the certificate chain
+        OpenSSL's lib is used to verify the certificate or the certificate chain
+
+        :return: Wheter the certificate is verified
+        :rtype: bool
         """
         store = crypto.X509Store()
         ssl_certificates = [
@@ -64,6 +70,9 @@ class SSLvN(ABC):
         Check if SSLvX version is supported by the web server
 
         Implemented in SSLv2 and SSLv3 classes
+
+        :return: Whether this SSL version is supported
+        :rtype: bool
         """
         pass
 
@@ -73,6 +82,9 @@ class SSLvN(ABC):
         Parse the cipher suite from the client_hello response
 
         Implemented in SSLv2 and SSLv3 classes
+
+        :return: Parsed cipher suite
+        :rtype: str
         """
         pass
 
@@ -82,6 +94,9 @@ class SSLvN(ABC):
         Parse the certificate from the client_hello response
 
         Implemented in SSLv2 and SSLv3 classes
+
+        :return: Parsed certificate
+        :rtype: cryptography.x509.Certificate
         """
         pass
 
@@ -91,7 +106,7 @@ class SSLvN(ABC):
         Converts mozilla root certificates to OpenSSL X509 certificate format
 
         :return: Mozilla certificate root store
-        :rtype: list
+        :rtype: list[OpenSSL.crypto.X509]
         """
         certs = []
         store_download_url = "https://ccadb-public.secure.force.com/mozilla/IncludedRootsPEMCSV?TrustBitsInclude=Websites"

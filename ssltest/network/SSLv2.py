@@ -85,4 +85,11 @@ class SSLv2(SSLvN):
 
     @staticmethod
     def int_to_hex_str(number):
+        """
+        Convert integer to hex string
+
+        :param int number: Any integer number
+        :return: Hex string of a number
+        :rtype: str
+        """
         return f"0x{number:02X}"

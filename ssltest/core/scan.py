@@ -16,12 +16,13 @@ log = logging.getLogger(__name__)
 
 def handle_scan_output(args, port, only_json):
     """
-    Handles the output of scanning
+    Handle output of scanning, depending on arguments
 
-    :param Namespace args: Parsed input arguments
-    :param int port: port to scan on
-    :param only_json:
-    :return:
+    :param argparse.Namespace args: Parsed script arguments
+    :param int port: Port to scan on
+    :param bool only_json: Not text output for the script
+    :return: Json scan data
+    :rtype: dict
     """
     address = SocketAddress(args.url, port)
     address_str = f"{address.url}:{address.port}"
@@ -44,7 +45,7 @@ def scan(args, address):
     """
     Call scanning/testing functions for a specific url and port
 
-    :param Namespace args: Parsed input arguments
+    :param argparse.Namespace args: Parsed script arguments
     :param SocketAddress address: Address of the web server
     :return: Single dictionary containing scanned data
     :rtype: dict
@@ -91,10 +92,10 @@ def scan(args, address):
 
 def test_option(args):
     """
-    Handle test option
+    Filter tests based on arguments
 
-    :param Namespace args: Parsed input arguments
-    :return: Tests to be tested
+    :param argparse.Namespace args: Parsed script arguments
+    :return: Filtered tests
     :rtype: list
     """
     tests_switcher = TestRunner.get_tests_switcher()
@@ -113,10 +114,10 @@ def cipher_suites_option(args, protocol):
     """
     Handle cipher suite support scanning option
 
-    :param Namespace args: Parsed input arguments
+    :param argparse.Namespace args: Parsed script arguments
     :param str protocol: Protocol of the main connection
     :return: List of bool values, 1st -- scan at all, 2nd -- only SSLv2 scan
-    :rtype: list
+    :rtype: list[bool, bool]
     """
     return_val = [False, False]
     if protocol == "SSLv2" and not args.cipher_suites:

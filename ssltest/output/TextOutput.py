@@ -32,9 +32,6 @@ class TextOutput:
     def __del__(self):
         print()
 
-    def set_indent(self, indent):
-        self.indent_start = indent
-
     def print_address(self):
         """
         Print the address of a scan
@@ -105,7 +102,6 @@ class TextOutput:
 
         :param dict data: Data to be printed
         :param int indent: Indentation count
-        :return:
         """
         indent += 1
         for key, value in data.items():
@@ -118,11 +114,13 @@ class TextOutput:
                 f"{self.get_color_for_value(next(iter(value.values())))} -- {next(iter(value.keys()))}"
             )
 
-    def smart_map(self, key: str):
+    def smart_map(self, key):
         """
         Map a key to its english equivalent including numbers
-        :param key:
-        :return:
+
+        :param str key: Key to be mapped
+        :return: Mapped key
+        :rtype: str
         """
         if key in self.english.keys():
             return self.english[key]
@@ -154,7 +152,7 @@ class TextOutput:
         """
         Removes any empty/invalid values/lists from the data
 
-        :param dict data: Data to be filtered
+        :param dict list data: Data to be filtered
         """
         for key, value in list(data.items()):
             val_type = type(value)
@@ -178,11 +176,18 @@ class TextOutput:
             self.filter_data(value)
 
     @staticmethod
-    def shorted_alternative_names(data):
+    def shorted_alternative_names(alternative_names):
+        """
+        Shorten the alternative names of a certificate
+
+        :param list[str] alternative_names: Certificates alternative names
+        :return: Certificates alternative names
+        :rtype: list[str]
+        """
         max_names = 5
-        if len(data) < max_names:
-            return data
-        return data[:max_names] + ["..."]
+        if len(alternative_names) < max_names:
+            return alternative_names
+        return alternative_names[:max_names] + ["..."]
 
     @staticmethod
     def get_color_for_value(text):

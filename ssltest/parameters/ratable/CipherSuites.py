@@ -21,7 +21,7 @@ class CipherSuites:
         Constructor
 
         :param SocketAddress address: Webserver address
-        :param list supported_protocols: Webserver supported SSL/TLS protocols
+        :param list[str] supported_protocols: Webserver supported SSL/TLS protocols
         """
         self.address = address
         self.supported = {}
@@ -39,6 +39,8 @@ class CipherSuites:
         possible cipher suites that the client sends. If the server response
         with an error of some kind the supported cipher suites are those
         which the server chose before.
+
+        :param bool only_sslv2: If the only available protocol is SSLv2
         """
         log.info("Scanning for cipher suite support")
         if "SSLv2" in self.supported_protocols:

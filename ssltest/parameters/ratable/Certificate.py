@@ -1,7 +1,9 @@
 import logging
 
-from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import rsa, dsa, ec, ed25519, ed448
+from cryptography.x509 import SubjectAlternativeName, DNSName, SignatureAlgorithmOID
+from cryptography.x509.extensions import ExtensionNotFound
+from cryptography.x509 import Certificate as cryptoCert
 
 from .PType import PType
 from .Parameters import Parameters
@@ -14,9 +16,9 @@ class Certificate(Parameters):
         """
         Constructor
 
-        :param list certificates: Certificate
+        :param list[cryptoCert] certificates: List of certificates
         :param bool cert_verified: Is certificate verified
-        :param Namespace args: Limit alternative names output
+        :param argparse.Namespace args: Limit alternative names output
         """
         super().__init__()
         self.verified = cert_verified
@@ -62,7 +64,9 @@ class Certificate(Parameters):
 
     def parse_certificate(self, certificate):
         """
-        Parse information from a certificate and into a dictionary
+        Parse information from a certificate into a dictionary
+
+        :param cryptoParam certificate: A certificate to parse
         """
         log.info("Parsing certificate")
         # Public key algorithm
@@ -145,19 +149,19 @@ class Certificate(Parameters):
         """
         Parse the alternative names from the certificate extensions
 
-        :param certificate: Certificate to parse
+        :param cryptography.x509.Certificate certificate: Certificate to parse
         :return: Alternative names
-        :rtype: list
+        :rtype: list[str]
         """
         log.info("Parsing alternative names from certificate")
         try:
             extension = certificate.extensions.get_extension_for_class(
-                x509.SubjectAlternativeName
+                SubjectAlternativeName
             )
-        except x509.extensions.ExtensionNotFound:
+        except ExtensionNotFound:
             log.error("No alternative names extension found in certificate")
             return []
-        alternative_names: list = extension.value.get_values_for_type(x509.DNSName)
+        alternative_names: list = extension.value.get_values_for_type(DNSName)
         if len(alternative_names) == 0:
             log.debug("No alternative names found")
         return alternative_names
@@ -167,7 +171,7 @@ class Certificate(Parameters):
         """
         Parse subject and issuer information and return as list
 
-        :param x509.Certificate.__name__ name: objects that is parsed
+        :param cryptography.x509.name.Name name: objects that is parsed
         :return: Parsed subject or issuer
         :rtype: list
         """
@@ -183,7 +187,7 @@ class Certificate(Parameters):
         Get the public key algorithm from a certificate
 
         :param public_key: Instance of a public key
-        :return: Parameter
+        :return: Parsed parameter
         :rtype: str
         """
         if isinstance(public_key, ec.EllipticCurvePublicKey):
@@ -205,10 +209,10 @@ class Certificate(Parameters):
         """
         Get a signature algorithm from an oid of a certificate
 
-        :param x509.ObjectIdentifier oid: Object identifier
+        :param cryptography.hazmat._oid.ObjectIdentifier oid: Object identifier
         :return: Signature algorithm
         :rtype: str
         """
-        values = list(x509.SignatureAlgorithmOID.__dict__.values())
-        keys = list(x509.SignatureAlgorithmOID.__dict__.keys())
+        values = list(SignatureAlgorithmOID.__dict__.values())
+        keys = list(SignatureAlgorithmOID.__dict__.keys())
         return keys[values.index(oid)].split("_")[0]

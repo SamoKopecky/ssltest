@@ -28,7 +28,7 @@ class CipherSuite(Parameters):
         Parse used cipher suite into python readable objects
 
         The cipher suite is split into each parameter and then sorted
-        to categories with the help of a json file. Categories are
+        to categorize with the help of a json file. Categories are
         defined in PType.py class.
         """
 
