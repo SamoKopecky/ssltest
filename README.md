@@ -11,7 +11,7 @@
     <a href="https://pypi.org/project/ssltest/" alt="pypi">
         <img src="https://img.shields.io/pypi/v/ssltest" /></a>
     <a href="https://github.com/SamoKopecky/ssltest/blob/master/LICENSE" alt="License">
-        <img src="https://img.shields.io/github/license/samokopecky/ssltest?color=9cf" /></a>
+        <img src="https://img.shields.io/github/license/samokopecky/ssltest?color=blue" /></a>
     <a href='https://ssltest.readthedocs.io/en/latest/?badge=latest'>
         <img src='https://readthedocs.org/projects/ssltest/badge/?version=latest' alt='Documentation Status' />
     <a href="https://github.com/psf/black" alt="Code style: black">
