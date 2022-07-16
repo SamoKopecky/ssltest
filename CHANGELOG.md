@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+# [0.2.0](https://github.com/SamoKopecky/ssltest/compare/v0.1.1...v0.2.0) - Jul 16, 2022
+### Added
+
+- Trello board for development tracking
+- `pre-commit` linting using some basic hooks and the [`black`](https://github.com/psf/black) formatter
+- The ability to install the script via `pip install .`
+- More logging messages
+- Certificate chain scanning via the option `-cc/--cert-chain`
+- New package `sockets` for network communication, which is a rework of the old network communication system which was very unreliable and slow
+- Configuration files for network communication
+- `-c/--config` option for custom configs directory location
+- Website documentation hosted via [`readthedocs`](https://readthedocs.org/)
+
+### Changed
+
+- Structure of packages, split into smaller more manageable packages
+- Rename to `ssltest` from `SSLTest`
+- Move `configs` folder to source directory
+- `-sc/--short-cert` is now `-sn/--short-names` and no longer shortens the json output only the text output
+
+
+### Removed
+
+- `-t/--timeout` option
+
+
 # [0.1.1](https://github.com/SamoKopecky/ssltest/compare/v0.1.0...v0.1.1) - Dec 22, 2021
 ### Added
 - Vulnerability test for HSTS support, FREAK, LOGJAM, BREACH
