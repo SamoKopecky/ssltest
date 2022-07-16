@@ -92,7 +92,9 @@ Template vulnerability test class can be found in `ssltest/scan_vulnerabilities/
 
 
 ## Updating `CHANGELOG.md`
-TODO
+
+If you are making adding a new feature, fixing a bug, changing something or removing something make an entry in the `CHANGELOG.md` file so that it can be used in future while creating a new release. Usefull tips on how to write additions to the changelog can be found [here](https://keepachangelog.com/en/1.0.0/).
 
 ## Release process
-TODO
+
+The release process is using [semantic versioning 2.0.0](https://semver.org/) and is automated using GitHub actions. Whenever a new tag is pushed a new release will be created on GitHub and on pypi.

@@ -13,6 +13,7 @@ setup(
     author_email="samo.kopecky@protonmail.com",
     project_urls={
         "Source": "https://github.com/SamoKopecky/ssltest",
+        "Documentation": "https://ssltest.readthedocs.io/en/latest",
     },
     url="https://www.penterep.io/",
     licence="GPLv3",
