@@ -14,9 +14,9 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          body: "- All the changes can be found in the [changelog](CHANGELOG.md) file"
+          body: "- All the changes can be found in the [changelog](https://github.com/SamoKopecky/ssltest/blob/master/CHANGELOG.md) file"
   build-n-publish:
-    name: Build and publish Python distributions to PyPI and TestPyPI
+    name: Build and publish Python distributions to PyPI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
