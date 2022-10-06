@@ -43,6 +43,7 @@ class SecureSafeSocket(SafeSocket):
             "[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE]",
             "[SSL: TLSV1_ALERT_PROTOCOL_VERSION]",
             "EOF occurred in violation of protocol",
+            "[SSL: UNSUPPORTED_PROTOCOL]",
         ]
         for i in range(self.retries_count + 1):
             self.connection_end = False
@@ -62,6 +63,7 @@ class SecureSafeSocket(SafeSocket):
             except Exception as exception:
                 if isinstance(exception, error):
                     error_str = exception.args[1]
+                    log.debug(error_str)
                     if any([m for m in correct_errors if m in error_str]):
                         log.debug("Connection refused")
                         return False
@@ -70,6 +72,7 @@ class SecureSafeSocket(SafeSocket):
                 sleep(current_retry_interval)
             finally:
                 current_retry_interval = current_retry_interval * 2
+        self.connection_end = True
         log.error("Number of retries exceeded limit, no longer trying again")
 
     def send(self, data):

@@ -76,6 +76,7 @@ class SafeSocket:
                 sleep(current_retry_interval)
             finally:
                 current_retry_interval *= 2
+        self.connection_end = True
         log.error("Number of retries exceeded limit, no longer trying again")
 
     def send(self, data):
@@ -98,6 +99,9 @@ class SafeSocket:
             try:
                 chunk = self.sock.recv(2048)
             except timeout:
+                break
+            except ConnectionResetError:
+                self.connection_end = True
                 break
             if chunk == b"":
                 log.debug("Connection broken/ended")
