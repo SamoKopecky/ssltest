@@ -25,7 +25,7 @@ Scan web servers cryptographic parameters and chosen vulnerabilities.
 
 ## Documentation
 
-Documentation is available [here](https://ssltest.readthedocs.io/en/latest/). Thanks [readthedocs](https://readthedocs.org/) for the free hosting!
+Documentation is available [here](https://ssltest.readthedocs.io/en/latest/).
 
 ## Main features
 
