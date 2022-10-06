@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-# [0.2.0](https://github.com/SamoKopecky/ssltest/compare/v0.1.1...v0.2.0) - Jul 16, 2022
+# [0.2.1](https://github.com0/SamoKopecky/ssltest/compare/v0.2.0...v0.2.1) - Oct 6, 2022
+
+### Fixed
+- Fix an issue where connections to some websites were not closed correctly
+
+# [0.2.0](https://github.com0/SamoKopecky/ssltest/compare/v0.1.1...v0.2.0) - Jul 16, 2022
 ### Added
 
 - Trello board for development tracking

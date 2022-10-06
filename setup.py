@@ -8,7 +8,7 @@ setup(
     description="Scan web servers cryptographic parameters and vulnerabilities",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version="0.2.0",
+    version="0.2.1",
     author="Samuel Kopecky",
     author_email="samo.kopecky@protonmail.com",
     project_urls={
