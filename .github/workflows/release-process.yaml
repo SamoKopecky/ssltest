@@ -4,12 +4,9 @@ on:
   push:
     tags:
       - "v*"
-    branches:
-      - "master"
 
 jobs:
   release-tag:
-    if: contains(github.ref, 'refs/tags/master') && contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,7 +16,6 @@ jobs:
         with:
           body: "- All the changes can be found in the [changelog](https://github.com/SamoKopecky/ssltest/blob/master/CHANGELOG.md) file"
   build-n-publish:
-    if: contains(github.ref, 'refs/tags/master') && contains(github.ref, 'refs/tags/')
     name: Build and publish Python distributions to PyPI
     runs-on: ubuntu-latest
     steps:
