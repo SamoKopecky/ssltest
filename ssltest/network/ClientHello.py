@@ -10,11 +10,14 @@ log = logging.getLogger(__name__)
 class ClientHello:
     json_ciphers = read_json("cipher_suites.json")
 
-    def __init__(self, protocol, cipher_suites=None, fill_cipher_suites=True):
+    def __init__(
+        self, protocol, server_name, cipher_suites=None, fill_cipher_suites=True
+    ):
         """
         Constructor
 
         :param int protocol: SSL/TLS protocol version
+        :param str server_name: Url of the server
         :param bytes cipher_suites: Custom cipher suites
         :param bool fill_cipher_suites: Fill with default cipher suites
         """
@@ -62,8 +65,19 @@ class ClientHello:
             0x08, 0x04, 0x08, 0x05, 0x08, 0x06, 0x04, 0x01,
             0x05, 0x01, 0x06, 0x01, 0x03, 0x03, 0x02, 0x03,
             0x03, 0x01, 0x02, 0x01, 0x03, 0x02, 0x02, 0x02,
-            0x04, 0x02, 0x05, 0x02, 0x06, 0x02
+            0x04, 0x02, 0x05, 0x02, 0x06, 0x02,
         ])
+        self.server_name_extension = bytearray([
+            # Server name extension type
+            0x00, 0x00,
+            # 0x00, 0x00, Server name extension length
+            # 0x00, 0x00, Server name list length
+            # 0x00,  # Server name type -- host_name
+            # 0x00, 0x00, Server name length
+            # 0x00, 0x00 Server name
+        ])
+        self.pack_server_name_extension(server_name)
+        self.extensions += self.server_name_extension
         # fmt: on
         # Fill random bytes
         self.handshake_protocol[2:34] = secrets.token_bytes(32)
@@ -90,6 +104,19 @@ class ClientHello:
                 0x00, 0x00,  # Key share length
             ])
             # fmt: on
+
+    def pack_server_name_extension(self, server_name):
+        name_bytes = bytes(server_name, "utf-8")
+        name_length = len(name_bytes)
+        server_name_length = pack(">H", name_length)
+        server_name_list_length = pack(">H", name_length + 3)
+        extension_length = pack(">H", name_length + 5)
+
+        self.server_name_extension += extension_length
+        self.server_name_extension += server_name_list_length
+        self.server_name_extension += bytes([0x00])
+        self.server_name_extension += server_name_length
+        self.server_name_extension += name_bytes
 
     def pack_client_hello(self):
         """

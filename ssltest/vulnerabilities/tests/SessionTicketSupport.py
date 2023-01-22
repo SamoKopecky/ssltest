@@ -28,7 +28,7 @@ class SessionTicketSupport(VulnerabilityTest):
         :return: Whether the server is vulnerable
         :rtype: bool
         """
-        client_hello = ClientHello(version)
+        client_hello = ClientHello(version, self.address.url)
         client_hello.extensions += self.session_ticket_extension
         client_hello = client_hello.pack_client_hello()
 

@@ -30,7 +30,7 @@ class CCSInjection(VulnerabilityTest):
             0x01  # CSS message
         ])
         # fmt: on
-        client_hello = ClientHello(version).pack_client_hello()
+        client_hello = ClientHello(version, self.address.url).pack_client_hello()
         with SafeSocket(self.address, self.usage) as sock:
             sock.send(client_hello)
             response = sock.receive()

@@ -33,7 +33,7 @@ class Heartbleed(VulnerabilityTest):
             0x40, 0x00,  # Payload length
         ])
         # fmt: on
-        client_hello = ClientHello(version)
+        client_hello = ClientHello(version, self.address.url)
         client_hello.extensions += self.heartbeat_extension
         client_hello = client_hello.pack_client_hello()
 

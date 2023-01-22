@@ -29,7 +29,7 @@ class ForwardSecrecySupport(VulnerabilityTest):
             cipher_suite_bytes, "ECDHE|DHE"
         )
         client_hello = ClientHello(
-            version, sixty_four_bit_ciphers, False
+            version, self.address.url, sixty_four_bit_ciphers, False
         ).pack_client_hello()
         with SafeSocket(self.address, self.usage) as sock:
             sock.send(client_hello)

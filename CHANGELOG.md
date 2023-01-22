@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+# [0.2.2](https://github.com0/SamoKopecky/ssltest/compare/v0.2.1...v0.2.2) - Jan 22, 2023
+
+### Fixed
+- An issue where some servers would reject connections if server_name extension wasn't supplied, for example `muni.cz`
+
 # [0.2.1](https://github.com0/SamoKopecky/ssltest/compare/v0.2.0...v0.2.1) - Oct 6, 2022
 
 ### Fixed

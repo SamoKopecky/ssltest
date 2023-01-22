@@ -23,7 +23,9 @@ class CipherSuiteTest(VulnerabilityTest, ABC):
         filtered_suites = filter_cipher_suite_bytes(
             cipher_suite_bytes, self.filter_regex
         )
-        client_hello = ClientHello(version, filtered_suites, False).pack_client_hello()
+        client_hello = ClientHello(
+            version, self.address.url, filtered_suites, False
+        ).pack_client_hello()
 
         with SafeSocket(self.address, self.usage) as sock:
             sock.send(client_hello)

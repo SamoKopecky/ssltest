@@ -22,7 +22,7 @@ class Crime(VulnerabilityTest):
         :rtype: bool
         """
         with SafeSocket(self.address, self.usage) as sock:
-            client_hello = ClientHello(version)
+            client_hello = ClientHello(version, self.address.url)
             client_hello.compression = bytearray(
                 [
                     0x01,  # Compression method length

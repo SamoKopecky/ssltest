@@ -25,7 +25,7 @@ class SSLv3(SSLvN):
         super().__init__(address)
         self.protocol = "SSLv3"
         self.client_hello = ClientHello(
-            protocol_version_conversion(self.protocol)
+            protocol_version_conversion(self.protocol), self.address.url
         ).pack_client_hello()
 
     def is_supported(self):

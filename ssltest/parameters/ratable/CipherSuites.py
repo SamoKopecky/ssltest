@@ -71,32 +71,9 @@ class CipherSuites:
                     to_test_cipher_suites.remove(tested_cipher_suite[0])
                     to_test_cipher_suites.remove(tested_cipher_suite[1])
                     accepted_cipher_suites.extend(tested_cipher_suite)
-            client_hello = ClientHello(
-                protocol_version_conversion(protocol), to_test_cipher_suites, False
+            self.test_cipher_suites(
+                accepted_cipher_suites, protocol, to_test_cipher_suites
             )
-            while True:
-                client_hello_bytes = client_hello.pack_client_hello()
-                with SafeSocket(self.address, "cipher_suites_scan") as sock:
-                    sock.send(client_hello_bytes)
-                    sock.shutdown()
-                    response = sock.receive()
-                if not ClientHello.is_server_hello(response):
-                    break
-                # Register accepted cipher suite
-                cipher_suite_index = to_test_cipher_suites.find(
-                    parse_cipher_suite(response)
-                )
-                cipher_suite = to_test_cipher_suites[
-                    cipher_suite_index : cipher_suite_index + 2
-                ]
-                accepted_cipher_suites.extend(cipher_suite)
-                if cipher_suite not in self.tested_cipher_suites:
-                    self.tested_cipher_suites.extend(cipher_suite)
-                to_test_cipher_suites.pop(cipher_suite_index)
-                to_test_cipher_suites.pop(cipher_suite_index)
-                client_hello.cipher_suites = client_hello.pack_cipher_suite_bytes(
-                    to_test_cipher_suites, False
-                )
             # Convert to cipher suite to string
             string_cipher_suites = []
             for i in range(0, len(accepted_cipher_suites), 2):
@@ -106,6 +83,38 @@ class CipherSuites:
             if protocol == "TLSv1.0":
                 protocol = "TLSv1.0/TLSv1.1"
             self.unrated.update({protocol: string_cipher_suites})
+
+    def test_cipher_suites(
+        self, accepted_cipher_suites, protocol, to_test_cipher_suites
+    ):
+        client_hello = ClientHello(
+            protocol_version_conversion(protocol),
+            self.address.url,
+            to_test_cipher_suites,
+            False,
+        )
+        while True:
+            client_hello_bytes = client_hello.pack_client_hello()
+            with SafeSocket(self.address, "cipher_suites_scan") as sock:
+                sock.send(client_hello_bytes)
+                response = sock.receive()
+            if not ClientHello.is_server_hello(response):
+                break
+            # Register accepted cipher suite
+            cipher_suite_index = to_test_cipher_suites.find(
+                parse_cipher_suite(response)
+            )
+            cipher_suite = to_test_cipher_suites[
+                cipher_suite_index : cipher_suite_index + 2
+            ]
+            accepted_cipher_suites.extend(cipher_suite)
+            if cipher_suite not in self.tested_cipher_suites:
+                self.tested_cipher_suites.extend(cipher_suite)
+            to_test_cipher_suites.pop(cipher_suite_index)
+            to_test_cipher_suites.pop(cipher_suite_index)
+            client_hello.cipher_suites = client_hello.pack_cipher_suite_bytes(
+                to_test_cipher_suites, False
+            )
 
     def scan_sslv2_cipher_suites(self):
         """

@@ -32,7 +32,7 @@ class FallbackSCSVSupport(VulnerabilityTest):
         second_worst_protocol = protocol_version_conversion(usable_protocols[-2])
 
         client_hello = ClientHello(
-            second_worst_protocol, self.fallback_scsv
+            second_worst_protocol, self.address.url, self.fallback_scsv
         ).pack_client_hello()
         with SafeSocket(self.address, self.usage) as sock:
             sock.send(client_hello)
